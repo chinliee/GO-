@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>餐廳簡介</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous" />
+  <link rel="stylesheet" href="/css/bootstrap-5.3.2.css" />
+  <!-- Bootstrap 5.3.2 JS -->
+  <!-- <script src="/js/bootstrap-5.3.2.bundle.min.js"></script> -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+
+  <!-- font awesome 6.4.0 -->
+  <script src="https://www.unpkg.com/axios@1.6.7/dist/axios.min.js"></script>
+
+  <script src="https://www.unpkg.com/vue@3.4.21/dist/vue.global.prod.js"></script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+  <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/airbnb.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.5"></script>
+
+  <link href="/css/frontstage-template.css" rel="stylesheet" />
+  <style>
+   
+
+    .fab {
+      position: fixed;
+      z-index: 1;
+      border: 0;
+      border-radius: 50%;
+      left: 90vw;
+      bottom: 3vh;
+      width: 50px;
+      height: 50px;
+    }
+
+    .card-generate-area .card-container {
+      background-color: wheat;
+      transition-duration: 2s;
+    }
+
+    .card-generate-area .card-body {
+      text-decoration: none;
+      color: navy;
+    }
+
+    /* unvisited link */
+    .card-generate-area .card-body:link {
+      text-decoration: none;
+      color: navy;
+    }
+
+    /* visited link */
+    .card-generate-area .card-body:visited {
+      text-decoration: none;
+      color: navy;
+    }
+
+    /* mouse over link */
+    .card-generate-area .card-body:hover {
+      text-decoration: none;
+      color: navy;
+    }
+
+    /* selected link */
+    .card-generate-area .card-body:active {
+      text-decoration: none;
+      color: #3498db;
+    }
+
+    .card-generate-area .card-container:hover {
+      transition-duration: 2s;
+      transform: translate(-10px, -10px);
+      box-shadow: 5px 10px;
+      transition: ease;
+    }
+
+
+
+
+    footer {
+      margin-top: 10px;
+      background-color: black;
+      text-align: center;
+      color: white;
+    }
+
+    .card-container {
+      background-color: wheat;
+      transition-duration: 2s;
+    }
+
+    .card-container:hover {
+      transition-duration: 2s;
+      transform: translate(-10px, -10px);
+      box-shadow: 5px 10px;
+      transition: ease;
+    }
+
+    hr {
+      border: 0;
+      height: 1px;
+      background-color: #ccc;
+      margin-top: 5px;
+      /* 增加底線上下間距 */
+    }
+
+    label {
+      text-align: center;
+    }
+
+    .margin-top-10 {
+      margin: 10px 0;
+    }
+
+    .search-options {
+      display: flex;
+      justify-content: space-evenly;
+    }
+
+    .search-options button {
+      /* margin-right: 10px; */
+      border: none;
+      background-color: transparent;
+      /* cursor: pointer; */
+      font-size: 16px;
+      text-decoration: none;
+      /* 刪除預設底線 */
+      color: #333;
+      /* 按鈕文字顏色 */
+
+    }
+
+    .nav-outer-flex-container {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+    }
+
+    .nav-inner-flex-container {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .nav-function-setting li {
+      margin: 0 1vw;
+      vertical-align: middle;
+    }
+
+    .nav-function-setting li div {
+      justify-items: center;
+    }
+
+    .nav-function-setting:last-child {
+      margin: 0;
+    }
+
+    /* #restaurantSearchTab{
+      margin: 0 25vw;
+    } */
+
+    /*  */
+    @media (min-width: 992px) and (max-width: 1199.99px) {
+      #myCarousel {
+        padding: 20px 30vh;
+      }
+
+      .carousel-control-prev {
+        margin-left: 0vh;
+      }
+
+      .carousel-control-prev-icon {
+        background-color: lightgray;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+      }
+
+      .carousel-control-next {
+        margin-right: 0vh;
+      }
+
+      .carousel-control-next-icon {
+        background-color: lightgray;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+      }
+    }
+
+    @media (min-width: 576px) and (max-width: 767.99px) {
+      #myCarousel {
+        padding: 0 0;
+      }
+
+      .carousel-control-prev {
+        margin-left: 0vh;
+      }
+
+      .carousel-control-prev-icon {
+        background-color: lightgray;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+      }
+
+      .carousel-control-next {
+        margin-right: 0vh;
+      }
+
+      .carousel-control-next-icon {
+        background-color: lightgray;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+      }
+    }
+
+
+
+
+
+    @media (min-width: 992px) and (max-width: 1199.99px) {
+      #myCarousel {
+        padding: 20px 30vh;
+      }
+
+      .carousel-control-prev {
+        margin-left: 10vh;
+      }
+
+      .carousel-control-prev-icon {
+        background-color: lightgray;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+      }
+
+      .carousel-control-next {
+        margin-right: 10vh;
+      }
+
+      .carousel-control-next-icon {
+        background-color: lightgray;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+      }
+    }
+
+    @media (min-width: 1200px) {
+      #myCarousel {
+        padding: 20px 10vw;
+      }
+
+      .carousel-control-prev {
+        margin-left: 1vh;
+      }
+
+      .carousel-control-prev-icon {
+        background-color: lightgray;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+      }
+
+      .carousel-control-next {
+        margin-right: 1vh;
+      }
+
+      .carousel-control-next-icon {
+        background-color: lightgray;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+      }
+    }
+
+    /* html {
+      scrollbar-gutter: stable;
+    } */
+    /* body {
+      overflow-y: scroll;
+    } */
+
+    .fab {
+      position: fixed;
+      z-index: 1;
+
+      /* background-color: green; */
+      border: 0;
+      border-radius: 50%;
+
+      left: 90vw;
+      bottom: 3vh;
+
+      width: 50px;
+      height: 50px;
+
+      /* padding: 10px; */
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* 餐廳介紹區塊 */
+    .restaurant-container {
+      width: 1000px;
+      height: 230px;
+      margin: 20px auto;
+      border-radius: 15px;
+      border: 1px solid rgb(214, 214, 214);
+      background: radial-gradient(circle, rgba(10, 0, 36, 0.1110819327731093) 0%, rgba(9, 9, 121, 0.1110819327731093) 5%, rgba(0, 212, 255, 0.04665616246498594) 100%);
+      display: flex;
+    }
+
+    .restaurant-info-wrapper {
+      flex-basis: 60%;
+      padding: 10px 20px;
+    }
+
+    .restaurant-name-box {
+      font-size: 30px;
+      color: #3498db;
+      font-weight: bolder;
+      text-align: center;
+    }
+
+    .restaurant-info-box {
+      font-size: 16px;
+      font-weight: bold;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+
+      img {
+        width: 20px;
+        height: 20px;
+        margin-right: 10px;
+      }
+    }
+
+    .restaurant-info-box .restaurant-introduce {
+      font-size: 13px;
+      margin-top: 3px;
+      padding-left: 35px;
+    }
+
+    .restaurant-img-wrapper {
+      flex-basis: 40%;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: fill;
+        border-radius: 10px;
+      }
+    }
+
+    .enabled-button,
+    .disabled-button {
+      margin-top: 10px;
+      display: block;
+      margin: 0 auto;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .enabled-button {
+      background-color: #007bff;
+    }
+
+    .disabled-button {
+      background-color:
+        #ccc;
+      cursor: not-allowed;
+    }
+  </style>
+
+</head>
+
+<body id="aaa" style="margin: 0; padding: 0; box-sizing: border-box;">
+
+  <header class="frontstage-template-header"  data-bs-theme="dark">
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+      <div class="container-fluid nav-outer-flex-container">
+        <div class="nav-container">
+          <a class="navbar-brand" href="/views/index.html"><img src="/favicon.ico" alt="覓食Go圖標預定地" width="50px" height="50px"></a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+            aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+          </button>
+        </div>
+        <div class="collapse navbar-collapse nav-inner-flex-container" id="navbarNavDropdown">
+          <div class="nav-container">
+            <ul class="navbar-nav nav-function-setting">
+              <li class="nav-item">
+                <a class="nav-link" href="/views/index.html"><b>尋找餐廳</b></a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/views/mall/mall-index.html"><b>購物商城</b></a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/views/member/member-contact.html"><b>聯絡我們</b></a>
+              </li>
+            </ul>
+          </div>
+          <div class="nav-container">
+            <ul class="navbar-nav">
+              <li class="nav-item not-login">
+                <a class="nav-link" href="/views/member/member-login.html">
+                  <b>登入 / 註冊</b>
+                </a>
+              </li>
+              <li class="nav-item dropdown is-login">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                  aria-expanded="false">
+                  <b class="login-regist-text">會員您好</b>
+                </a>
+                <ul class="dropdown-menu">
+                  <li>
+                    <a class="dropdown-item login-dropdown-item" href="/views/member/member-menu-order.html">歷史訂單</a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item login-dropdown-item" href="/views/member/member-reserve.html">預約訂單</a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item login-dropdown-item" href="/views/member/member-coupon.html">折扣券</a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item login-dropdown-item" href="#" @click="logout">登出</a>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+
+    <section class="restaurant-container">
+      <div class="restaurant-info-wrapper">
+        <div class="restaurant-name-box">
+          {{singlerestanrant.name}}
+        </div>
+        <div class="restaurant-info-box">
+          <div>
+            <!-- <img src="/images/schedule.png"> -->
+            <span>
+              營業時間：{{singlerestanrant.openTime}} - {{singlerestanrant.closeTime}}
+            </span>
+          </div>
+          <div>
+            <!-- <img src="/images/map.png"> -->
+            <span>
+              餐廳地址：{{singlerestanrant.county}}{{singlerestanrant.district}}{{singlerestanrant.address}}
+            </span>
+          </div>
+          <div>
+            <!-- <img src="/images/no-restaurant-photo.png"> -->
+            <span>餐廳介紹：</span>
+            <div class="restaurant-introduce">
+              {{singlerestanrant.introduce}}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="restaurant-img-wrapper">
+        <img :src="indexPhoto">
+      </div>
+    </section>
+
+    <div style="width: 1000px; margin: 10px auto;">
+      <div
+        style="padding: 20px; border-radius: 15px; border: 1px solid rgb(214, 214, 214); background: radial-gradient(circle, rgba(10,0,36,0.1110819327731093) 0%, rgba(9,9,121,0.1110819327731093) 5%, rgba(0,212,255,0.04665616246498594) 100%); "
+        class="custom-box">
+        <div style="margin-bottom: 20px; display: flex; justify-content: center;" class="external-buttons">
+          <button
+            style="border: none; background: none; cursor: pointer; text-decoration: none; font-size: 16px; color: #007bff; width: 300px; padding: 10px; background: radial-gradient(circle, rgba(10,0,36,0.1110819327731093) 0%, rgba(9,9,121,0.1110819327731093) 5%, rgba(0,212,255,0.04665616246498594) 100%); "
+            @click="showTab('nameSearchTab')">餐廳說明</button>
+        </div>
+
+        <div
+          style="border: 1px solid rgb(214, 214, 214); border-radius: 15px; padding: 20px; text-align: left; position: relative;"
+          class="second-box">
+          <div v-show="currentTab === 'nameSearchTab'" class="tab" style="width: 1200;">
+            <div v-html="showHtml"></div>
+            <button @click="showTab('restaurantSearchTab'), initFlatpickr()"
+              style="margin-top: 10px; display: block; margin: 0 auto; background-color: #007bff; color: #fff; border: none; border-radius: 4px; padding: 10px 20px; font-size: 16px; cursor: pointer;">餐廳訂位</button>
+          </div>
+
+          <div v-show="currentTab === 'restaurantSearchTab'" class="tab"
+            style="display: flex; flex-direction: column; justify-content: center; align-items: center; margin: 0 auto; text-align: center;">
+            <div style="margin-bottom: 20px; width: fit-content;">
+              <input type="hidden" disabled v-model="selectedDate" placeholder="選擇日期" @click="resetTime"
+                style="margin-top: 10px; display: block; margin: 0 auto; padding: 10px; border: 1px solid #ccc; border-radius: 4px; width: 200px; text-align: center;">
+              <div id="sss" style="display: block; margin: 0 auto;"></div>
+            </div>
+
+            <div style="margin-top: 20px; text-align: center;">
+              <div style="display: none;"></div>
+              <label v-if="selectedDate" :key="selectedDate" style="font-size: 18px; margin-bottom: 10px;">人數</label>
+              <select v-if="selectedDate" @change="handleTableSelection" v-model="tableFor" class="form-select"
+                name="seat" @click="resetTime"
+                style="background-color: #fdfdfd; padding: 10px; border: 1px solid #ccc; border-radius: 5px; width: 330px; display: block; margin: 0 auto;"
+                :key="selectedDate">
+                <option value="兩人桌">2人</option>
+                <option value="四人桌">4人</option>
+                <option value="六人桌">6人</option>
+                <option value="八人桌">8人</option>
+                <option value="十人桌">10人</option>
+                <option value="十二人桌">12人</option>
+                <option value="十四人桌">14人</option>
+                <option value="十六人桌">16人</option>
+                <option value="十八人桌">18人</option>
+              </select>
+            </div>
+
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+              <div style="margin-top: 20px;">
+                <button v-for="time in reservedTime" :key="time"
+                  style="padding: 12px 24px; margin-top: 20px; margin: 10px; width: 120px; height: 60px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.3s; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);"
+                  @click="showValue(time),callPrice()">
+                  {{ time }}
+                </button>
+
+              </div>
+
+              <!-- ============================================================== -->
+              <div v-if="tableFor" style="width: 100%; max-width: 500px; margin-top: 20px; margin: 100px auto;">
+
+                <div
+                  style="padding: 20px; border: 2px solid #ccc; border-radius: 8px; margin-top: 20px; background-color: #ffffff; overflow: hidden;">
+                  <div
+                    style="display: flex; justify-content: space-between;text-align: center; width: 100%; margin-top: 20px;">
+                    <div style="width: 48%;">
+                      <label for="date" style="width: 100%;text-align: center;">日期</label>
+                      <input v-model="selectedDate" type="date" id="date"
+                        style="width: 100%; text-align: center;height: 40px" disabled>
+                    </div>
+                    <div style="width: 48%;">
+                      <label for="people" style="width: 100%;">時間</label>
+                      <input v-model="selectedTime" type="text" id="people"
+                        style="width: 100%;text-align: center; height: 40px" disabled>
+                    </div>
+                  </div>
+
+
+                  <div
+                    style="display: flex; justify-content: space-between;text-align: center; width: 100%;margin-top: 20px;">
+                    <div style="width: 48%;">
+                      <label for="people" style="width: 100%;">人數</label>
+                      <select style="width: 100%; text-align: center; height: 40px" v-model="tableFor" disabled>
+                        <option value="兩人桌">2人</option>
+                        <option value="四人桌">4人</option>
+                        <option value="六人桌">6人</option>
+                        <option value="八人桌">8人</option>
+                        <option value="十人桌">10人</option>
+                        <option value="十二人桌">12人</option>
+                        <option value="十四人桌">14人</option>
+                        <option value="十六人桌">16人</option>
+                        <option value="十八人桌">18人</option>
+                      </select>
+                    </div>
+                    <div style="width: 48%;">
+                      <label for="price" style="width: 100%;">價錢</label>
+                      <input v-model="getPrice" type="text" id="people"
+                        style="width: 100%; text-align: center;height: 40px" disabled>
+                    </div>
+                  </div>
+
+                  <!-- <div style="margin-top: 20px;">
+                          <label>付款方式</label>
+                          <select>
+                              <option value="" disabled selected hidden>請選擇付款方式</option>
+                              <option>LinePlay</option>
+                              <option>信用卡</option>
+                              <option>街口支付</option>
+      
+                          </select>
+      
+                          <div style="margin-bottom: 10px; font-weight: bold;">最後金額</div>
+                      </div> -->
+
+
+                  <div style="margin-top: 20px;">
+                    <button @click="CallInsertReserve"
+                      :class="{ 'enabled-button': !isButtonDisabled, 'disabled-button': isButtonDisabled }"
+                      :disabled="isButtonDisabled">
+                      建立訂單
+                    </button>
+                  </div>
+                </div>
+                <!-- ====================================== -->
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <footer class="frontstage-template-footer">
+      Copyright © 覓食Go All rights reserved.
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+
+      const { createApp } = Vue;
+
+
+
+      const app = createApp({
+        data() {
+          return {
+            indexPhoto: [],
+            imageUrl: null,
+            aaa: '',
+            selectedDate: null,
+            selectedTime: '',
+            flatpickrInstance: null,
+            restaurantSeat: [],
+            reservedDates: [],
+            currentTab: 'nameSearchTab',
+            reservedTime: [],
+            tableFor: '',
+            getPrice: '',
+            singlerestanrant: [],
+            restaurantIntroduce: '',
+            restaurantName: '',
+            reservedId: '',
+          };
+        },
+        methods: {
+          showMainImage: function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const restaurantinId = urlParams.get('restaurantId');
+            console.log(restaurantinId);
+            axios.get('http://localhost:8080/restaurantPhotoMain/' + restaurantinId, {
+              responseType: 'text'
+            })
+              .then(response => {
+                this.indexPhoto = 'data:image/jpeg;base64,' + response.data;
+              })
+              .catch(error => {
+                console.error('Error:', error);
+                console.log(error);
+              });
+          },
+          callSeatState: function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const restaurantId = urlParams.get('restaurantId');
+            let data = {
+              start: 0,
+              rows: 100,
+            };
+            axios.get("http://localhost:8080/restaurantSeat/seatStateData/" + restaurantId, { params: data }).then((response) => {
+              this.restaurantSeat = response.data;
+
+              console.log(this.restaurantSeat)
+            }).catch(function (error) {
+              console.log(error);
+
+            })
+          },
+          initFlatpickr() {
+
+            console.log(this.restaurantSeat);
+            this.flatpickrInstance = flatpickr("#sss", {
+              enableTime: false,
+              dateFormat: "Y-m-d",
+              onChange: (selectedDates, dateStr) => {
+                this.selectedDate = dateStr;
+                this.callSeatTime();
+                this.resetTime();
+              },
+              position: "above",
+              inline: true,
+
+              // minDate: "2024-03-22",
+              // maxDate: "2024-03-30"
+              enable: this.restaurantSeat
+
+            });
+          },
+          showTab(tabId) {
+            this.currentTab = tabId;
+          },
+          callSeatTime: function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const restaurantId = urlParams.get('restaurantId');
+
+            let data = {
+              start: 0,
+              rows: 100,
+              openDay: this.selectedDate,
+              tableFor: this.tableFor
+            };
+            console.log(this.selectedDate);
+            console.log(this.tableFor);
+
+            axios.get("http://localhost:8080/restaurantSeat/seatStateTime/" + restaurantId, { params: data }).then((response) => {
+              this.reservedTime = response.data.map(timeStr => this.formatTime(timeStr)).sort((a, b) => {
+                // 將時間轉換成日期比較
+                const timeA = new Date('1970-01-01T' + a);
+                const timeB = new Date('1970-01-01T' + b);
+                return timeA - timeB;
+              });
+              console.log(this.reservedTime);
+            }).catch(function (error) {
+              console.log(error);
+
+            })
+          },
+          formatTime(timeStr) {
+            // 將時間字串轉換為 Date 對象
+            const time = new Date('1970-01-01T' + timeStr);
+            // 提取小時和分鐘部分
+            const hours = ('0' + time.getHours()).slice(-2);
+            const minutes = ('0' + time.getMinutes()).slice(-2);
+            // 返回格式化後的時間字串
+            return hours + ':' + minutes;
+          },
+          handleTableSelection() {
+            // 在這裡添加當下拉列表選擇改變後需要執行的程式碼
+            console.log('Selected table size:', this.tableFor);
+            this.callSeatTime();  // 在下拉列表選擇改變時調用 callSeatTime 方法
+          },
+          loghtmlContent() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const restaurantId = urlParams.get('restaurantId');
+            axios.get("http://localhost:8080/ckEditorlogin/" + restaurantId)
+              .then(response => {
+                const htmlshow = response.data;
+                this.showHtml = htmlshow[0].html; // 取得第一個對象的 html 屬性值
+                this.singlerestanrant = htmlshow[0]
+                this.restaurantName = htmlshow[0].name
+                console.log(this.restaurantName);
+              })
+              .catch(error => {
+                console.error(error);
+
+              });
+          },
+          checkMemberLoginStatus() {
+            if (localStorage.getItem('memberName')) {
+              document.querySelector('li.is-login').setAttribute("style", "display: block;");
+              document.querySelector('li.not-login').setAttribute("style", "display: none;");
+              document.querySelector('.login-regist-text').textContent = "歡迎 " + localStorage.getItem('memberName');
+            } else {
+              document.querySelector('li.is-login').setAttribute("style", "display: none;");
+              document.querySelector('li.not-login').setAttribute("style", "display: block;");
+            }
+          },
+
+
+
+
+
+
+
+          // callFindAll: function () {
+          //   const urlParams = new URLSearchParams(window.location.search);
+          //   const restaurantId = urlParams.get('asd');
+          //   console.log(restaurantId);
+
+          //   axios.get("http://localhost:8080/restaurant/" + restaurantId).then((response) => {
+          //     console.log(response);
+          //     this.singlerestanrant = response.data;
+
+          //   }).catch(function (error) {
+          //     console.log(error);
+          //   })
+          // },
+
+
+          CallInsertReserve() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const restaurantId = urlParams.get('restaurantId');
+            var memberId = localStorage.getItem('memberId');
+            let tableNumber;
+            switch (this.tableFor) {
+              case "兩人桌":
+                tableNumber = 2;
+                break;
+              case "四人桌":
+                tableNumber = 4;
+                break;
+              case "六人桌":
+                tableNumber = 6;
+                break;
+              case "八人桌":
+                tableNumber = 8;
+                break;
+              case "十人桌":
+                tableNumber = 10;
+                break;
+              case "十二人桌":
+                tableNumber = 12;
+                break;
+              case "十四桌":
+                tableNumber = 14;
+                break;
+              case "十六人桌":
+                tableNumber = 16;
+                break;
+              case "十八人桌":
+                tableNumber = 18;
+                break;
+            }
+
+            let data = {
+              restaurantId: restaurantId,
+              memberId: memberId,
+              customer: tableNumber,
+              reserveDay: this.selectedDate,
+              reserveTime: this.selectedTime,
+            }
+            console.log(data);
+            axios.post("http://localhost:8080/restaurantReserve/insert", data)
+              .then((response) => {
+                this.reservedId = response.data;
+                console.log(this.reservedId);
+                console.log(response.data);
+                this.callEmail();
+                Swal.fire({
+                  title: "預約成功",
+                  text: "是否線上結帳",
+                  icon: "success",
+                  showCancelButton: true,
+                  confirmButtonText: '線上付款',
+                  cancelButtonText: '到場付款'
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    vm.callecplay();
+                    setTimeout(() => {
+                      window.location.href = '../index.html';
+                  }, 2000);
+
+                  } else {
+                    window.location.href = '../index.html';
+                  }
+                });
+
+              })
+              .catch(error => {
+                console.error(error);
+
+              });
+          }, callEmail() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const restaurantId = urlParams.get('restaurantId');
+            var memberId = localStorage.getItem('memberId');
+            let tableNumber;
+            switch (this.tableFor) {
+              case "兩人桌":
+                tableNumber = 2;
+                break;
+              case "四人桌":
+                tableNumber = 4;
+                break;
+              case "六人桌":
+                tableNumber = 6;
+                break;
+              case "八人桌":
+                tableNumber = 8;
+                break;
+              case "十人桌":
+                tableNumber = 10;
+                break;
+              case "十二人桌":
+                tableNumber = 12;
+                break;
+              case "十四桌":
+                tableNumber = 14;
+                break;
+              case "十六人桌":
+                tableNumber = 16;
+                break;
+              case "十八人桌":
+                tableNumber = 18;
+                break;
+            }
+            let data = {
+              restaurantId: restaurantId,
+              memberId: memberId,
+              customer: tableNumber,
+              reserveDay: this.selectedDate,
+              reserveTime: this.selectedTime,
+            };
+            axios.post("http://localhost:8080/restaurantReserveEmail/" + memberId + "/" + restaurantId, data)
+              .then((response) => {
+                console.log(response);
+              })
+              .catch(error => {
+                console.error(error);
+              });
+          },
+          callecplay: function () {
+            const id = this.reservedId;
+            let data = {
+              amount: this.getPrice,
+              restaurantName: this.restaurantName,
+            };
+            console.log(this.reservedId);
+            axios.post("http://localhost:8080/restaurantReserve/ecpayCheckout/" +id , data).then((response) => {
+              const newWindow = window.open('', '_blank');
+              newWindow.document.write(response.data);
+            }).catch(function (error) {
+              console.log(error);
+
+            })
+          },
+
+          callPrice: function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const restaurantId = urlParams.get('restaurantId');
+
+            let tableNumber;
+            switch (this.tableFor) {
+              case "兩人桌":
+                tableNumber = 2;
+                break;
+              case "四人桌":
+                tableNumber = 4;
+                break;
+              case "六人桌":
+                tableNumber = 6;
+                break;
+              case "八人桌":
+                tableNumber = 8;
+                break;
+              case "十人桌":
+                tableNumber = 10;
+                break;
+              case "十二人桌":
+                tableNumber = 12;
+                break;
+              case "十四桌":
+                tableNumber = 14;
+                break;
+              case "十六人桌":
+                tableNumber = 16;
+                break;
+              case "十八人桌":
+                tableNumber = 18;
+                break;
+            }
+            let data = {
+              start: 0,
+              rows: 100,
+              openDay: this.selectedDate,
+              tableFor: this.tableFor,
+              openTime: this.selectedTime,
+            };
+            console.log(this.selectedTime);
+            axios.get("http://localhost:8080/getPrice/" + restaurantId, { params: data }).then((response) => {
+              this.getPrice = response.data;
+              console.log(this.getPrice);
+              if (!isNaN(this.getPrice)) {
+                this.getPrice *= tableNumber;
+              };
+            }).catch(function (error) {
+              console.log(error);
+
+            })
+          },
+          showValue(time) {
+            // 當按鈕被點擊時，將選擇的時間更新為按鈕的值
+            this.selectedTime = time;
+          },
+          resetTime() {
+            this.selectedTime = '';
+          },
+           logout() {
+          localStorage.removeItem("memberId");
+          localStorage.removeItem("memberName");
+          window.location.href = "/views/index.html";
+        },
+        },
+        mounted() {
+          this.loghtmlContent();
+         
+        },
+        computed: {
+          isButtonDisabled() {
+            return !this.selectedDate || !this.selectedTime || !this.tableFor || !this.getPrice;
+          }
+        },
+      });
+      const vm = app.mount("#aaa")
+      // vm.loghtmlContent();
+      vm.showMainImage();
+      vm.callSeatState();
+      vm.checkMemberLoginStatus();
+    </script>
+
+</body>
+
+</html>

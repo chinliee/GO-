@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>預約訂單</title>
+
+    <script src="https://www.unpkg.com/vue@3.3.5/dist/vue.global.prod.js"></script>
+    <script src="https://www.unpkg.com/axios@1.6.7/dist/axios.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="/css/frontstage-template.css" rel="stylesheet"/>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #F0C9F8;
+        }
+    </style>
+</head>
+
+<body id="bbb" style="font-family: Arial, sans-serif; background-color:#ffffff;">
+
+    <header class="frontstage-template-header"  data-bs-theme="dark" >
+        <nav class="navbar navbar-expand-lg bg-body-tertiary">
+          <div class="container-fluid nav-outer-flex-container">
+            <div class="nav-container">
+              <a class="navbar-brand" href="/views/index.html"><img src="/favicon.ico" alt="覓食Go圖標預定地" width="50px" height="50px"></a>
+              <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+                aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+              </button>
+            </div>
+            <div class="collapse navbar-collapse nav-inner-flex-container" id="navbarNavDropdown">
+              <div class="nav-container">
+                <ul class="navbar-nav nav-function-setting">
+                  <li class="nav-item">
+                    <a class="nav-link" href="/views/index.html"><b>尋找餐廳</b></a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="/views/mall/mall-index.html"><b>購物商城</b></a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="/views/member/member-contact.html"><b>聯絡我們</b></a>
+                  </li>
+                </ul>
+              </div>
+              <div class="nav-container">
+                <ul class="navbar-nav">
+                  <li class="nav-item not-login">
+                    <a class="nav-link" href="/views/member/member-login.html">
+                      <b>登入 / 註冊</b>
+                    </a>
+                  </li>
+                  <li class="nav-item dropdown is-login">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                      aria-expanded="false">
+                      <b class="login-regist-text">會員您好</b>
+                    </a>
+                    <ul class="dropdown-menu">
+                      <li>
+                        <a class="dropdown-item login-dropdown-item" href="/views/member/member-menu-order.html">歷史訂單</a>
+                      </li>
+                      <li>
+                        <a class="dropdown-item login-dropdown-item" href="/views/member/member-reserve.html">預約訂單</a>
+                      </li>
+                      <li>
+                        <a class="dropdown-item login-dropdown-item" href="/views/member/member-coupon.html">折扣券</a>
+                      </li>
+                      <li>
+                        <a class="dropdown-item login-dropdown-item" href="#" @click="logout">登出</a>
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </nav>
+      </header>
+    
+
+
+
+    <div class="container" style="margin: 0 auto; padding: 20px; text-align: center;">
+        <button @click="toggleTab('reserve')" class="btn btn-primary"
+            style="margin-bottom: 10px; margin-right: 20px;">預約訂單</button>
+        <button @click="toggleTab('history')" class="btn btn-primary"
+            style="margin-bottom: 10px; margin-right: 20px;">歷史訂單</button>
+        <button @click="toggleTab('chart'),callstate1,callstate2" class="btn btn-primary"
+            style="margin-bottom: 10px;">訂單圖表</button>
+    </div>
+
+
+    <div v-if="currentTab === 'reserve'" class="container" style="max-width: 600px; margin: 0 auto;min-height: 100vh; ">
+        <div class="order-container"
+            style="padding: 20px; background-color: #fff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);">
+            <div>
+                <h1 class="order-header"
+                    style="margin-bottom: 20px; padding: 10px; font-size: 24px; font-weight: bold; color: #007bff; background-color: #bbdefb; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+                    預約訂單</h1>
+            </div>
+            <div v-for="aaa in orderstate" :key="aaa.id" class="order-item"
+                style="margin-bottom: 20px; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); background-color: #cce5ff;">
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px;">
+                    <div>
+                        <h2 style="margin: 0; color: #333;">{{ aaa.restaurantName }}</h2>
+                        <p style="margin: 5px 0; color: #333;">{{aaa.state}}</p>
+                        <p style="margin: 5px 0; color: #333;">{{ aaa.reserveDay }}</p>
+                        <p style="margin: 5px 0; color: #333;">{{ aaa.reserveTime }}</p>
+                    </div>
+                    <div>
+                        <h2 style="margin: 0; color: #333;">$ {{ aaa.amount }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div v-if="currentTab === 'history'" class="container" style="max-width: 600px; margin: 0 auto; min-height: 100vh;">
+        <div class="order-container"
+            style="padding: 20px; background-color: #fff; margin-top: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);">
+            <div>
+                <h1 class="order-header"
+                    style="margin-bottom: 20px; padding: 10px; font-size: 24px; font-weight: bold; color: #dc3545; background-color: #ffcdd2; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+                    歷史訂單</h1>
+            </div>
+            <div v-for="aaa in order" :key="aaa.id" class="order-item"
+                style="margin-bottom: 20px; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); background-color: #ffcccc;">
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px;">
+                    <div>
+                        <h2 style="margin: 0; color: #333;">{{ aaa.restaurantName }}</h2>
+                        <p style="margin: 5px 0; color: #333;">已完成</p>
+                        <p style="margin: 5px 0; color: #333;">{{ aaa.reserveDay }}</p>
+                        <p style="margin: 5px 0; color: #333;">{{ aaa.reserveTime }}</p>
+                    </div>
+                    <div>
+                        <h2 style="margin: 0; color: #333;">$ {{ aaa.amount }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div v-else-if="currentTab === 'chart'" class="container" style="max-width: 600px; margin: 0 auto; min-height: 100vh;">
+    <div  class="order-container"
+        style="padding: 20px; margin: 0 auto; background-color: #fff; width: 600px; margin-top: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); text-align: center; ">
+        <canvas id="myCanvas" width="550" height="500" ></canvas>
+    </div>
+    </div>
+
+    <footer class="frontstage-template-footer">
+        Copyright © 覓食Go All rights reserved.
+      </footer>
+
+    <script>
+
+        const { createApp } = Vue;
+        const app = createApp({
+            data() {
+                return {
+                    order: [],
+                    orderstate: [],
+                    orderstate2:[],
+                    showPassword: false,
+                    months: [],
+                    amounts: [],
+                    currentTab: 'reserve'
+
+                }
+            },
+            methods: {
+                callstate1: function () {
+                    var memberId = localStorage.getItem('memberId');
+                    let data = {
+                        start: 0,
+                        rows: 100,
+                        state: '已結單',
+                    };
+                    axios.get("http://localhost:8080/order/member/" + memberId, { params: data }).then((response) => {
+                        // this.order = response.data;
+                        this.order = response.data.sort((a, b) => new Date(b.reserveDay) - new Date(a.reserveDay));
+                    }).catch(function (error) {
+                        console.log(error);
+                    });
+                },
+                callstate2: function () {
+                    var memberId = localStorage.getItem('memberId');
+
+                    let data = {
+                        start: 0,
+                        rows: 100,
+                        states: '已預約,已付款'
+                    };
+                    axios.get("http://localhost:8080/order/memberState/" + memberId, { params: data }).then((response) => {
+                        this.orderstate = response.data.sort((a, b) => new Date(b.reserveDay) - new Date(a.reserveDay));
+                    }).catch(function (error) {
+                        console.log(error);
+                    });
+                },
+                // callstate3: function () {
+                //     let data = {
+                //         start: 0,
+                //         rows: 100,
+                //         state: '已付款',
+                //     };
+                //     axios.get("http://localhost:8080/order/member/1", { params: data }).then((response) => {
+                //         this.orderstate2 = response.data.sort((a, b) => new Date(b.reserveDay) - new Date(a.reserveDay));
+                //     }).catch(function (error) {
+                //         console.log(error);
+                //     });
+                // },
+                callmomth: function () {
+                    var memberId = localStorage.getItem('memberId');
+
+                    let data = {
+                        start: 0,
+                        rows: 100,
+                    };
+                    axios.get("http://localhost:8080/membermonth/" + memberId, { params: data }).then((response) => {
+                        let responseData = response.data;
+                        this.months = responseData.map(entry => entry[0]);
+                        this.amounts = responseData.map(entry => entry[1]);
+                        console.log(this.months);
+                        console.log(this.amounts);
+                        console.log(response);
+                        this.renderChart();
+                    }).catch(function (error) {
+                        console.log(error);
+                    });
+                },
+                renderChart() {
+                    const ctx = document.getElementById("myCanvas").getContext("2d");
+                    console.log(this.months);
+                    console.log(this.amounts);
+
+                    const colors = [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ];
+                    const labels = this.months.map((month, index) => month + '月 (' + this.amounts[index] + ')');
+
+
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: '',
+                                data: this.amounts,
+                                backgroundColor: colors,
+                                borderColor: 'black',
+                                borderWidth: 2
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    grid: {
+                                        display:
+                                            true,
+                                        color: 'rgba(0, 0, 0, 0.1)',
+                                        drawBorder: false,
+                                        drawTicks: false
+                                    }
+                                },
+                                x: {
+                                    grid: {
+                                        display: false
+                                    },
+                                    font: {
+                                        size: 15,
+                                        weight: 'bold'
+                                    },
+                                },
+
+                            }, plugins: {
+                                title: {
+                                    display: true,
+                                    text: '每月消費金額',
+                                    color: 'blue',
+                                    font: {
+                                        size: 30,
+                                        weight: 'bold'
+                                    },
+                                    padding: 10
+                                },
+                                legend: {
+                                    labels: {
+                                        filter: function (legendItem, data) {
+                                            return legendItem.text !== '';
+                                        }
+                                    }
+                                }
+
+                            },
+                            layout: {
+                                padding: {
+                                    left: 10,
+                                    right: 10,
+                                    top: 10,
+                                    bottom: 10
+                                }
+                            },
+                            responsive: false,
+                            maintainAspectRatio: false,
+                            elements: {
+                                bar: {
+                                    borderDash: [10, 0] 
+                                }
+                            }
+                        },
+
+                    });
+                }, toggleTab(tab) {
+                    this.currentTab = tab;
+                    if (tab === 'chart') {
+                        console.log("OK");
+                        this.callmomth();
+                    }
+                },
+                checkMemberLoginStatus() {
+            if (localStorage.getItem('memberName')) {
+              document.querySelector('li.is-login').setAttribute("style", "display: block;");
+              document.querySelector('li.not-login').setAttribute("style", "display: none;");
+              document.querySelector('.login-regist-text').textContent = "歡迎 " + localStorage.getItem('memberName');
+            } else {
+              document.querySelector('li.is-login').setAttribute("style", "display: none;");
+              document.querySelector('li.not-login').setAttribute("style", "display: block;");
+            }
+          },
+          logout() {
+          localStorage.removeItem("memberId");
+          localStorage.removeItem("memberName");
+          window.location.href = "/views/index.html";
+        },
+            },
+        });
+
+        const vm = app.mount('#bbb');
+        vm.callstate1();
+        vm.callstate2();
+        vm.callmomth();
+        vm.checkMemberLoginStatus();
+        // vm.renderChart();
+
+    </script>
+
+</body>
+
+</html>

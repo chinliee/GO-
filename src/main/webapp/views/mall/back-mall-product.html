@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>商城後台-商品資訊</title>
+
+  <!-- 樣板需要的 css 資源-->
+  <script src="https://kit.fontawesome.com/cda74843f9.js" crossorigin="anonymous"></script>
+  <link href="/css/sb-admin-2.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/sb-admin-2-custom-restaurant.css">
+
+  <!-- Bootstrap 5 -->
+  <link rel="stylesheet" href="/css/bootstrap-5.3.2.css" />
+  <!-- Bootstrap Table 會使用到的 Bootstrap icon -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+  <!-- Bootstrap Table -->
+  <link rel="stylesheet" href="/css/bootstrap-table-1.22.1.css">
+  <!-- toastr -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.css">
+  <!-- Sweet Alert2 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.min.css">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    .bootstrap-table {
+      width: 1000px;
+      margin: 0 auto;
+      margin-top: 40px;
+    }
+    /* Bootstrap Table 的 Toolbar 樣式 */
+    .fixed-table-toolbar {
+      background-color: #3498db;
+      color: white;
+      padding: 5px 20px;
+      margin: 15px 0;
+      border-radius: 4px;
+    }
+    /* Toolbar 按鈕 */
+    .fixed-table-toolbar .btn {
+      color: white;
+      background-color: #2c3e50;
+      font-weight: 900;
+    }
+    .fixed-table-toolbar .btn.btn-delete-selected {
+      background-color: red;
+      color: white;
+      margin-left: 10px;
+    }
+    /* 每頁幾筆資料區域 */
+    .pagesize-box {
+      display: inline-block;
+      margin-left: 20px;
+      font-weight: 900;
+    }
+    .pagesize-box select {
+      display: inline-block;
+      width: 55px;
+      margin: 0 10px;
+    }
+    /* 搜尋框 */
+    .float-right.search.btn-group {
+      margin-right: 20px;
+    }
+    /* table 欄位標題列 */
+    .bootstrap-table .fixed-table-container .table thead th {
+      background-color: linen;
+      color: navy;
+      font-size: 18px;
+      font-weight: 900;
+      text-align: center;
+    }
+    /* table 資料列 */
+    .table tbody td {
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .table tbody tr:hover td {
+      background-color: lemonchiffon;
+    }
+    .table tbody tr.tr-created td {
+      background-color: #FDF2F7;
+      transition: background-color 1s linear;
+    }
+    .table tbody tr.tr-updated td {
+      background-color: #e4fad6;
+      transition: background-color 1s linear;
+    }
+    /* 點選資料列勾選 checkbox，Bootstrap Table 會自動加上 selected class
+      原本預設背景顏色會變深灰色，修改顏色 */
+    .table tbody tr.selected {
+      background-color: rgb(255, 255, 255);
+    }
+    /* 餐點圖片欄位 */
+    .table tbody .td-photo {
+      img {
+        width: 100px;
+        height: 100px;
+        border-radius: 10px;
+      }
+    }
+    /* 操作按鈕 */
+    .btn-update, .btn-delete {
+      font-weight: 900;
+      margin: 0 5px;
+      transition: transform 0.3s linear;
+    }
+    .btn-update:hover, .btn-delete:hover {
+      transform: scale(1.15);
+    }
+    /* table 下方，總共資料筆數、分頁區域 */
+    .bootstrap-table .fixed-table-pagination {
+      margin-top: 5px;
+    }
+    /* 總共幾筆資料文字 */
+    .bootstrap-table .fixed-table-pagination .pagination-detail .pagination-info {
+      font-size: 16px;
+      font-weight: 900;
+      padding: 8px 10px;
+      color: white;
+      background-color: #3498db;
+      border-radius: 5px;
+    }
+    /* 頁數區域 */
+    .bootstrap-table .fixed-table-pagination ul.pagination li.page-item.active a {
+      background-color: #3498db;
+      border-color: #3498db;
+    }
+    /* 新增、修改菜單的 Bootstrap Modal */
+    /* 必填欄位，使用偽元素加上紅色星號 */
+    .required::before {
+      content: '*';
+      color: red;
+      margin-right: 5px;
+    }
+    .error-message {
+      display: none;
+      color: red;
+      font-size: 15px;
+      margin-top: 6px;
+    }
+    /* 錯誤訊息區塊顯示 */
+    .error-message.show {
+      display: block;
+    }
+    .modal-content {
+      font-weight: 900;
+      min-width: 800px;
+    }
+    .modal-header {
+      padding: 20px 30px;
+    }
+    .modal-header .modal-title-wrapper {
+      flex-grow: 1;
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      color: navy;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 25px;
+      img {
+        width: 45px;
+        height: 45px;
+      }
+    }
+    .modal-body {
+      padding: 30px 30px 10px 30px;
+      border: none;
+    }
+    /* Modal 中的上傳圖片區域 */
+    .photo-box {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      text-align: center;
+    }
+    .phto-file-wrapper label {
+      margin: 0 20px;
+      font-weight: 900;
+    }
+    .phto-file-wrapper .btn-select-photo {
+      font-size: 14px;
+      font-weight: 900;
+      padding: 5px 10px;
+      color: white;
+      background-color: #417560;
+      border: 0;
+      border-radius: 5px;
+    }
+    .photo-wrapper {
+      flex-grow: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .previewImg {
+      width: 300px;
+      height: 300px;
+      /* 讓上傳的圖片預覽，等比例縮放符合設定的寬高 */
+      object-fit: cover;
+      margin-top: 10px;
+      border-radius: 20px;
+    }
+    .modal-footer {
+      padding-top: 5px;
+      padding-bottom: 20px;
+      border: none;
+      justify-content: center;
+    }
+    /* Modal中的儲存按鈕 */
+    .modal-footer button {
+      font-weight: 900;
+      padding: 8px 30px;
+      margin: 0 20px;
+      color: white;
+      background-color: #3498db;
+      border-radius: 5px;
+      border: 0;
+    }
+    .modal-footer button[disabled] {
+      cursor: not-allowed;
+      background-color: #ccc;
+    }
+    /* 讓 toastr 訊息在視窗中間 */
+    .toast-center-center {
+      top: 50%;
+      left: 50%;
+      margin-top: -30px;
+      margin-left: -150px;
+    }
+    /* 刪除餐點的 Sweet Alert2 視窗
+      先在刪除餐點 Sweet Alert2 的 JavaScript 加上一個自訂 class
+      再用 class 去找內部的組件修改 css 樣式，這樣就不會影響到頁面其他的 Sweet Alert2 的視窗樣式  */
+      .custom-delete-menu-popup {
+      width: 500px;
+      background-color: rgb(255, 251, 247);
+      border-radius: 10px;
+      box-shadow: 0 0 10px 2px #ccc;
+    }
+    /* 自訂 icon */
+    .custom-delete-menu-popup .custom-icon-wrapper {
+      border: 0;
+      img {
+        width: 80px;
+        height: 80px;
+      }
+    }
+    /* 標題 */
+    .custom-delete-menu-popup .swal2-title {
+      font-size: 28px;
+      color: navy;
+      padding-top: 10px;
+    }
+    /* 按鈕區域 */
+    .custom-delete-menu-popup .swal2-actions button {
+      font-weight: 900;
+      margin: 0 10px;
+    }
+    .custom-delete-menu-popup .swal2-actions button.swal2-confirm {
+      background-color: #3498db;
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <!-- 模板外層容器 -->
+  <div id="wrapper">
+    <!-- 側邊 Sidebar -->
+    <ul class="navbar-nav sidebar sidebar-dark accordion bg-deep-blue" id="accordionSidebar">
+      <a class="sidebar-brand d-flex align-items-center justify-content-center" href="#">
+        <div class="sidebar-brand-text mx-3">餐廳後台</div>
+      </a>
+      <!-- 分隔線 -->
+      <hr class="sidebar-divider my-0">
+      <!-- 無下拉式選項 -->
+      <li class="nav-item">
+        <a class="nav-link" href="./restaurant-menu.html">
+          <img src="/images/food-1.png">
+          <span>餐點資訊</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="./restaurant-menu-order.html">
+          <img src="/images/data-1.png">
+          <span>餐點訂單</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="./restaurant-statistic.html">
+          <img src="/images/money-report-1.png">
+          <span>銷售數據</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="./restaurant-ad-buy.html">
+          <img src="/images/buyad.png">
+          <span>購買廣告</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="./restaurant-ad-history.html">
+          <img src="/images/adhistory.png">
+          <span>廣告履歷</span>
+        </a>
+      </li>
+      <!-- 下拉式選項-->
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages" aria-expanded="true" aria-controls="collapsePages">
+          <i class="fas fa-fw fa-folder"></i>
+          <span>下拉式選項</span>
+        </a>
+        <div id="collapsePages" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
+          <div class="bg-white py-2 collapse-inner rounded">
+            <h6 class="collapse-header">基本功能</h6>
+            <a class="collapse-item" href="#">基本資訊</a>
+            <div class="collapse-divider"></div>
+            <h6 class="collapse-header">進階功能</h6>
+            <a class="collapse-item" href="#">折扣券</a>
+          </div>
+        </div>
+      </li>
+      <!-- Sidebar 展開收合按鈕 -->
+      <div class="text-center d-none d-md-inline">
+        <button class="rounded-circle border-0" id="sidebarToggle"></button>
+      </div>
+    </ul>
+
+    <!-- 主內容區域，包含上方導覽列與各網頁內容 -->
+    <div id="content-wrapper" class="d-flex flex-column">
+      <div id="content">
+        <!-- 上方導覽列 -->
+        <nav class="navbar navbar-expand topbar mb-4 static-top" style="display: flex; justify-content: space-between;">
+          <div class="temp"></div>
+          <div class="nav-item dropdown no-arrow">
+            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <span class="mr-2 d-none d-lg-inline text-gray-600 small topbar-name">餐廳名稱</span>
+            </a>
+            <!-- 功能列表 -->
+            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+              aria-labelledby="userDropdown">
+              <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
+                <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                登出
+              </a>
+            </div>
+          </div>
+        </nav>
+        <!-- 各網頁內容 -->
+        <div class="container-fluid">
+          <!-- Bootstrap Table -->
+          <table id="menuTable">
+          </table>
+          <!-- 要放在 Bootstrap Table 中，自定義的 Toolbar -->
+          <div id="myToolbar" class="toolbar">
+            <button id="btn-create" type="button" class="btn btn-primary">
+              <i class="fa-solid fa-plus"></i>
+              <span>新增</span>
+            </button>
+            <button id="btn-delete-selected" type="button" class="btn btn-primary btn-delete-selected">
+              <i class="fa-solid fa-minus"></i>
+              <span>刪除</span>
+            </button>
+            <!-- 資料筆數選單 -->
+            <div class="pagesize-box">
+              <span>每頁顯示</span>
+              <select class="form-control pagesize-select" id="pageSizeSelect">
+              </select>
+              <span>筆資料</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <footer class="sticky-footer bg-white">
+        <div class="container my-auto">
+          <div class="copyright text-center my-auto">
+            <span>Copyright &copy; 覓食 GO</span>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <!-- 新增、修改 Modal -->
+  <div class="modal fade menuModal" id="menuModal" tabindex="-1" aria-labelledby="menuModal" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="modal-title-wrapper">
+            <img src="/images/food-1.png">
+            <span id="exampleModalLabel">編輯菜單資料</span>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="menuForm" enctype="multipart/form-data">
+            <div class="row">
+              <!-- 餐點名稱、價錢、描述 -->
+              <div class="col-6">
+                <div class="mb-3">
+                  <label for="name" class="form-label required">餐點名稱</label>
+                  <input type="text" class="form-control input-name" id="name" name="name" required
+                    placeholder="輸入餐點名稱...">
+                  <!-- 錯誤訊息 -->
+                  <div class="error-message error-name">
+                    <i class="far fa-times-circle"></i>
+                    <span></span>
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label for="price" class="form-label required">價錢</label>
+                  <input type="number" class="form-control input-price" id="price" name="price" min="0" required>
+                  <div class="error-message error-price">
+                    <i class="far fa-times-circle"></i>
+                    <span></span>
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label for="description" class="form-label">餐點介紹</label>
+                  <textarea class="form-control textarea-description" id="description" name="description" rows="6"
+                    cols="50" placeholder="餐點介紹"></textarea>
+                </div>
+              </div>
+              <!-- 上傳餐點圖片 -->
+              <div class="col-6">
+                <div class="mb-2 photo-box">
+                  <div class="phto-file-wrapper">
+                    <label for="photo" class="form-label">餐點圖片</label>
+                    <button type="button" class="btn-select-photo" onclick="handleClickInputFile()">選擇檔案</button>
+                    <input type="file" class="form-control form-control-sm input-phto" id="photo" name="photo"
+                      accept="image/*" onChange="handleFileChange()" style="display: none;">
+                  </div>
+                  <div class="photo-wrapper">
+                    <img src="" id="previewImg" class="previewImg">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-submit" id="btn-submit">儲存</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 模板需要的 js 資源 -->
+  <script src="/js/jquery-3.7.1.js"></script>
+  <script src="/js/bootstrap-4.6.2.bundle.min.js"></script>
+  <script src="/js/sb-admin-2.min.js"></script>
+
+  <!-- Bootstrap 5 -->
+  <script src="/js/bootstrap-5.3.2.bundle.min.js"></script>
+  <!-- Bootstrap Table -->
+  <script src="/js/bootstrap-table-1.22.1.js"></script>
+  <!-- axios -->
+  <script src="/js/axios-1.6.2.min.js"></script>
+  <!-- Sweet Alert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.all.min.js"></script>
+  <!-- toastr -->
+  <script src="https://cdn.jsdelivr.net/npm/toastr@2.1.4/toastr.min.js"></script>
+
+  <script>
+    let restaurantId = localStorage.getItem('restaurantId');
+    let restaurantName = localStorage.getItem('restaurantName');
+    // Bootstrap Table 實例
+    let menuTable = null;
+    let menuArr = [];
+    // currentMenu 是修改時的暫存菜單物件
+    let currentMenu = { 
+      menuId: null,
+      name: null,
+      price: null,
+      description: null,
+      photo: null,
+      photoSrc: null,
+      errorMsg: {},
+      isUploadFileChange: false,
+      checkNameStatus: false,
+      checkPriceStatus: false,
+    };
+    let noPhoto = '/images/no-image.jpg';
+
+    $(document).ready(function () {
+
+      if (restaurantName) {
+        $('.topbar-name').text(restaurantName);
+      }
+
+      // 先初始化 Bootstrap Table
+      initMenuTable();
+
+      // 初始化每頁顯示筆數的下拉選單
+      initPageSizeSelect();
+
+      // 載入餐廳的菜單資料
+      initMenuData();
+
+      // 初始化 toastr
+      toastrOptions();
+
+      // 綁定事件
+      $('#btn-create').on('click', function () {
+        let menuId = null;
+        openMenuModal(menuId);
+      });
+      $('#btn-submit').on('click', handleMenuSubmit);
+      
+      $('#name').on('blur', checkMenuForm);
+      $('#price').on('blur', checkMenuForm)
+      $('#btn-delete-selected').on('click', deleteSelectedMenu);
+
+      // 監聽 BootStrap Modal 關閉(隱藏)的事件
+      $('#menuModal').on('hidden.bs.modal', function () {
+        // 重置 Form 表單，$('#menuForm') 是 jQuery 物件，[0] 是取得 Form Dom 元素
+        // reset() 方法是原生 JavaScript 重置表單的方法
+        $('#menuForm')[0].reset();
+
+        // 清除表單欄位值(保險起見)、清除預覽圖片路徑
+        clearMenuForm();
+
+        // 移除殘留的錯誤訊息
+        $('.error-message').removeClass('show');
+        $('.error-message span').text('');
+
+        // 清空 currentMenu 物件
+        currentMenu = { 
+          menuId: null,
+          name: null,
+          price: null,
+          description: null,
+          photo: null,
+          photoSrc: null,
+          errorMsg: {},
+        }
+
+        $('#menuModal').removeAttr('data-operation'); // 移除 Modal 自定義的 data-operation 屬性
+        $('#btn-submit').prop('disabled', false) // 重置儲存按鈕的 disabled 屬性值
+      });
+    })
+
+    // 載入菜單資料
+    function initMenuData() {
+      axios({
+        method: 'GET',
+        url: 'http://localhost:8080/restaurant/menu/list',
+        params: { restaurantId: restaurantId },
+      })
+      .then(response => {
+        menuArr = response.data.data;
+        menuArr.forEach((menu) => {
+          menu.errorMsg = {};
+        });
+
+        // 連結資料來源 menuArr，重新載入表格
+        menuTable.bootstrapTable('load', menuArr);
+      })
+      .catch(function (error) {
+        console.log('error', error);
+      })
+    }
+
+    // 初始化 Bootstrap Table
+    function initMenuTable() {
+      menuTable = $('#menuTable').bootstrapTable({
+        classes: 'table table-bordered', // table 樣式
+        cache: false,    // ajax 請求是否用快取
+        clickToSelect: true, // 搭配第一欄的 checkbox 使用，點選資料列就會勾選 checkbox
+
+        // Toolbar 的設定
+        toolbar: '#myToolbar', // 自定義 Toolbar 的 HTML 元素，例如新增按鈕、把預設的每頁筆數選單移到上面 Toolbar
+        search: true, // 搜尋選單
+        showColumns: true, // 欄位顯示選擇按鈕
+        showFullscreen: true, // 全螢幕按鈕
+
+        // 分頁處理方式，client 前端分頁、server 伺服器端分頁
+        sidePagination: "client", 
+        // 分頁相關設定
+        pagination: true, // 分頁
+        pageNumber: 1, // 預設頁數
+        pageSize: 10, // 預設每頁資料筆數
+        pageList: [10, 20, 50, 100], // 每頁資料筆數的選單
+        smartDisplay: false, // 智能隱藏、或顯示某些元素，關閉，預設為true
+
+        /**
+         * data 屬性，設定 Table 的資料來源
+         * 在載入初始菜單資料的 initMenuData() 方法中，ajax 成功載入資料後，
+         * 有使用 menuTable.bootstrapTable('load', menuArr)，設定資料來源並重新載入表格，所以這邊就可以不用設定 data 屬性
+        */
+        // data: menuArr, 
+        uniqueId: 'menuId', // 哪一個欄位是key
+        columns: [ // 欄位設定
+          {
+            checkbox : true,
+            align: 'center',
+            width: 50,
+          },
+          {
+            field: 'name',
+            title: '餐點名稱',
+            align: 'center', // 欄位水平對齊方式
+            width: 180, // 欄位寬度，不用寫 px
+          },
+          {
+            field: 'price',
+            title: '價錢',
+            align: 'center',
+            sortable: true, // 欄位是否可以排序
+            width: 100,
+          },
+          {
+            field: 'description',
+            title: '介紹',
+          },
+          {
+            field: 'photoSrc',
+            title: '圖片',
+            align: 'center',
+            width: 200,
+            formatter: function (value, row) {
+              if (value) {
+                return img_el = `<img src="${value}">`;
+              } else {
+                return img_el = '<img src="/images/no-image.jpg">';
+              }
+            },
+            // 欄位的 td 加上自訂 class，方便後續 css 樣式設定
+            // 加上兩個自訂 class，用空格隔開
+            cellStyle: function(value, row, index) {
+              return {
+                classes: 'td td-photo',
+              };
+            }
+          },
+          {
+            // 自定義的修改、刪除按鈕
+            field: 'action',
+            title: '操作',
+            align: 'center',
+            width: 150,
+            formatter: function (index, row) { // index 參數沒用到也要傳，不傳會報錯
+              let button_el = `
+                <button class="btn btn-warning btn-sm btn-update" onclick="openMenuModal(${row.menuId})">修改</button>
+                <button class="btn btn-danger btn-sm btn-delete" onclick="deleteMenu(${row.menuId})">刪除</button>`;
+              return button_el;
+            }
+          }
+        ],
+        formatNoMatches: function () { // 如果查詢不到資料，要顯示的內容
+          return '無符合條件的記錄';
+        },
+        formatShowingRows: function (fromIndex, toIndex, totalSize) {
+          let currentPage = Math.ceil(fromIndex / this.pageSize); // 目前第幾頁
+          let totalPageCount = Math.ceil(totalSize / this.pageSize); //總共幾頁
+          return `共${totalSize}筆資料`;
+        },
+        formatRecordsPerPage: function (pageSize) {
+          // return `每頁顯示${pageSize}筆`;
+          return ''; // 不顯示資訊
+        },
+        // 切換分頁時，觸發的事件
+        onPageChange: function (currentPage, pageSize) {
+          console.log(`目前頁數:${currentPage}, 每頁顯示:${pageSize}筆`);
+        },
+      })
+    }
+    // 新增、修改菜單，打開 Modal，根據 menuId 判斷是新增、或修改操作
+    function openMenuModal(menuId) {
+        currentMenu = { 
+          menuId: null,
+          name: null,
+          price: null,
+          description: null,
+          photo: null,
+          photoSrc: null,
+          errorMsg: {},
+        }
+
+      if (!menuId) { // 新增
+        clearMenuForm(); // 先清除表單欄位值、預覽圖片路徑
+        $('.modal-title').text('新增菜單資料');
+        // 自定義 data-operation 屬性，標記為 Modal 是新增 (後續送出表單時，需要判斷)
+        $('#menuModal').attr('data-operation', 'create');
+      }
+      else { // 修改
+        $('.modal-title').text('修改菜單資料');
+        $('#menuModal').attr('data-operation', 'update');
+
+        let menu = menuArr.find(menu => menu.menuId === menuId);
+        // 深拷貝，讓原始 menu、currentMenu 是不同的物件(參照不同的記憶體位址)，避免修改 currentMenu 的資料，也會修改 menuArr 的資料
+        currentMenu = JSON.parse(JSON.stringify(menu));
+
+        // 填充欄位
+        $('#name').val(currentMenu.name);
+        $('#price').val(currentMenu.price);
+        $('#description').val(currentMenu.description);
+        $('#previewImg').attr('src', currentMenu.photoSrc ? currentMenu.photoSrc : noPhoto);
+      }
+
+      currentMenu.isUploadFileChange = false; // 預設沒有上傳新的圖片檔案
+      currentMenu.checkNameStatus = false; // 預設名稱欄位沒有通過驗證
+      currentMenu.checkPriceStatus = false; // 預設價錢欄位沒有通過驗證
+      let price = parseInt(currentMenu.price);
+
+      if (currentMenu.name) {
+        currentMenu.checkNameStatus = true;
+      }
+      if (!isNaN(price) && currentMenu.price >= 0 ) {
+        currentMenu.checkPriceStatus = true;
+      }
+      if (!currentMenu.checkNameStatus || !currentMenu.checkPriceStatus) {
+        $('#btn-submit').prop('disabled', true)
+      }
+
+      // 顯示 Modal
+      $('#menuModal').modal('show');
+    }
+
+    // 新增菜單、修改菜單的 Modal，儲存更新資料
+    function handleMenuSubmit() {
+      // 取得 Modal 的 data-operation 屬性值，判斷是新增、或修改
+      let operation = $('#menuModal').attr('data-operation');
+
+      // 使用 formData 取得 Form 表單的 input 欄位，並發送 ajax 請求到後端
+      // 方法1：直接把 Form 表單元素傳入 FormData 的建構子中
+      let formData = new FormData($('#menuForm')[0]);
+      formData.append('restaurantId', restaurantId) 
+
+      if (operation === 'update') {
+        formData.append("menuId", currentMenu.menuId);
+        
+        // form表單，input file 欄位，檔案都沒有上傳過
+        if (currentMenu.isUploadFileChange === false) { 
+        
+          // 當原本菜單就有圖片檔案，檔案都沒有上傳過，就取得原本的圖片檔案，傳到後端
+          if (currentMenu.photo && currentMenu.photo.length > 0) {
+
+            if (currentMenu.photo && currentMenu.photoSrc) {
+              // 在 Java 中，photo 屬性是圖片的 byte[]，經由 JSON 格式傳遞資料到前端
+              // 會把 photo 轉成 base64 編碼的字串形式，所以前端的 photo 屬性是圖片的 base64 編碼字串
+              // -> 要取得原本的圖片檔案，需要把 base64 編碼的字串，轉換成 Blob 物件，傳送到後端
+              let blob = base64toBlob(currentMenu.photo);
+              formData.set('photo', blob);
+            }
+          }
+        }
+      }
+
+      let apiUrl = '';
+      if (operation === 'create') {
+        apiUrl = 'http://localhost:8080/restaurant/menu/create';
+      } else if (operation === 'update') {
+        apiUrl = 'http://localhost:8080/restaurant/menu/update';
+      }
+
+      // 發送 ajax 請求到後端，新增、修改資料
+      $.ajax({
+        url: apiUrl,
+        type: 'POST',
+        data: formData,
+        // processData 預設值為 true，代表用物件的形式上傳的資料，會被進行編碼轉成字串形式
+        // 但檔案資料，不需要轉成字串，所以指定 processData: false
+        processData: false,
+        // contentType 預設值為 application/x-www-form-urlencoded，不能處理檔案上傳
+        // 設定成 false，會自動根據 formData 的檔案類型，設定 contentType: multipart/form-data
+        contentType: false,
+        success: function (data) {
+          console.log('data', data);
+
+          if (operation === 'create') {
+            let newMenu = data.data;
+            newMenu.errorMsg = {};
+
+            menuArr.push(newMenu); // 更新資料來源 menuArr，把新增的資料加到陣列最後面
+            menuTable.bootstrapTable('load', menuArr); // 重新載入表格
+
+            // 取得表格的總頁數，並跳轉到最後一頁，目的是要看到新增的資料
+            let totalPage = menuTable.bootstrapTable('getOptions').totalPages;
+            menuTable.bootstrapTable('selectPage', totalPage); // 選擇頁數至最後一頁
+
+            // 幫新增的資料列，加上背景顏色
+            let updated_row = $(`#menuTable tbody tr[data-index="${menuArr.length - 1}"]`);
+            updated_row.addClass('tr-created');
+            setTimeout(() => {
+              updated_row.removeClass('tr-created');
+            }, 3000);
+
+            toastr.success('新增資料成功', '完成操作');
+          }
+          else if (operation === 'update') {
+            let updatedMenu = data.data;
+            updatedMenu.errorMsg = {};
+            
+            // menuArr 中，要更新資料的索引值
+            let indexToUpdate = menuArr.findIndex((menu) => menu.menuId === updatedMenu.menuId);
+            menuArr.splice(indexToUpdate, 1, updatedMenu);
+
+            // menuArr 資料來源改變後，重新載入表格
+            menuTable.bootstrapTable('load', menuArr);
+            
+            // 幫修改的資料列，加上背景顏色
+            let updated_row = $(`#menuTable tbody tr[data-index="${indexToUpdate}"]`);
+            updated_row.addClass('tr-updated');
+            setTimeout(() => {
+              updated_row.removeClass('tr-updated');
+            }, 3000);
+
+            toastr.success('修改資料成功', '完成操作');
+          }
+        },
+        error: function (error) {
+          console.log(eror)
+        },
+      })
+
+      // 隱藏 Modal
+      $('#menuModal').modal('hide');
+    }
+
+    // 把圖片的 base64 編碼字串，轉換成 Blob 物件 (handleMenuSubmit 方法中，修改資料會用到)
+    function base64toBlob(base64String) {
+      let binaryString = atob(base64String);
+      let arrayBuffer = new ArrayBuffer(binaryString.length);
+      let byteArray = new Uint8Array(arrayBuffer);
+      for (var i = 0; i < binaryString.length; i++) {
+          byteArray[i] = binaryString.charCodeAt(i);
+      }
+      return new Blob([arrayBuffer], { type: 'image/*' });
+    }
+
+    // 檢查必填欄位的狀態，並更新 Modal 儲存按鈕的 disabled 屬性值
+    function checkMenuForm() {
+      let error_name_el = $('.error-name');
+      let error_price_el = $('.error-price');
+      let name_value = $('#name').val().trim();
+      let price_value = parseInt($('#price').val());
+
+      // 檢查必填欄位的狀態、錯誤時就顯示錯誤訊息
+      // 檢查餐點名稱
+      if (!name_value) {
+        currentMenu.checkNameStatus = false;
+        currentMenu.errorMsg.name = '餐點名稱不可為空';
+        error_name_el.addClass('show');
+        error_name_el.find('span').text(currentMenu.errorMsg.name);
+      } else {
+        currentMenu.checkNameStatus = true;
+        delete currentMenu.errorMsg.name;
+        error_name_el.removeClass('show');
+        error_name_el.find('span').text('');
+      }
+      // 檢查價格
+      if ((isNaN(price_value)) || price_value < 0) {
+        currentMenu.checkPriceStatus = false;
+        $('#price').val(0);
+        currentMenu.errorMsg.price = '價格不可為負數、文字';
+        error_price_el.addClass('show');
+        error_price_el.find('span').text(currentMenu.errorMsg.price);
+      } else {
+        currentMenu.checkPriceStatus = true;
+        delete currentMenu.errorMsg.price;
+        error_price_el.removeClass('show');
+        error_price_el.find('span').text('');
+      }
+
+      updateSubmitButtonStatus()
+    }
+
+    // 更新 Modal 儲存按鈕的 disabled 屬性值
+    function updateSubmitButtonStatus() {
+      let btn_submit = $('#btn-submit');
+      // Objec.key() 方法，會回傳物件所有屬性名稱的字串陣列
+      // 如果 errorMsg 物件沒有屬性，就代表沒有錯誤訊息，submit 按鈕就要啟用
+      if (currentMenu.checkNameStatus && currentMenu.checkPriceStatus && Object.keys(currentMenu.errorMsg).length === 0) {
+        btn_submit.prop('disabled', false);
+      } else {
+        btn_submit.prop('disabled', true);
+      }
+    }
+    
+    // 刪除單一餐點
+    function deleteMenu(menuId) {
+      Swal.fire({
+        // 自訂圖示
+        iconHtml: '<img src="/images/cancel-2.png">',
+        title: "確定要刪除資料嗎？",
+        position: 'center',
+        confirmButtonText: "確認",
+        showDenyButton: true,
+        denyButtonText: "取消",
+        showCloseButton: true,
+        // 加上自訂的 class，再透過 class 去找內部的組件修改 css 樣式
+        // 這樣就不會影響頁面上其他的 SweetAlert2 視窗樣式
+        customClass: {
+          popup: 'custom-delete-menu-popup',
+          // 自訂 icon 父層加上 class，方便修改 css
+          icon: 'custom-icon-wrapper'
+        },
+      }).then((result) => {
+
+        let menuIds = [];
+        menuIds.push(menuId);
+        
+        // 參數，準備序列化成 JSON 傳到後端
+        let paramObj = {
+          restaurantId: restaurantId,
+          menuIds: menuIds,
+        }
+        if (result.isConfirmed) {
+          // 發送 ajax 請求到後端，刪除資料
+          $.ajax({
+            url: 'http://localhost:8080/restaurant/menu/delete',
+            type: 'POST',
+            dataType: 'json',
+            contentType: 'application/json;charset=utf-8', 
+            data: JSON.stringify(paramObj), // 把物件轉成 JSON 字串
+            success: function (data) {
+              // 刪除 menuArr 的資料，並更新表格
+              let indexToDelete = menuArr.findIndex((menu) => menu.menuId === menuId);
+              if (indexToDelete !== -1) {
+                menuArr.splice(indexToDelete, 1);
+              }
+              // menuArr 資料來源改變後，更新表格
+              menuTable.bootstrapTable('load', menuArr);
+              toastr.success('成功刪除資料', '操作成功');
+            },
+            error: function (error) {
+              console.log(eror)
+            },
+          })
+
+        }
+      });
+    }
+    // 刪除選取的餐點
+    function deleteSelectedMenu() {      
+      // 獲取被選中的資料
+      let selectedMenu = $('#menuTable').bootstrapTable('getSelections');
+      if (selectedMenu.length > 0) {
+        Swal.fire({
+          iconHtml: '<img src="/images/cancel-2.png">',
+          title: `要刪除${selectedMenu.length}筆資料嗎？`,
+          position: 'center',
+          confirmButtonText: "確認",
+          showDenyButton: true,
+          denyButtonText: "取消",
+          showCloseButton: true,
+          customClass: {
+            popup: 'custom-delete-menu-popup',
+            icon: 'custom-icon-wrapper'
+          },
+        }).then((result) => {
+          if (result.isConfirmed) {
+            // 選取的菜單ID
+            let selectedId = selectedMenu.map((menu) => menu.menuId); 
+            let paramObj = {
+              restaurantId: restaurantId,
+              menuIds: selectedId,
+            }
+            $.ajax({
+              url: 'http://localhost:8080/restaurant/menu/delete',
+              type: 'POST',
+              dataType: 'json',
+              contentType: 'application/json;charset=utf-8',
+              data: JSON.stringify(paramObj),
+              success: function (data) {
+                // 刪除資料來源 menuArr 選中的菜單資料
+                selectedId.forEach((id) => {
+                  let indexToDelete = menuArr.findIndex((menu) => menu.menuId === id);
+                  if (indexToDelete !== -1) {
+                    menuArr.splice(indexToDelete, 1);
+                  }
+                })
+                // menuArr 資料來源改變後，要重新載入表格資料
+                menuTable.bootstrapTable('load', menuArr);
+                toastr.success('成功刪除資料', '操作成功');
+              },
+              error: function (error) {
+                console.log(eror)
+              },
+            })
+          }
+        });
+      }
+      else {
+        Swal.fire({
+          iconHtml: '<img src="/images/warning-1.png">',
+          title: `請先勾選要刪除的資料`,
+          position: 'center',
+          confirmButtonText: "確認",
+          showCloseButton: true,
+          customClass: {
+            popup: 'custom-delete-menu-popup',
+            icon: 'custom-icon-wrapper'
+          },
+        })
+      }
+    }
+    // 清除表單欄位值、清除預覽圖片路徑
+    function clearMenuForm() {
+      $('#name').val('');
+      $('#price').val('');
+      $('#description').val('');
+      $('#previewImg').attr('src', noPhoto);
+    }
+    // 點擊選擇檔案按鈕，觸發 input file 元素的 click 事件
+    // 因為 input file 是 display:none，透過這樣方式觸發
+    function handleClickInputFile() {
+      $('#photo').click();
+    }
+    // 預覽圖片
+    function handleFileChange() {
+      // isUploadFileChange，給修改資料使用
+      // 標記上傳檔案欄位，曾經有上傳過 (不論結果是否有檔案上傳、或是又按取消)
+      currentMenu.isUploadFileChange  = true;
+      
+      // event 是觸發的事件對象，target 是觸發事件的 DOM 元素；input 元素的 files 屬性，是一個陣列，裡面存放著上傳的檔案
+      const file = event.target.files[0];
+
+      // 如果沒有上傳圖片檔案，或是上傳後再點擊取消按鈕，就顯示預設圖片
+      if (!file) {
+        console.log('沒有上傳圖片檔案');
+        currentMenu.photo = null;
+        currentMenu.photoSrc = null;
+        $('#previewImg').attr('src', noPhoto);
+        return;
+      }
+
+      /** 
+       * 如果有上傳圖片檔案，就顯示上傳的圖片
+       * URL.createObjectURL，讓上傳檔案產生一個臨時的 URL 字串，再指定給 img 元素的 src 屬性，來顯示圖片
+       * URL.createObjectURL，不需要把圖片檔案轉成 base64 字串，所以不會有記憶體負擔，但 URL 只在當前頁面有效，頁面關閉後就會失效
+      */
+
+      let tempUrl = URL.createObjectURL(file);
+      $('#previewImg').attr('src', tempUrl);
+      currentMenu.photo = file;
+      currentMenu.photoSrc = tempUrl;
+    }
+
+    // 初始化每頁顯示筆數的下拉選單
+    function initPageSizeSelect() {
+      // 取得 Bootstrap table 中 pageList 屬性值
+      let pageSizes = menuTable.bootstrapTable('getOptions').pageList;
+
+      // 每頁資料筆數的選單，動態設定選項值
+      let pageSizeSelect = $('#pageSizeSelect');
+      pageSizes.forEach(value => {
+        let option = $('<option>', {
+          value: value,
+          text: value
+        });
+        pageSizeSelect.append(option);
+      });
+
+      // 綁定事件，當每頁資料筆數改變時，要更新 Bootstrap table物件的 pageSize 屬性值、並調整表格的顯示
+      pageSizeSelect.change(function () {
+        // $(this) 是 jQuery 物件，和 this、event.target，都可以取得觸發事件的 select 元素
+        let pageSize = $(this).val();
+        // 設定 Bootstrap Table 的每頁顯示筆數 pageSize 屬性
+        menuTable.bootstrapTable('refreshOptions', {
+          pageSize: pageSize
+        });
+      })
+    }
+    // toastr 設定
+    function toastrOptions() {
+      // toastr 訊息視窗的各種設定參數，有*是比較常用會改的設定
+      toastr.options = {
+        "closeButton": true,    // *顯示關閉按紐
+        "progressBar": true,   // *顯示時間進度條
+        // *官方沒有讓視窗置中的選項，自己在css加一個class名稱並設計讓視窗置中
+        "positionClass": "toast-center-center",
+        "timeOut": "2000",         // *訊息視窗的顯示時間 (毫秒) 
+        "extendedTimeOut": "1000",  // *當使用者滑鼠碰到訊息視窗，設定滑鼠離開訊息視窗後幾毫秒後消失
+        "preventDuplicates": true,  // *隱藏重覆訊息
+        "onclick": null,            // *當點選提示訊息時，則執行此函式
+        "showDuration": "300",      // 顯示時動畫的時間 (毫秒)
+        "hideDuration": "1000",     // 消失時動畫的時間 (毫秒)
+      }
+    }
+
+  </script>
+
+</body>
+
+</html>

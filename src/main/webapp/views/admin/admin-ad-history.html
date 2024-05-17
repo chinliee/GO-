@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>管理員後台-廣告履歷</title>
+
+  <!-- 樣板需要的 css 資源-->
+  <script src="https://kit.fontawesome.com/cda74843f9.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="/css/sb-admin-2.min.css">
+  <link rel="stylesheet" href="/css/sb-admin-2-custom-admin.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <script src="https://unpkg.com/vue@3.4.21/dist/vue.global.prod.js"></script>
+  <script src="https://unpkg.com/axios@1.6.7/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ"
+    crossorigin="anonymous"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <style>
+    [v-cloak] {
+      display: none;
+    }
+  </style>
+</head>
+
+<body id="app" v-cloak>
+
+  <!-- 模板外層容器 -->
+  <div id="wrapper">
+    <!-- 側邊 Sidebar -->
+    <ul class="navbar-nav sidebar sidebar-dark accordion bg-deep-blue" id="accordionSidebar">
+      <a class="sidebar-brand d-flex align-items-center justify-content-center" href="#">
+        <div class="sidebar-brand-text mx-3">管理員後台</div>
+      </a>
+      <!-- 分隔線 -->
+      <hr class="sidebar-divider my-0">
+      <li class="nav-item">
+        <a class="nav-link" href="./admin-member.html">
+          <img src="/images/member-1.png">
+          <span>會員資料</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="./admin-menu-order.html">
+          <img src="/images/data-1.png">
+          <span>餐點訂單</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="./admin-statistic.html">
+          <img src="/images/money-report-1.png">
+          <span>銷售數據</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="./admin-ad-history.html">
+          <img src="/images/adhistory.png">
+          <span>廣告履歷</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="./admin-coupon.html">
+          <img src="/images/coupon.png">
+          <span>優惠卷</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="./admin-restaurant.html">
+          <img src="/images/edit.png">
+          <span>餐廳資訊</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="./admin-contact.html">
+          <img src="/images/customer-service.jpg">
+          <span>客服中心</span>
+        </a>
+      </li>
+
+      <!-- Sidebar 展開收合按鈕 -->
+      <div class="text-center d-none d-md-inline">
+        <button class="rounded-circle border-0" id="sidebarToggle"></button>
+      </div>
+    </ul>
+
+    <!-- 主內容區域，包含上方導覽列與各網頁內容 -->
+    <div id="content-wrapper" class="d-flex flex-column">
+      <div id="content">
+        <!-- 上方導覽列 -->
+        <nav class="navbar navbar-expand topbar mb-4 static-top" style="display: flex; justify-content: space-between;">
+          <div class="temp"></div>
+          <div class="nav-item dropdown no-arrow">
+            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown"
+              aria-haspopup="true" aria-expanded="false">
+              <span class="mr-2 d-none d-lg-inline text-gray-600 small topbar-name">{{adminName}}</span>
+            </a>
+            <!-- 功能列表 -->
+            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
+              <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal" @click="logout">
+                <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                登出
+              </a>
+            </div>
+          </div>
+        </nav>
+
+        <!-- 各網頁內容 -->
+        <div class="container-fluid">
+          <div class="col py-3">
+            <div class="container mt-3">
+              <div class="row">
+                <div class="col">
+                  <button type="button" class="btn btn-info text-white" @click="selectAll">查詢所有</button>
+                  <button type="button" class="btn btn-danger" @click="clearIndexAd">清除首頁廣告</button>
+                </div>
+                <div class="col-md-5">
+                  <div class="input-group">
+                    <input type="text" class="form-control" placeholder="搜索">
+                    <div class="input-group-append">
+                      <button class="btn btn btn-outline-info" type="button">搜索</button>
+                    </div>
+                  </div>
+                </div>
+                <table class="table table-bordered table-hover table-sm">
+                  <thead>
+                    <tr>
+                      <th>
+                        <div class="form-check">
+                          <input type="checkbox" class="form-check-input" id="checkbox1" name="checkbox1"
+                            value="option1">
+                          <label class="form-check-label" for="checkbox1"></label>
+                        </div>
+                      </th>
+                      <th>餐廳名稱</th>
+                      <th>廣告位置</th>
+                      <th>廣告圖片</th>
+                      <th>希望開始日期</th>
+                      <th>結束日期</th>
+                      <th>成立時間</th>
+                      <th>審核狀態</th>
+                      <th>操作選項</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(adData,index) in adDatas" :key="adData.adId">
+                      <td>
+                        <div class="form-check">
+                          <input type="checkbox" class="form-check-input" :id="'checkbox-' + adData.adId"
+                            :name="'checkbox' + adData.adId" :value="adData.adId">
+                          <label class="form-check-label" :for="'checkbox-' + adData.adId"></label>
+                        </div>
+                      </td>
+                      <td>{{adData.name}}</td>
+                      <td>{{adData.location}}</td>
+                      <td><img :src="'data:image/jpeg;base64,' + adData.photo" alt="Ad Photo"
+                          style="width: 50px; height: auto;"></td>
+
+
+
+                      <td>{{adData.startTime}}</td>
+                      <td>{{adData.endTime}}</td>
+                      <td>{{adData.createdTime}}</td>
+                      <td>
+                        <select class="form-select" aria-label="Default select example" v-model="adData.status"
+                          @click="showAlert(adData)">
+                          <option value="nocheck">未審核</option>
+                          <option value="checked">已審核</option>
+                          <option value="paid">已付款</option>
+                        </select>
+                      </td>
+                      <td>
+                        <button type="button" class="btn btn-danger btn-primary btn-sm"
+                          @click="deleteAdData(adData.adId)">刪除</button>
+                        <button type="button" class="btn btn-secondary btn-primary btn-sm" data-bs-toggle="modal"
+                          data-bs-target="#myadedit" @click="beforeEditAdData(adData)">詳細編輯</button>
+                        <button type="button" class="btn btn-warning btn-primary btn-sm"
+                          :disabled="adData.status !== 'paid'" @click="uploadToIndex(adData)">上傳首頁</button>
+
+                        <div id="myadedit" class="modal" tabindex="-1">
+                          <div class="modal-dialog">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title">編輯廠商廣告資料</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                  aria-label="Close"></button>
+                              </div>
+                              <div class="modal-body">
+                                <form role="form">
+                                  <div class="form-group">
+                                    <label for="adcode">序號</label>
+                                    <input type="text" class="form-control" id="adId" name="adId" v-model="adId"
+                                      readonly>
+                                  </div>
+                                  <div class="form-group">
+                                    <label for="restname">餐廳名稱</label>
+                                    <input type="text" class="form-control" id="name" name="name" v-model="name">
+                                  </div>
+                                  <div class="form-group">
+                                    <label for="location">廣告位置</label>
+                                    <input type="text" class="form-control" id="location" name="location"
+                                      v-model="location">
+                                  </div>
+                                  <div class="form-group">
+                                    <input type="file" class="form-control" :key="inputKey" id="photo" name="photo"
+                                      @change="handleFileChange">
+
+                                    <img :src="'data:image/jpeg;base64,' + photo" alt="Ad Photo"
+                                      style="width: 200px; height: auto;">
+                                  </div>
+                                  <div class="form-group">
+                                    <label for="url">餐廳連結</label>
+                                    <input type="text" class="form-control" id="url" name="url" v-model="url">
+                                  </div>
+                                  <div class="form-group">
+                                    <label for="content">廣告內容</label>
+                                    <textarea class="form-control" id="content" name="content"
+                                      v-model="content"></textarea>
+                                  </div>
+                                  <div class="form-group">
+                                    <label for="day">購買天數</label>
+                                    <input type="number" class="form-control" id="days" name="days" v-model="days"
+                                      min="1" max="365" step="1">
+                                  </div>
+
+                                  <div class="form-group">
+                                    <label for="price">價格</label>
+                                    <input type="text" class="form-control" id="price" name="price" v-model="totalPrice"
+                                      readonly>
+                                  </div>
+                                  <div class="form-group">
+                                    <label for="startime">希望開始日期</label>
+                                    <input type="date" class="form-control" id="starTime" name="startTime"
+                                      v-model="startTime">
+                                  </div>
+                                  <div class="form-group">
+                                    <label for="endtime">結束日期</label>
+                                    <input type="date" class="form-control" id="endTime" name="endTime"
+                                      v-model="endTime">
+                                  </div>
+                                  <div class="form-group">
+                                    <label for="statusSelect">審核狀態</label>
+                                    <select class="form-select" id="statusSelect" aria-label="Default select example"
+                                      name="status" v-model="status">
+                                      <option value="nocheck">未審核</option>
+                                      <option value="checked">已審核</option>
+                                      <option value="paid">已付款</option>
+                                    </select>
+                                  </div>
+                                  <div class="form-group">
+                                    <label for="createdtime">成立時間</label>
+                                    <input type="datetime-local" class="form-control" id="createdTime"
+                                      name="createdTime" v-model="createdTime" readonly>
+                                  </div>
+                                </form>
+                              </div>
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
+                                <button type="button" class="btn btn-primary" @click="editAdData(adId)">提交</button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+
+
+                  </tbody>
+                </table>
+
+              </div>
+              <ul class="pagination justify-content-center" style="margin:20px 0">
+                <li class="page-item disabled"><a class="page-link" href="#">上一頁</a></li>
+                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                <!-- <li class="page-item"><a class="page-link" href="#">2</a></li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                <li class="page-item"><a class="page-link" href="#">4</a></li>
+                <li class="page-item"><a class="page-link" href="#">5</a></li> -->
+                <li class="page-item"><a class="page-link" href="#">下一頁</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Footer -->
+      <footer class="sticky-footer bg-white">
+        <div class="container my-auto">
+          <div class="copyright text-center my-auto">
+            <span>Copyright &copy; 覓食 GO</span>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <!-- 模板需要的 js 資源 -->
+  <script src="/js/jquery-3.7.1.js"></script>
+  <script src="/js/bootstrap-4.6.2.bundle.min.js"></script>
+  <script src="/js/sb-admin-2.min.js"></script>
+
+  <script>
+
+    const { createApp, ref, onMounted, computed, watch } = Vue
+
+    const app = createApp({
+      setup() {
+        const inputKey = ref(0); // 用於重置 input 元素
+        let adDatas = ref({});
+
+        let adId = ref(0);
+        let name = ref('');
+        let location = ref('');
+        let photo = ref('');
+        let url = ref('');
+        let content = ref('');
+        let days = ref(1);//初始化預設值最少1天
+        let price = ref(0);
+        let startTime = ref(0);
+        let endTime = ref(0);
+        let status = ref('');
+        let createdTime = ref(0);
+
+
+        const adminName = ref(localStorage.getItem('adminName'));
+
+
+        onMounted(() => {
+          selectAll();//頁面加載時顯示所有廣告
+        });
+
+
+
+
+
+        //監聽編輯前購買天數跟開始時間
+        watch([days, startTime], () => {
+          calculateEndTime();
+        });
+
+        //監聽後結束時間
+        const calculateEndTime = () => {
+          if (days.value && startTime.value) {
+            let startDate = new Date(startTime.value);
+            let endDate = new Date(startDate.getTime() + days.value * 24 * 60 * 60 * 1000);
+            //格式化日期為 YYYY-MM-DD 格式以適應 <input type="date">
+            endTime.value = endDate.toISOString().split('T')[0];
+          }
+        };
+
+        const totalPrice = computed(() => {
+          return days.value * 3000; // 計算總金額
+        });
+
+        //監聽圖片更換
+        function handleFileChange(event) {
+          const file = event.target.files[0];
+          if (!file) {
+            return;
+          }
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const result = e.target.result;
+            photo.value = result.split(',')[1]; // 这将尝试仅提取 Base64 部分，假设结果是纯 Base64 字符串
+          };
+          reader.readAsDataURL(file);
+        }
+
+
+
+
+        //查詢所有廣告按鈕
+        function selectAll() {
+          axios.get('http://localhost:8080/adDatas')
+            .then(function (response) {
+              adDatas.value = response.data;
+
+            })
+            .catch(function (error) {
+
+              console.log(error);
+            })
+        };
+
+
+
+
+        function deleteAdData(adId) {
+          Swal.fire({
+            title: "是否刪除資料?",
+            text: "一旦刪除，您將無法恢復此紀錄!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: '確定',
+            cancelButtonText: '取消',
+            reverseButtons: true // 將取消按鈕放在右邊
+          }).then((result) => {
+            if (result.isConfirmed) {
+              axios.delete(`http://localhost:8080/adDatas/${adId}`)
+                .then(response => {
+                  Swal.fire({
+                    title: "廣告已被刪除!",
+                    icon: "success",
+                  });
+                  selectAll(); // 這裡假設 selectAll() 是您用來刷新列表的函數
+                })
+                .catch(error => {
+                  Swal.fire({
+                    title: "刪除失敗",
+                    icon: "error",
+                  });
+                });
+            }
+          });
+        }
+
+
+
+        //編輯廣告前綁定資料
+        function beforeEditAdData(adData) {
+
+          adId.value = adData.adId;
+          name.value = adData.name;
+          location.value = adData.location;
+          photo.value = adData.photo;
+          url.value = adData.url;
+          content.value = adData.content;
+          days.value = adData.days;
+          price.value = adData.price;
+          startTime.value = adData.startTime;
+          endTime.value = adData.endTime;
+          status.value = adData.status;
+          createdTime.value = adData.createdTime;
+
+          inputKey.value++ // 用於重置 input 元素
+
+        }
+
+
+        //初始化數據下次新增時clear畫面
+        function clearForm() {
+          name.value = '';
+          location.value = '';
+          photo.value = '';
+          url.value = '';
+          content.value = '';
+          days.value = '';
+          price.value = '';
+          startTime.value = '';
+          endTime.value = '';
+          status.value = '';
+          createdTime.value = '';
+        }
+
+
+        //modal內資料編輯修改
+        function editAdData(adId) {
+          const updateAdData = {
+            name: name.value,
+            location: location.value,
+            photo: photo.value,
+            url: url.value,
+            content: content.value,
+            days: days.value,
+            price: price.value,
+            startTime: Date.parse(startTime.value),
+            endTime: Date.parse(endTime.value),
+            status: status.value,
+            createdTime: Date.parse(createdTime.value)
+          };
+
+
+
+          axios.put(`http://localhost:8080/adDatas/${adId}`, updateAdData)
+            .then(function (response) {
+              Swal.fire({
+                title: "修改成功",
+                icon: "success"
+              }).then(function () {
+                $('#myadedit').modal('hide');
+                clearForm();
+                selectAll();
+              });
+            })
+            .catch(function (error) {
+              Swal.fire({
+                title: "修改失敗,請檢查輸入是否正確",
+                icon: "error",
+              }).then(function (confirm) {
+                // 可以在這裡處理確認後的操作
+              });
+            });
+        }
+
+
+
+        const showAlert = (adData) => {
+          // 保存当前选中的状态，以便在需要时可以回退
+          const originalStatus = adData.status;
+          Swal.fire({
+            title: '警告',
+            text: '您確定要更改審核狀態嗎？',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: '確定',
+            cancelButtonText: '取消'
+          }).then((result) => {
+            if (result.isConfirmed) {
+              Swal.fire({
+                title: '選擇新的審核狀態',
+                input: 'select',
+                inputOptions: {
+                  'nocheck': '未審核',
+                  'checked': '已審核',
+                  'paid': '已付款'
+                },
+                inputPlaceholder: '選擇狀態',
+                showCancelButton: true,
+                inputValidator: (value) => {
+                  return new Promise((resolve) => {
+                    if (value !== '') {
+                      resolve();
+                    } else {
+                      resolve('請選擇一個狀態！');
+                    }
+                  });
+                }
+              }).then((inputResult) => {
+                if (inputResult.isConfirmed) {
+                  // 設置新狀態
+                  adData.status = inputResult.value;
+                  beforeEditAdData(adData);//修改前綁定資料
+                  editAdData(adData.adId);//修改資料庫
+                }
+              });
+            } else {
+              // 取消，退回
+              adData.status = originalStatus;
+            }
+          });
+        };
+
+
+        function uploadToIndex(adData) {
+          //尝试从 Local Storage 中获取现有的广告数组
+          console.log(adData);
+          let ads = JSON.parse(localStorage.getItem('adDatas')) || [];
+
+          // 查找是否已存在具有相同 location 的广告
+          const existingIndex = ads.findIndex(ad => ad.location === adData.location);
+          console.log(existingIndex);
+          if (existingIndex !== -1) {
+            // 如果找到，覆盖原本的数据
+            ads[existingIndex] = adData;
+          } else {
+            // 如果未找到，添加新的广告数据到数组中
+            ads.push(adData);
+            console.log(ads);
+          }
+
+          // 将更新后的数组保存回 Local Storage
+          localStorage.setItem('adDatas', JSON.stringify(ads));
+          // localStorage.clear();
+
+          // 可选：跳转到 index.html，如果您需要立即在另一个页面显示这些数据
+          window.open('../index.html', '_blank');
+        }
+
+        function clearIndexAd() {
+
+          localStorage.removeItem('adDatas');
+          console.log('clearok');
+        }
+
+        function logout() {
+          localStorage.removeItem("adminId");
+          localStorage.removeItem("adminName");
+          window.location.href = "./admin-login.html";
+        }
+
+
+
+
+        return {
+          selectAll,
+          adDatas,
+          deleteAdData,
+          beforeEditAdData,
+          adId,
+          name,
+          location,
+          photo,
+          url,
+          content,
+          days,
+          price,
+          startTime,
+          endTime,
+          status,
+          createdTime,
+          handleFileChange,
+          inputKey,
+          editAdData,
+          totalPrice,
+          showAlert,
+          uploadToIndex,
+          clearIndexAd,
+          logout,
+          adminName
+
+        }
+
+      }
+    })
+
+    app.mount("#app")
+
+  </script>
+
+</body>
+
+</html>

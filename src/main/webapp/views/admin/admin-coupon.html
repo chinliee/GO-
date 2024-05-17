@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>管理員後台-優惠卷</title>
+
+  <!-- 樣板需要的 css 資源-->
+  <script src="https://kit.fontawesome.com/cda74843f9.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="/css/sb-admin-2.min.css">
+  <link rel="stylesheet" href="/css/sb-admin-2-custom-admin.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <script src="https://unpkg.com/vue@3.4.21/dist/vue.global.prod.js"></script>
+  <script src="https://unpkg.com/axios@1.6.7/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ"
+    crossorigin="anonymous"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <style>
+    [v-cloak] {
+      display: none;
+    }
+  </style>
+</head>
+
+<body id="app" v-cloak>
+
+  <!-- 模板外層容器 -->
+  <div id="wrapper">
+    <!-- 側邊 Sidebar -->
+    <ul class="navbar-nav sidebar sidebar-dark accordion bg-deep-blue" id="accordionSidebar">
+      <a class="sidebar-brand d-flex align-items-center justify-content-center" href="#">
+        <div class="sidebar-brand-text mx-3">管理員後台</div>
+      </a>
+      <!-- 分隔線 -->
+      <hr class="sidebar-divider my-0">
+      <li class="nav-item">
+        <a class="nav-link" href="./admin-member.html">
+          <img src="/images/member-1.png">
+          <span>會員資料</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="./admin-menu-order.html">
+          <img src="/images/data-1.png">
+          <span>餐點訂單</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="./admin-statistic.html">
+          <img src="/images/money-report-1.png">
+          <span>銷售數據</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="./admin-ad-history.html">
+          <img src="/images/adhistory.png">
+          <span>廣告履歷</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="./admin-coupon.html">
+          <img src="/images/coupon.png">
+          <span>優惠卷</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="./admin-restaurant.html">
+          <img src="/images/edit.png">
+          <span>餐廳資訊</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="./admin-contact.html">
+          <img src="/images/customer-service.jpg">
+          <span>客服中心</span>
+        </a>
+      </li>
+
+      <!-- Sidebar 展開收合按鈕 -->
+      <div class="text-center d-none d-md-inline">
+        <button class="rounded-circle border-0" id="sidebarToggle"></button>
+      </div>
+    </ul>
+
+    <!-- 主內容區域，包含上方導覽列與各網頁內容 -->
+    <div id="content-wrapper" class="d-flex flex-column">
+      <div id="content">
+        <!-- 上方導覽列 -->
+        <nav class="navbar navbar-expand topbar mb-4 static-top" style="display: flex; justify-content: space-between;">
+          <div class="temp"></div>
+          <div class="nav-item dropdown no-arrow">
+            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown"
+              aria-haspopup="true" aria-expanded="false">
+              <span class="mr-2 d-none d-lg-inline text-gray-600 small topbar-name">{{adminName}}</span>
+            </a>
+            <!-- 功能列表 -->
+            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
+              <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal" @click="logout">
+                <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                登出
+              </a>
+            </div>
+          </div>
+        </nav>
+
+        <!-- 各網頁內容 -->
+        <div class="container-fluid">
+          <div class="col py-3">
+            <div class="container mt-12">
+              <div class="row">
+                <div class="col">
+                  <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                    data-bs-target="#mycoupon">新增優惠卷</button>
+                  <div id="mycoupon" class="modal" tabindex="-1">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title">新增優惠卷</h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                          <form role="form">
+
+                            <div class="form-group">
+                              <label for="couponcode">優惠碼</label>
+                              <div class="input-group">
+                                <input type="text" class="form-control" name="code" v-model="code" placeholder="請輸入優惠碼">
+                                <div class="input-group-append">
+                                  <button type="button" class="btn btn-info" @click="generateCode">生成優惠碼</button>
+                                </div>
+                              </div>
+                            </div>
+
+                            <label for="coupontype">類型</label>
+                            <select class="form-select" aria-label="Default select example" v-model="type">
+                              <option disabled value="">--請選擇--</option>
+                              <option value="birthday">生日優惠卷</option>
+                              <option value="newmember">新會員優惠卷</option>
+                              <option value="newyear">新年優惠卷</option>
+                            </select>
+                            <div class="form-group">
+                              <label for="coupondiscount">折扣</label>
+                              <input type="text" class="form-control" name="discount" v-model="discount"
+                                placeholder="折扣範圍0.01~0.99">
+                            </div>
+                            <div class="form-group">
+                              <label for="couponprice">使用金額</label>
+                              <input type="text" class="form-control" name="usagePrice" v-model="usagePrice"
+                                placeholder="請輸入金額">
+                            </div>
+                            <div class="form-group">
+                              <label for="couponstarttime">開始時間</label>
+                              <input type="datetime-local" class="form-control" name="startTime" v-model="startTime"
+                                :min="minDateTime">
+                            </div>
+                            <div class="form-group">
+                              <label for="couponendtime">結束時間</label>
+                              <input type="datetime-local" class="form-control" name="endTime" v-model="endTime"
+                                :min="minDateTime">
+                            </div>
+                          </form>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
+                          <button type="button" class="btn btn-primary" @click="addnewcoupon">提交</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <button type="button" class="btn btn-info text-white" @click="selectAll">查詢所有</button>
+                  <!-- <button type="button" class="btn btn-danger" @click="deleteSelectedCoupons">批量刪除</button> -->
+                  <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#memberSearch"
+                    @click="searchMember()">查詢會員</button>
+                  <div class="modal fade" id="memberSearch" tabindex="-1" aria-labelledby="exampleModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="exampleModalLabel">成員列表</h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                          <table class="table table-striped table-hover">
+                            <thead>
+                              <tr>
+                                <th scope="col">姓名</th>
+                                <th scope="col">註冊日</th>
+                                <th scope="col">郵件</th>
+
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr v-for="(member,index) in memberList" :key="member.memberId">
+                                <td>{{member.name}}</td>
+                                <td>{{member.registeration_date}}</td>
+                                <td>{{member.email}}</td>
+                              </tr>
+                            </tbody>
+                          </table>
+
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="input-group">
+                    <select class="form-select form-select-sm" v-model="selectedType"
+                      aria-label=".form-select-lg example">
+                      <option value="selected">請選擇</option>
+                      <option value="code">優惠碼</option>
+                      <option value="type">類型</option>
+                      <option value="discount">折扣</option>
+                      <option value="usagePrice">使用金額</option>
+                      <option value="startTime">開始時間</option>
+                      <option value="endTime">結束時間</option>
+                    </select>
+                    <input type="text" class="form-control w-50" v-model="keyword" placeholder="搜索">
+                    <button class="btn btn-outline-info" type="button" @click="searchKeyWord">搜索</button>
+                  </div>
+                </div>
+
+                <table class="table table-bordered table-hover">
+                  <thead>
+                    <tr>
+                      <th>
+                        <div class="form-check">
+                          <input type="checkbox" class="form-check-input" id="checkboxhead" name="checkboxhead"
+                            value="option1" v-model="allselect">
+                          <label class="form-check-label" for="checkbox1"></label>
+                        </div>
+
+
+                      </th>
+                      <th>優惠碼</th>
+                      <th>類型</th>
+                      <th>折扣</th>
+                      <th>使用金額</th>
+                      <th>開始時間</th>
+                      <th>結束時間</th>
+                      <th>操作選項</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+
+                    <tr v-for="(coupon, index) in paginatedCoupons" :key="coupon.couponId">
+                      <td>
+                        <div class="form-check">
+                          <input type="checkbox" class="form-check-input" :id="'checkbox-' + coupon.couponId"
+                            :name="'checkbox' + coupon.couponId" :value="coupon.couponId"
+                            @click="getCheckbox(coupon.couponId)">
+                          <label class="form-check-label" :for="'checkbox-' + coupon.couponId"></label>
+                        </div>
+                      </td>
+
+                      <td>{{ coupon.code }}</td>
+                      <td>{{ coupon.type }}</td>
+                      <td>{{ coupon.discount }}</td>
+                      <td>{{ coupon.usagePrice }}</td>
+                      <td>{{ coupon.startTime }}</td>
+                      <td>{{ coupon.endTime }}</td>
+                      <td>
+                        <button type="button" class="btn btn-danger btn-primary btn-sm"
+                          @click="deleteConfirm(coupon)">刪除</button>
+                        <button type="button" class="btn btn-secondary btn-primary btn-sm" data-bs-toggle="modal"
+                          data-bs-target="#mycouponedit" @click="beforeEditCoupon(coupon)">
+                          編輯
+                        </button>
+                        <div id="mycouponedit" class="modal" tabindex="-1">
+                          <div class="modal-dialog">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title">編輯優惠卷</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                  aria-label="Close"></button>
+                              </div>
+                              <div class="modal-body">
+                                <form role="form">
+                                  <div class="form-group">
+                                    <label for="couponcode">序號</label>
+                                    <input type="text" class="form-control" name="couponId" v-model="couponId" readonly>
+                                  </div>
+
+                                  <div class="form-group">
+                                    <label for="couponcode">優惠碼</label>
+                                    <input type="text" class="form-control" name="code" v-model="code">
+                                  </div>
+
+                                  <label for="coupontype">類型</label>
+                                  <select class="form-select" aria-label="Default select example" name="type"
+                                    v-model="type">
+
+                                    <option value="birthday">生日優惠卷</option>
+                                    <option value="newmember">新會員優惠卷</option>
+                                    <option value="newyear">新年優惠卷</option>
+                                  </select>
+                                  <div class="form-group">
+                                    <label for="coupondiscount">折扣</label>
+                                    <input type="text" class="form-control" name="discount" v-model="discount">
+                                  </div>
+                                  <div class="form-group">
+                                    <label for="couponprice">使用金額</label>
+                                    <input type="text" class="form-control" name="usagePrice" v-model="usagePrice">
+                                  </div>
+                                  <div class="form-group">
+                                    <label for="couponstarttime">開始時間</label>
+                                    <input type="datetime-local" class="form-control" name="startTime"
+                                      v-model="startTime" :min="minDateTime">
+                                  </div>
+                                  <div class="form-group">
+                                    <label for="couponendtime">結束時間</label>
+                                    <input type="datetime-local" class="form-control" name="endTime" v-model="endTime"
+                                      :min="minDateTime">
+                                  </div>
+                                </form>
+                              </div>
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
+                                <button type="button" class="btn btn-primary" @click="editCoupon">提交</button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <button type="button" class="btn btn-warning btn-primary btn-sm" data-bs-toggle="modal"
+                          data-bs-target="#couponToMember" @click="addCouponToMember(coupon)">新增到會員</button>
+                        <!-- Modal -->
+                        <div class="modal fade" id="couponToMember" tabindex="-1" aria-labelledby="exampleModalLabel"
+                          aria-hidden="true">
+                          <div class="modal-dialog">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">成員列表</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                  aria-label="Close"></button>
+                              </div>
+                              <div class="modal-body">
+
+                                <table class="table table-striped table-hover">
+                                  <thead>
+                                    <tr>
+                                      <th scope="col"><input type="checkbox">
+                                      </th>
+                                      <th scope="col">姓名</th>
+                                      <th scope="col">註冊日</th>
+                                      <th scope="col">郵件</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    <tr v-for="(member, index) in toMembersCoupon" :key="member.memberId">
+                                      <td><input type="checkbox" name="memberId" :value="member.memberId"
+                                          class="membercheck" @click="getCheckboxMemberId(member.memberId)"></td>
+                                      <td>{{ member.name }}</td>
+                                      <td>{{ member.registeration_date }}</td>
+                                      <td>{{ member.email }}</td>
+                                    </tr>
+                                  </tbody>
+                                </table>
+                              </div>
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                                <button type="button" class="btn btn-warning" @click="getCouponToAll">全員新增</button>
+                                <button type="button" class="btn btn-primary" @click="getCoupon">個別新增</button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <ul class="pagination justify-content-center" style="margin:20px 0">
+            <li class="page-item" :class="{ disabled: currentPage === 1 }">
+              <a class="page-link" href="#" @click.prevent="changePage(currentPage - 1)">上一頁</a>
+            </li>
+            <li class="page-item" :class="{ active: page === currentPage }" v-for="page in totalPages" :key="page">
+              <a class="page-link" href="#" @click.prevent="changePage(page)">{{ page }}</a>
+            </li>
+            <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+              <a class="page-link" href="#" @click.prevent="changePage(currentPage + 1)">下一頁</a>
+            </li>
+          </ul>
+          <div class="col-md-3 d-flex align-items-center">
+            <select class="form-select w-auto" v-model="itemsPerPage" @change="changeItemsPerPage">
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="20">20</option>
+            </select>
+            <span class="ms-2">每頁顯示筆數</span>
+          </div>
+        </div>
+      </div>
+      <!-- Footer -->
+      <footer class="sticky-footer bg-white">
+        <div class="container my-auto">
+          <div class="copyright text-center my-auto">
+            <span>Copyright &copy; 覓食 GO</span>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <!-- 模板需要的 js 資源 -->
+  <script src="/js/jquery-3.7.1.js"></script>
+  <script src="/js/bootstrap-4.6.2.bundle.min.js"></script>
+  <script src="/js/sb-admin-2.min.js"></script>
+
+  <script>
+
+    const { createApp, ref, onMounted, computed } = Vue
+
+    const app = createApp({
+      setup() {
+        //儲存查詢後respon.data資料的coupons
+        let coupons = ref([]);
+        //編輯前綁定toMembersCoupon的資料
+        let toMembersCoupon = ref([]);
+        //checkbox被選中selectedMemberId
+        let selectedMemberId = ref(0);
+        //增加會員到優惠卷內
+        let addMemberIdToCoupon = ref({});
+        //收集memberList
+        const memberList = ref([]);
+
+        //編輯前綁定members的資料
+        let members = ref([]);
+        //新增優惠卷資料axios post
+        let addcoupon = ref({});
+        //雙向綁定couponId初始值
+        let couponId = ref(0);
+        //雙向綁定code初始值
+        let code = ref('');
+        //雙向綁定type初始值
+        let type = ref('');
+        //雙向綁定discount初始值
+        let discount = ref(0);
+        //雙向綁定usagePrice初始值
+        let usagePrice = ref(0);
+        //雙向綁定startTime初始值
+        let startTime = ref('');
+        //雙向綁定endTime初始值
+        let endTime = ref('');
+        //編輯優惠卷資料axios put
+        let updateCoupon = ref({});
+        //編輯按鈕的帶入參數coupon 放到currentCoupon
+        let currentCoupon = ref({});
+
+        //不可輸日今天以前的日期變量
+        const minDateTime = ref('');
+
+        //現在頁面數預設1
+        let currentPage = ref(1);
+        //現在每頁幾筆預設
+        let itemsPerPage = ref(5);
+
+        const selectedCouponId = ref(0);
+
+        const selectedType = ref('selected') // 儲存選擇的类型預設
+        const keyword = ref('') // 儲存關鍵字
+
+        const adminName = ref(localStorage.getItem('adminName'));
+
+        function searchKeyWord() {
+          axios.get(`http://localhost:8080/coupons/search/${selectedType.value}/${keyword.value}`)
+            .then(response => {
+              coupons.value = response.data;
+              selectedType.value = "selected";
+              keyword.value = "";
+            }).catch(error => {
+              console.error("An error occurred:", error);
+            });
+        }
+
+        //getCheckbox(id)
+        function getCheckbox(couponId) {
+          selectedCouponId.value = couponId;
+          console.log(selectedCouponId.value);
+        }
+
+        //search member
+        function searchMember() {
+          axios.get(`http://localhost:8080/coupons/${selectedCouponId.value}/members`)
+            .then(response => {
+              memberList.value = response.data;
+            }).catch(error => {
+              console.error("An error occurred:", error);
+            });
+        }
+
+        //優惠碼生成
+        function generateCode() {
+          const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+          let result = '';
+          const charactersLength = characters.length;
+          for (let i = 0; i < 4; i++) {
+            result += characters.charAt(Math.floor(Math.random() * charactersLength));
+          }
+          code.value = result;
+        }
+
+        //計算coupon數量長度/每頁幾筆 = 組共幾頁
+        const totalPages = computed(() => {
+          return Math.ceil(coupons.value.length / itemsPerPage.value);
+        });
+
+
+        //現在頁面數-1*每頁幾筆 = 開始值
+        //開始值+每頁幾筆 = 結束值
+        //回傳已分頁後的coupon 5-10 10-15 15-20
+        const paginatedCoupons = computed(() => {
+          const start = (currentPage.value - 1) * itemsPerPage.value;
+          const end = start + itemsPerPage.value;
+          return coupons.value.slice(start, end);
+        });
+
+
+        //頁面加載時顯示所有優惠卷
+        onMounted(() => {
+          selectAll();
+        });
+
+        //startTime endTime不可選擇今天之前的日期時間
+        onMounted(() => {
+          const today = new Date();
+          const year = today.getFullYear();
+          const month = (today.getMonth() + 1).toString().padStart(2, '0'); // 因為 getMonth() 從 0 開始
+          const day = today.getDate().toString().padStart(2, '0');
+          const hours = today.getHours().toString().padStart(2, '0');
+          const minutes = today.getMinutes().toString().padStart(2, '0');
+          minDateTime.value = `${year}-${month}-${day}T${hours}:${minutes}`;
+        });
+
+        //新增成員到優惠卷內前先查詢成員列表
+        function addCouponToMember(coupon) {
+          $(".membercheck").prop('checked', false);
+          couponId.value = coupon.couponId;
+
+
+          axios.get('http://localhost:8080/member/search/all-member')
+            .then(function (response) {
+              toMembersCoupon.value = response.data.data;
+              getCheckboxMemberId(0);
+            })
+            .catch(function (error) {
+
+              console.log(error);
+            })
+        }
+
+
+        function getCheckboxMemberId(memberId) {
+
+          selectedMemberId.value = memberId;
+          console.log(selectedMemberId.value);
+        }
+
+        //將優惠卷插入到指定成員中
+        function getCoupon() {
+
+          const addMemberIdToCoupon = {
+            memberId: selectedMemberId.value
+          };
+          console.log(addMemberIdToCoupon);
+
+          axios.post(`http://localhost:8080/coupons/${couponId.value}/members`, addMemberIdToCoupon)
+            .then(function (response) {
+              Swal.fire("新增成功", "", "success").then(() => {
+                $('#couponToMember').modal('hide');
+              });
+
+            })
+            .catch(function (error) {
+              Swal.fire("新增失敗,請檢查輸入是否正確", "", "error");
+            });
+        }
+
+        function getCouponToAll() {
+          console.log(couponId.value);
+          axios.post(`http://localhost:8080/coupons/${couponId.value}/toallmembers`)
+            .then(function (response) {
+              Swal.fire("新增成功", "", "success").then(() => {
+                $('#couponToMember').modal('hide');
+              });
+            })
+            .catch(function (error) {
+              Swal.fire("新增失敗,請檢查輸入是否正確", "", "error");
+            });
+        }
+
+
+
+
+
+        //查詢所有優惠卷按鈕
+        function selectAll() {
+          axios.get('http://localhost:8080/coupons')
+            .then(function (response) {
+              coupons.value = response.data;
+            })
+            .catch(function (error) {
+
+              console.log(error);
+            })
+        };
+
+        //刪除優惠券如有會員有此優惠卷則無法刪除
+        function deleteConfirm(coupon) {
+          // 檢查優惠卷關連的會員
+          axios.get(`http://localhost:8080/coupons/${coupon.couponId}/members`)
+            .then(checkResponse => {
+              if (checkResponse.data.length > 0) {
+                Swal.fire({
+                  title: "刪除失败",
+                  text: "已有會員擁有此優惠卷，無法刪除。",
+                  icon: "error",
+                  confirmButtonText: '查看此優惠卷會員',
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    axios.get(`http://localhost:8080/coupons/${coupon.couponId}/members`)
+                      .then(response => {
+                        // 假设 response.data 是会员名单数组
+                        const memberList = response.data.map(member => member.name).join(", ");
+                        Swal.fire({
+                          title: "擁有此優惠卷的會員名單",
+                          text: memberList,
+
+                        });
+                      })
+                      .catch(error => {
+                        // 处理错误情况
+                        Swal.fire("獲取資料失敗", "", "error");
+                      });
+                  }
+                });
+              } else {
+                Swal.fire({
+                  title: "是否刪除資料?",
+                  text: "一旦刪除，您將無法恢復此紀錄!",
+                  icon: "warning",
+                  showCancelButton: true,
+                  confirmButtonText: '确定',
+                  cancelButtonText: '取消',
+                  reverseButtons: true,
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    axios.delete(`http://localhost:8080/coupons/${coupon.couponId}`)
+                      .then(response => {
+                        Swal.fire("優惠卷已被删除!", "", "success");
+                        selectAll();
+                      })
+                      .catch(error => {
+                        console.error("删除優惠卷失敗", error);
+                      });
+                  }
+                });
+              }
+            })
+            .catch(error => {
+              console.error("檢查優惠卷是否有關連的會員", error);
+            });
+        }
+
+
+
+
+        //新增初始化數據下次新增時clear畫面
+        function clearForm() {
+          code.value = '';
+          type.value = '';
+          discount.value = '';
+          usagePrice.value = '';
+          startTime.value = '';
+          endTime.value = '';
+        }
+        //新增優惠卷
+        function addnewcoupon() {
+          const addcoupon = {
+            code: code.value,
+            type: type.value,
+            discount: discount.value,
+            usagePrice: usagePrice.value,
+            startTime: Date.parse(startTime.value),
+            endTime: Date.parse(endTime.value)
+          };
+
+          axios.post('http://localhost:8080/coupons', addcoupon)
+            .then(function (response) {
+              Swal.fire("新增成功", "", "success").then(() => {
+                $('#mycoupon').modal('hide');
+                clearForm();
+                selectAll();
+              });
+            })
+            .catch(function (error) {
+              Swal.fire("新增失敗,請檢查輸入是否正確", "", "error");
+            });
+        }
+
+        //編輯優惠卷前綁定資料
+        function beforeEditCoupon(coupon) {
+          //coupon存到currentCoupon.value
+          currentCoupon.value = coupon;
+          couponId.value = coupon.couponId;
+          code.value = coupon.code;
+          type.value = coupon.type;
+          discount.value = coupon.discount;
+          usagePrice.value = coupon.usagePrice;
+          startTime.value = coupon.startTime;
+          endTime.value = coupon.endTime;
+
+        }
+        //修改優惠卷
+        function editCoupon() {
+
+
+          const updateCoupon = {
+            code: code.value,
+            type: type.value,
+            discount: discount.value,
+            usagePrice: usagePrice.value,
+            startTime: Date.parse(startTime.value),
+            endTime: Date.parse(endTime.value),
+          };
+
+          // 檢查優惠卷關連的會員
+          axios.get(`http://localhost:8080/coupons/${currentCoupon.value.couponId}/members`)
+            .then(checkResponse => {
+              if (checkResponse.data.length > 0) {
+                Swal.fire({
+                  title: "修改失敗",
+                  text: "已有會員擁有此優惠卷，無法修改。",
+                  icon: "error",
+                  confirmButtonText: '查看此優惠卷會員',
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    axios.get(`http://localhost:8080/coupons/${currentCoupon.value.couponId}/members`)
+                      .then(response => {
+                        // 假设 response.data 是会员名单数组
+                        const memberList = response.data.map(member => member.name).join(", ");
+                        Swal.fire({
+                          title: "擁有此優惠卷的會員名單",
+                          text: memberList,
+
+
+                        });
+                        $('#mycouponedit').modal('hide');
+                      })
+                      .catch(error => {
+                        // 处理错误情况
+                        Swal.fire("獲取資料失敗", "", "error");
+                      });
+                  }
+                });
+              } else {
+                Swal.fire({
+                  title: "是否修改資料?",
+                  text: "",
+                  icon: "warning",
+                  showCancelButton: true,
+                  confirmButtonText: '确定',
+                  cancelButtonText: '取消',
+                  reverseButtons: true,
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    axios.put(`http://localhost:8080/coupons/${currentCoupon.value.couponId}`, updateCoupon)
+                      .then(response => {
+                        Swal.fire("修改成功!", "", "success");
+                        $('#mycouponedit').modal('hide');
+                        clearForm();
+                        selectAll();
+                      })
+                      .catch(error => {
+                        console.error("修改優惠卷失敗", error);
+                      });
+                  }
+                });
+              }
+            })
+            .catch(error => {
+              console.error("檢查優惠卷是否有關連的會員", error);
+            });
+
+        }
+
+        //分頁
+        function changePage(page) {
+          currentPage.value = page;
+        }
+
+        //分頁
+        function changeItemsPerPage(event) {
+          itemsPerPage.value = Number(event.target.value);
+          currentPage.value = 1; // Reset to first page
+        }
+
+        function logout() {
+          localStorage.removeItem("adminId");
+          localStorage.removeItem("adminName");
+          window.location.href = "./admin-login.html";
+        }
+
+
+
+        return {
+          selectAll,
+          coupons,
+          deleteConfirm,
+          addnewcoupon,
+          beforeEditCoupon,
+          addcoupon,
+          couponId,
+          code,
+          type,
+          discount,
+          usagePrice,
+          startTime,
+          endTime,
+          editCoupon,
+          minDateTime,
+          addCouponToMember,
+          toMembersCoupon,
+          getCoupon,
+          selectedMemberId,
+          getCouponToAll,
+          generateCode,
+          searchMember,
+          getCheckbox,
+          selectedCouponId,
+          memberList,
+          searchKeyWord,
+          getCheckboxMemberId,
+
+          //搜索
+          selectedType,
+          keyword,
+
+          //以下分頁
+          paginatedCoupons,
+          currentPage,
+          itemsPerPage,
+          totalPages,
+          changePage,
+          changeItemsPerPage,
+
+          adminName,
+          logout
+
+
+        }
+
+      }
+    })
+
+    app.mount("#app")
+
+  </script>
+
+</body>
+
+</html>

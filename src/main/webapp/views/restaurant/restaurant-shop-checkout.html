@@ -1,0 +1,1556 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>購物車餐點結帳</title>
+
+  <!-- Bootstrap 5 -->
+  <link rel="stylesheet" href="/css/bootstrap-5.3.2.css" />
+
+  <!-- 前台模板 -->
+  <link href="/css/frontstage-template.css" rel="stylesheet"/>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    ul {
+      list-style-type: none;
+    }
+    .card-body {
+      padding: 20px;
+    }
+    main.main-content {
+      margin: 0 auto;
+      width: 1000px;
+    }
+    /* 餐廳資訊區塊 */
+    .restaurant-info-box {
+      margin: 30px 0;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .restaurant-photo {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      /* 子元素圖片，如果超出父層寬高，隱藏顯示 */
+      overflow: hidden;
+    }
+    .restaurant-photo img {
+      width: 100%;
+      height: 100%;
+      /* object-fit, 讓不同大小的圖片符合父容器的大小 */
+      object-fit: fill;
+    }
+    .restaurant-name {
+      font-size: 30px;
+      font-weight: 900;
+    }
+    /* 訂單與購物車資訊 */
+    .cart-checkout {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+    }
+    /* 左邊會員、外送資訊，卡片共用的 css */
+    .cart-checkout-info {
+      flex-basis: 60%;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .cart-checkout-info .icon {
+      width: 20px; 
+      height: 20px;
+    }
+    .card-title-box {
+      margin-bottom: 5px;
+    }
+    .card-title {
+      font-size: 24px;
+      font-weight: 900;
+    }
+    .card-data-box {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    } 
+    /* 外送地址、餐廳地址 */
+    .order-address {
+      margin-top: 10px;
+      font-size: 18px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .addess-box {
+      flex-grow: 1;
+    }
+    .btn-edit-box {
+      flex-shrink: 0;
+    }
+    .btn-edit {
+      font-size: 16px;
+      font-weight: 900;
+      padding: 6px 15px;
+      background-color: #f1f1f1;
+      color: navy;
+      border: none;
+      border-radius: 5px;
+      transition: transform 0.3s ease;
+    }
+    .btn-edit:hover {
+      background-color: #FDF2F7;
+      transform: scale(1.1);
+    }
+    /* 預定時間區塊 */
+    .oder-time-title {
+      display: flex;
+      justify-content: space-between;
+
+      .delivery-time-estimate {
+        font-size: 20px;
+      }
+    }
+    .option-type {
+      padding: 15px;
+      border: 2px solid rgb(226, 226, 226);
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+
+      span {
+        font-weight: 900;
+      }
+    }
+    .option-type:hover {
+      background-color: #FDF2F7;
+    }
+    .option-type.selected {
+      background-color: #FDF2F7;
+      border: 1px solid black;
+    }
+    .option-type span.booking-time {
+      /* 這個 flex item 要排列在主軸的最後面
+      方法1：此 flex-item 設定 margin-left:auto
+      方法2：其他 flex-item，其中一個設定 flex-grow:1，代表如果有剩餘空間，
+            flex-grow:1 的元素會佔據所有的剩餘空間，這樣此元素也會被推到主軸的最後面
+      */
+      margin-left: auto;
+    }
+    /* 付款方式區塊 */
+    .payment-type img.icon {
+      width: 30px;
+      height: 30px;
+      margin: 0 1px;
+    }
+    .payment-type img.icon-linepay {
+      width: 80px;
+    }
+    .payment-type .form-check-input {
+      margin-left: 0;
+    }
+    .payment-type .form-check-input:checked {
+      background-color: #E21B70;;
+      border-color: #E21B70; 
+    }
+    .payment-type span {
+      flex-grow: 1;
+    }
+    /* 付款方式-信用卡區域 */
+    .option-type.payment-type.credit-card-wrapper {
+      display: block;
+    }
+    .credit-card-select {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .credit-card-info {
+      margin-top: 20px;
+    }
+    /* 信用卡欄位中的浮動 label */
+    .credit-card-info .form-floating label {
+      font-size: 14px;
+    }
+    .expired-date-cvc-wrapper {
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-between;
+      gap: 30px;
+    }
+    .expired-date-wrapper {
+      flex-basis: 50%;
+    }
+    .cvc-wrapper {
+      flex-basis: 50%;
+    }
+    /* 信用卡欄位驗證的 css */
+    .credit-card-info input {
+      letter-spacing: 3px;
+    }
+    /* 先移除 Bootstrap input 欄位 focus 時候的藍色邊框效果 */
+    .credit-card-info input.form-control:focus {
+      border-color: none;
+      box-shadow: none;
+    }
+    .credit-card-info input.credit-card-default {
+      border: 1px solid #ccc;
+    }
+    .credit-card-info input.credit-card-valid {
+      border: 2px solid green;
+      color: green;
+    }
+    .credit-card-info input.credit-card-invalid {
+      border: 2px solid red;
+      color: red;
+    }
+    /* 右邊購物車餐點明細 */
+    .cart-summary {
+      flex-basis: 40%;
+      font-weight: 900;
+    }
+    .card-cart-summary {
+      box-shadow: 0 0 10px 5px #ccc;
+    }
+    .cart-summary-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      img {
+        width: 35px;
+        height: 35px;
+      }
+    }
+    .menu-item-box {
+      padding-bottom: 10px;
+      border-bottom: 1px solid #ccc;
+    }
+    .menu-item {
+      margin: 15px 0;
+      color:  #666666;
+      display: flex;
+      justify-content: space-between;
+    }
+    .cart-price-item {
+      margin: 10px 0;
+      color: navy;
+      display: flex;
+      justify-content: space-between;
+    }
+    .cart-price-item.total {
+      margin-top: 20px;
+      font-size: 24px;
+    }
+    /* 結帳按鈕 */
+    .btn-checkout {
+      width: 100%;
+      height: 45px;
+      font-size: 20px;
+      font-weight: 900;
+      color: white;
+      background-color: #E21B70;
+      border-radius: 5px;
+      border: 0;
+      margin-top: 40px;
+    }
+    .btn-checkout[disabled] {
+      cursor: not-allowed;
+      background-color: #ccc;
+    }
+    /* Bootstrap Modal 共用樣式 */
+    .modal-header .modal-title-wrapper {
+      flex-grow: 1;
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      color: navy;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 25px;
+      img {
+        width: 45px;
+        height: 45px;
+      }
+    }
+    .modal-footer {
+      padding-top: 5px;
+      padding-bottom: 15px;
+      border: none;
+      justify-content: center;
+    }
+    .modal-footer button {
+      font-weight: 900;
+      padding: 8px 30px;
+      color: white;
+      background-color: #3498db;
+      border-radius: 5px;
+      border: 0;
+    }
+    .modal-footer button[disabled] {
+      cursor: not-allowed;
+      background-color: #ccc;
+    }
+    /* 預訂時間的 Bootstrap Modal */
+    .orderTimeModal .modal-content {
+      height: 650px;
+    }
+    .orderTimeModal .modal-body {
+      padding: 16px 25px;
+    }
+    .order-time-picker {
+      margin-top: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .date-container {
+      font-weight: 900;
+      display: flex;
+      gap: 10px;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .date-item {
+      width: 100px;
+      padding: 12px 15px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      cursor: pointer;
+      text-align: center;
+    }
+    .date-item.selected {
+      color: navy;
+      background-color: #FDF2F7;
+      border: 1px solid black;
+    }
+    .date-item.test {
+      display: block;
+    }
+    .time-conatiner {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      font-size: 18px;
+      font-weight: 900;
+    }
+    .time-item {
+      cursor: pointer;
+      padding: 20px 30px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+    }
+    .time-item:hover {
+      background-color: #FDF2F7;
+    }
+    .time-item.selected {
+      background-color: #FDF2F7;
+    }
+    .time-option {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    /* 外送地址的 Bootstrap Modal */
+    .addressModal .modal-dialog {
+      /* 自訂 Modal 寬度要使用 min-width 才有效，且要加在 .modal-dialog 或是 .modal-content 上 */
+      min-width: 650px;
+      height: 600px;
+    }
+    .addressModal .modal-body {
+      padding: 13px 25px;
+    }
+    .address-picker {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .address-search-container {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .address-search-container img.icon {
+      width: 25px;
+      height: 25px;
+    }
+    .address-search {
+      flex-grow: 1;
+    }
+    .address-search #address-input {
+      height: 45px;  
+      font-weight: 900;  
+    }
+    .address-search #address-input:focus {
+      border-color: #FDF2F7;
+      box-shadow: 0 0 0 0.25rem rgba(247, 135, 169, 0.25);
+    }
+    /* Google Map 的 css，一定要添加明確高度 height:360px (用 % 會顯示不出來)，且一定要加在 map 元素身上，不可以加在父層，否則地圖會顯示不出來 */
+    #map {
+      height: 360px;
+      width: 100%;
+    }
+    /* 重要！地址搜尋框的 Autocomplete 提示選單，會產生一個 pac-container 的容器，一定要加上 z-index，否則就會小於 Bootstrap Modal 的 z-index，而被覆蓋就看不到 */
+    .pac-container {
+      z-index: 1500;
+    }
+    /* Sweet Alert2 視窗 */
+    /* .custom-delivery-address-error-popup 是送地址超出範圍視窗，加上的自訂樣式
+      從每個視窗的自訂樣式，往內找 DOM 元素修改 css，就不會影響頁面上其他的視窗樣式 */
+    .custom-delivery-address-error-popup {
+      width: 500px;
+      background-color: rgb(255, 251, 247);
+      border-radius: 10px;
+      box-shadow: 0 0 10px 2px #ccc;
+    }
+    /* 自訂 icon */
+    .custom-delivery-address-error-popup .custom-icon-wrapper {
+      border: 0;
+      img {
+        width: 80px;
+        height: 80px;
+      }
+    }
+    /* 標題 */
+    .custom-delivery-address-error-popup .swal2-title {
+      color: navy;
+      padding-top: 10px;
+    }
+    /* 自訂內文 */
+    .custom-delivery-address-error-popup .custom-text-wrapper {
+      font-size: 20px;
+      font-weight: 900;
+      color: #E21B70;
+    }
+    /* 按鈕區域 */
+    .custom-delivery-address-error-popup .swal2-actions button {
+      font-weight: 900;
+    }
+    .custom-delivery-address-error-popup .swal2-actions button.swal2-confirm {
+      background-color: #3498db;
+    }
+    [v-cloak] {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="app"  v-cloak>
+    <!-- header -->
+    <header class="frontstage-template-header"  data-bs-theme="dark">
+      <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid nav-outer-flex-container">
+          <div class="nav-container">
+            <a class="navbar-brand" href="/views/index.html"><img src="/favicon.ico" alt="覓食Go圖標預定地" width="50px" height="50px"></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+              aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            </button>
+          </div>
+          <div class="collapse navbar-collapse nav-inner-flex-container" id="navbarNavDropdown">
+            <div class="nav-container">
+              <ul class="navbar-nav nav-function-setting">
+                <li class="nav-item">
+                  <a class="nav-link" href="/views/index.html"><b>尋找餐廳</b></a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/views/mall/mall-index.html"><b>購物商城</b></a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/views/member/member-contact.html"><b>聯絡我們</b></a>
+                </li>
+              </ul>
+            </div>
+            <div class="nav-container">
+              <ul class="navbar-nav">
+                <li class="nav-item not-login">
+                  <a class="nav-link" href="/views/member/member-login.html">
+                    <b>登入 / 註冊</b>
+                  </a>
+                </li>
+                <li class="nav-item dropdown is-login">
+                  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                    <b class="login-regist-text">會員您好</b>
+                  </a>
+                  <ul class="dropdown-menu">
+                    <li>
+                      <a class="dropdown-item login-dropdown-item" href="/views/member/member-menu-order.html">歷史訂單</a>
+                    </li>
+                    <li>
+                      <a class="dropdown-item login-dropdown-item" href="/views/member/member-reserve.html">預約訂單</a>
+                    </li>
+                    <li>
+                      <a class="dropdown-item login-dropdown-item" href="/views/member/member-coupon.html">折扣券</a>
+                    </li>
+                    <li>
+                      <a class="dropdown-item login-dropdown-item" href="#" @click="logout">登出</a>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <!-- 主內容 -->
+    <main class="main-content">
+      <div class="restaurant-info-box">
+        <div class="restaurant-photo">
+          <img :src="restaurant.photoSrc ? restaurant.photoSrc : noRestaurantPhoto">
+        </div>
+        <div class="restaurant-name">
+          <span>{{restaurant.name}}</span>
+        </div>
+      </div>
+      <div class="cart-checkout">
+        <section class="cart-checkout-info">
+          <div class="order-address-box">
+            <div class="card card-address">
+              <div class="card-body">
+                <div class="card-title-box">
+                  <span class="card-title" v-if="order.orderType ==='DELIVERY'">外送地址資訊</span>
+                  <span class="card-title" v-if="order.orderType ==='TAKEOUT'">餐廳地址資訊</span>
+                </div>
+                <div class="card-data-box">
+                  <div class="order-address">
+                    <div class="map-icon-box">
+                      <img src="/images/map.png" class="icon">
+                    </div>
+                    <div class="addess-box">
+                      <span v-if="order.orderType ==='TAKEOUT'">
+                        {{restaurant.address}}
+                      </span>
+                      <span v-if="order.orderType ==='DELIVERY'">
+                        {{deliveryAddress}}
+                      </span>
+                    </div>
+                    <div class="btn-edit-box" v-if="order.orderType ==='DELIVERY'">
+                      <button class="btn-edit" @click="editAddress">
+                        <img src="/images/edit.png" class="icon">
+                        <span>編輯</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="order-time-box">
+            <div class="card card-oder-time">
+              <div class="card-body">
+                <div class="card-title-box oder-time-title">
+                  <span class="card-title" v-if="order.orderType ==='DELIVERY'">預訂外送時間</span>
+                  <span class="card-title" v-if="order.orderType ==='TAKEOUT'">預約取餐時間</span>
+                  <span class="card-title delivery-time-estimate" v-if="order.orderTime.type === 'RIGHT_NOW'">
+                    15 到 30 分鐘
+                  </span>
+                </div>
+                <div class="card-data-box order-time">
+                  <div class="option-type time-type" 
+                    :class="{'selected': order.orderTime.type === 'RIGHT_NOW'}"
+                    @click="selectOrderTimeType('RIGHT_NOW')">
+                    <img src="/images/right-now.png" class="icon">
+                    <span>立即</span>
+                  </div>
+                  <div class="option-type time-type"
+                    :class="{'selected': order.orderTime.type === 'BOOKING'}"
+                    @click="selectOrderTimeType('BOOKING')">
+                    <img src="/images/schedule.png" class="icon">
+                    <span class="field-name">預訂時間</span>
+                    <span class="booking-time" 
+                      v-if="order.orderTime.type === 'BOOKING' && order.orderTime.isTimeOptionSubmit === true
+                      && order.orderTime.timeSelect">
+                      {{order.orderTime.timeSelect.format('M月D日 dddd HH:mm')}} - {{getExtraTime(order.orderTime.timeSelect)}}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="payment-box">
+            <div class="card card-payment">
+              <div class="card-body">
+                <div class="card-title-box pament-title">
+                  <span class="card-title">付款方式</span>
+                </div>
+                <div class="card-data-box">
+                  <div class="option-type payment-type"
+                    :class="{'selected': order.orderPayment.type === 'CASH'}" 
+                    @click="selectPayment('CASH')">
+                    <input class="form-check-input" type="radio" name="orderPayment" value="CASH" v-model="order.orderPayment.type" checked>
+                    <span>現金付款</span>
+                    <div>
+                      <img src="/images/cash.png" class="icon">
+                    </div>
+                  </div>
+                  <div class="option-type payment-type"
+                    :class="{'selected': order.orderPayment.type === 'LINE_PAY'}" 
+                  @click="selectPayment('LINE_PAY')">
+                    <input class="form-check-input" type="radio" name="orderPayment" value="LINE_PAY" v-model="order.orderPayment.type">
+                    <span>LINE Pay</span>
+                    <div>
+                      <img src="/images/LINE-Pay-1.png" class="icon-linepay">
+                    </div>
+                  </div>
+                  <div class="option-type payment-type credit-card-wrapper" 
+                    :class="{'selected': order.orderPayment.type === 'CREDIT_CARD'}"
+                    @click="selectPayment('CREDIT_CARD')">
+                    <div class="credit-card-select">
+                      <input class="form-check-input" type="radio" name="orderPayment" value="CREDIT_CARD" v-model="order.orderPayment.type">
+                      <span>信用卡</span>
+                      <div>
+                        <img src="/images/visa.png" class="icon">
+                        <img src="/images/mastercard.png" class="icon">
+                        <img src="/images/jcb.png" class="icon">
+                      </div>
+                    </div>
+                    <div class="credit-card-info" v-if="order.orderPayment.type === 'CREDIT_CARD'">
+                      <div class="form-floating card-number-wrapper">
+                        <!-- label浮動效果，input 的 placeholder 屬性要存在，否則 label 就不會浮動 -->
+                        <input type="text"
+                          id="card-number"
+                          class="form-control"
+                          :class="{'credit-card-default': cardNumberDefault, 'credit-card-valid': cardNumberValid, 'credit-card-invalid': cardNumberInvalid}"
+                          placeholder=""
+                          maxlength="19"
+                          v-model="order.orderPayment.creditCard.number"
+                          @input="validateCardNumber">
+                        <label for="card-number">信用卡號</label>
+                      </div>
+                      <div class="expired-date-cvc-wrapper">
+                        <div class="form-floating expired-date-wrapper">
+                          <input type="text"
+                            id="expired-date"
+                            class="form-control"
+                            :class="{'credit-card-default': expiredDateDefault, 'credit-card-valid': expiredDateValid, 'credit-card-invalid': expiredDateInvalid}"
+                            placeholder=""
+                            maxlength="5"
+                            v-model="order.orderPayment.creditCard.expiredDate"
+                            @input="validateExpiredDate">
+                          <label for="expired-date">到期日 (月月/年年)</label>
+                        </div>
+                        <div class="form-floating cvc-wrapper">
+                          <input type="text"
+                            id="cvc"
+                            class="form-control"
+                            :class="{'credit-card-default': cvcDefault, 'credit-card-valid': cvcValid, 'credit-card-invalid': cvcInvalid}"
+                            placeholder=""
+                            maxlength="3"
+                            v-model="order.orderPayment.creditCard.cvc"
+                            @input="validateCvc">
+                          <label for="cvc">安全碼 (CVC)</label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section class="cart-summary">
+          <div class="cart-summary-box">
+            <div class="card card-cart-summary">
+              <div class="card-body">
+                <div class="card-title-box cart-summary-title">
+                  <div>
+                    <span class="card-title">訂單資訊</span>
+                  </div>
+                  <div>
+                    <img src="/images/shopping-cart.png">
+                  </div>
+                </div>
+                <div class="card-data-box">
+                  <div class="menu-item-box">
+                    <div class="menu-item" v-for="(item, index) in cart.itemArr" :key="index">
+                      <div class="menu-item-info">
+                        <span class="menu-name">{{item.name}}</span>
+                        <span class="x-char">x</span>
+                        <span class="menu-quantity">{{item.quantity}}</span>
+                      </div>
+                      <div class="menu-item-price">
+                        <span class="menu-totalPrice">$ {{formatNumber(item.totalPrice)}}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="cart-price-box">
+                    <div class="cart-price-item subTotal" v-if="order.orderType ==='DELIVERY'">
+                      <span class="field-name">小計</span>
+                      <span class="field-value">$ {{formatNumber(order.subTotal)}}</span>
+                    </div>
+                    <div class="cart-price-item deliveryFee" v-if="order.orderType ==='DELIVERY'">
+                      <span class="field-name">外送服務費</span>
+                      <span class="field-value">$ {{formatNumber(order.deliveryFee)}}</span>
+                    </div>
+                    <div class="cart-price-item platformFee" v-if="order.orderType ==='DELIVERY'">
+                      <span class="field-name">平台費</span>
+                      <span class="field-value">$ {{formatNumber(order.platformFee)}}</span>
+                    </div>
+                    <div class="cart-price-item total">
+                      <span class="field-name">總計</span>
+                      <span class="field-value">$ {{formatNumber(order.total)}}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="cart-btn-checkout">
+            <button class="btn-checkout" :disabled="disabledSubmit"
+              @click="submitMenuOrder">
+              <span>送出訂單</span>
+            </button>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- footer -->
+    <footer class="frontstage-template-footer">
+      Copyright © 覓食Go All rights reserved
+    </footer>
+
+    <!-- 預訂時間的 Modal -->
+    <div ref="orderTimeModal" class="modal fade orderTimeModal" id="orderTimeModal"
+      tabindex="-1"  aria-labelledby="orderTimeModal" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <div class="modal-title-wrapper">
+              <img src="/images/schedule.png">
+              <span id="exampleModalLabel">預訂時間</span>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="order-time-picker">
+              <div class="date-container">
+                <div v-for="(dateTimeObj, index) in order.orderTime.dateTimeArr" :key="index"
+                  class="date-item"
+                  :class="{'selected': dateTimeObj.dateObj.date() === order.orderTime.dateSelect.date()}"
+                  @click="selectOrderDate(dateTimeObj.dateObj)">
+                  <span>{{ dateTimeObj.dateObj.format('M月D日 dddd') }}</span>
+                </div>
+              </div>
+              <div class="time-conatiner">
+                <div v-for="(timeObj, index) in filterTimeOption" :key="index"
+                  class="time-item"
+                  :class="{'selected': timeObj.isSame(order.orderTime.timeSelect)}"
+                  @click="selectTimeOption(timeObj)">
+                  <div class="time-option">
+                    <span class="time-text">
+                      {{ timeObj.format('HH:mm') }} - {{getExtraTime(timeObj)}}
+                    </span>
+                    <input class="form-check-input" type="radio" name="orderDateTime"
+                      :value="timeObj" v-model="order.orderTime.timeSelect">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn-time-submit" 
+              @click="submitTimeOption"
+              :disabled="!order.orderTime.timeSelect">
+              儲存
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 外送地址的 Modal -->
+    <div ref="addressModal" class="modal fade addressModal" id="addressModal"
+    tabindex="-1"  aria-labelledby="addressModal" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content" id="modal-content">
+          <div class="modal-header">
+            <div class="modal-title-wrapper">
+              <img src="/images/delivery-man-1.png">
+              <span id="exampleModalLabel">外送地址</span>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="address-picker">
+              <div class="address-search-container">
+                <div class="map-icon-box">
+                  <img src="/images/map.png" class="icon">
+                </div>
+                <div class="address-search">
+                  <input type="text" id="address-input"
+                  class="form-control"
+                  placeholder="輸入外送地址"
+                  v-model="selectedPlace.formatted_address" />
+                </div>
+              </div>
+              <!-- Google Map -->
+              <div class="map-container"> 
+                <div id="map"></div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn-time-submit" 
+              @click="submitAddress">
+              儲存
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bootstrap 5 -->
+  <script src="/js/bootstrap-5.3.2.bundle.min.js"></script>
+  <!-- Vue -->
+  <script src="/js/vue-2.7.15.min.js"></script>
+  <!-- axios -->
+  <script src="/js/axios-1.6.2.min.js"></script>
+  <!-- Numeral.js -->
+  <script src="/js/numeral-2.0.6.min.js"></script>
+  <!-- Moment.js，引入有 locales 設定的檔案，才能使用國際語系的功能  -->
+  <script src="/js/moment-with-locales-2.30.1.min.js"></script>
+  <!-- Sweet Alert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.all.min.js"></script>
+  <!-- 載入 google Map APIs -->
+  <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDudgOhv52MRazyYEI1REC6hVladKg62gI&libraries=places,geometry"></script>
+
+  <script>
+    // 設定 moment.js 的語系為中文
+    moment.locale('zh-tw');
+
+    const vm = new Vue({
+      el: '#app',
+      data() {
+        return {
+          member: {
+            memberId: null,
+            // 會員預設地址，給 Google Map 外送位置的預設地址使用
+            address: null,
+            // 會員預設信用卡資訊
+            creditCardInfo: null,
+          },
+          restaurant: {
+            restaurantId: null,
+            name: null,
+            address: null,
+            longitude: null, // 餐廳經度
+            latitude: null, // 餐廳緯度
+            openTime: '11:00', // 餐廳開始營業時間
+            closeTime: '20:00',   // 餐廳結束營業時間
+          },
+          // 會員此餐廳的購物車資料
+          cart: {},
+          // 訂單資料
+          order: {
+            orderType: 'DELIVERY', // 外送：DELIVERY、外帶自取：TAKEOUT
+            deliveryFee: 0,
+            platformFee: 0,
+            subTotal: 0,
+            total: 0,
+            orderTime: {
+              type: 'RIGHT_NOW', // 立即配送：RIGHT_NOW、預定時間：BOOKING
+              isTimeOptionSubmit: false,
+              dateSelect: moment(),
+              timeSelect: null,
+              dateTimeArr: [],
+            }, 
+            orderPayment: {
+              type: 'CASH', // 現金：CASH、信用卡：CREDIT_CARD、LINE Pay：LINE_PAY
+              creditCard: {
+                number: '',
+                expiredDate: '',
+                cvc: '',
+              },
+            },
+          },
+          // 信用卡欄位驗證狀態，預設沒通過驗證
+          isCardNumberValid: false,
+          isExpiredDateValid: false,
+          isCvcValid: false,
+          // 沒有餐廳圖片時，顯示的預設圖片
+          noRestaurantPhoto: '/images/no-restaurant-photo.png',
+
+          // 預訂時間的 Bootstrap Modal 實例物件
+          orderTimeModal: null,
+          // 外送地址的 Bootstrap Modal 實例物件
+          addressModal: null,
+          // 外送地址，實際要傳到後端儲存的值
+          deliveryAddress: '資展國際-高雄訓練中心',
+          // 地址搜尋框中，選擇的地點資訊
+          selectedPlace: {
+            formatted_address: null, // 地點物件，中文地址
+            geometry: {
+              location: {}, // 經緯度物件
+            },
+          },
+          // Google Map 實例物件
+          map: null,
+          // 地圖標記 marker 實例物件
+          marker: null,
+          // 地址搜尋框的 Autocomplete 實例物件
+          autocomplete: null,
+        }
+      },
+      computed: {
+        // 當 v-for、v-if 同時使用的時候，使用 computed 來代替 v-if 進行篩選
+        // 並回傳篩選後的陣列給 v-for 使用
+        filterTimeOption() {
+          let dateTimeObj = this.order.orderTime.dateTimeArr.find((dateTimeObj) => {
+            return this.order.orderTime.dateSelect.date() === dateTimeObj.dateObj.date();
+          });
+          return dateTimeObj ? dateTimeObj.timeObjArr : [];
+        },
+        // 送出訂單按鈕的 disabled 狀態
+        disabledSubmit() {
+          // 是外送訂單，但外送地址不存在，禁用按鈕
+          if (this.order.orderType === 'DELIVERY' && !this.deliveryAddress) {
+            return true;
+          }
+
+          //#region
+          /*
+            外送訂單，且外送地址也存在
+            要檢查是否為有效地址 (可以轉換成合法的經緯度)，避免亂打地址也可以送出訂單
+            
+            因為 computed 會在 Vue 實例掛載到 DOM 後，就執行第一次
+            但這時候 Google Map API Script 還沒載入完成
+            外部資源、圖片，要到 window load 事件才載入完成
+            
+            所以要檢查 google 這個全域變數是否存在
+            如果存在，代表 Google Map API Script 已經載入完成
+            -> 使用 checkDeliveryAddressValid() 方法，驗證合法地址時
+                new google.maps.Geocoder 程式碼，才不會發生錯誤
+
+            注意：這邊檢查 google 變數是否已定義
+            一定要用 type of google 檢查！不能用 if (google) 檢查！
+            因為當 google 實例物件還沒初始化完成 (Script 沒載入完成)
+            -> 正確作法：用 type of google 判斷，會回傳 undefined
+            -> 錯誤作法：用 if (google) 判斷，就和直接取用 google 變數一樣
+                會發生 ReferenceError 物件參考錯誤，同樣是 google is not defined 錯誤
+          */
+          //#endregion
+          if (typeof google !== 'undefined') {
+            // 外送訂單，且外送地址存在，但轉換成經緯度失敗，代表是不合法的地址，禁用按鈕
+            if (this.order.orderType === 'DELIVERY'
+              && this.deliveryAddress
+              && this.checkDeliveryAddressValid(this.deliveryAddress) === false) {
+              return true;
+            }
+          }
+
+          // 如果選擇預定時間，卻沒有選擇時間選項，禁用按鈕
+          if (this.order.orderTime.type === 'BOOKING'
+            && !this.order.orderTime.timeSelect) {
+            return true;
+          }
+          
+          // 如果付款方式是信用卡，但信用卡資料沒有通過驗證，禁用按鈕
+          if (this.order.orderPayment.type === 'CREDIT_CARD') {
+            if (!this.isCardNumberValid|| !this.isExpiredDateValid
+              || !this.isCvcValid) {
+              return true;
+            }
+          }
+          return false
+        },
+        // 信用卡欄位狀態，藉由 class 變化套用不同 css 樣式
+        //#region
+        cardNumberDefault() {
+          return this.order.orderPayment.creditCard.number === '';
+        },
+        cardNumberValid() {
+          return this.isCardNumberValid;
+        },
+        cardNumberInvalid() {
+          return this.order.orderPayment.creditCard.number !== '' && !this.isCardNumberValid;
+        },
+        expiredDateDefault() {
+          return this.order.orderPayment.creditCard.expiredDate === '';
+        },
+        expiredDateValid() {
+          return this.isExpiredDateValid;
+        },
+        expiredDateInvalid() {
+          return this.order.orderPayment.creditCard.expiredDate !== '' && !this.isExpiredDateValid;
+        },
+        cvcDefault() {
+          return this.order.orderPayment.creditCard.cvc === '';
+        },
+        cvcValid() {
+          return this.isCvcValid;
+        },
+        cvcInvalid() {
+          return this.order.orderPayment.creditCard.cvc !== '' && !this.isCvcValid;
+        },
+        //#endregion
+      },
+      created() {
+        // 從 localStorage 取得，登入會員的 memberId
+        this.member.memberId = localStorage.getItem('memberId');
+        
+        // 取得 URLSearchParams 物件，透過該物件，存取頁面跳轉時傳遞的所有參數
+        let urlParams = new URLSearchParams(window.location.search);
+        // 取得 restaurantId 參數值
+        this.restaurant.restaurantId = urlParams.get('restaurantId');
+      },
+      mounted() {
+        // 檢查會員登入狀態，用於 header 樣式切換
+        this.checkMemberLoginStatus();
+
+        // 載入頁面上所需要的會員資料、餐廳資料、餐點購物車、餐點明細資料
+        this.loadCheckoutInfo();
+
+        //#region
+        /*
+          1. 初始化 Bootstrap Modal 實例物件，並將 Modal 物件指定給 Vue data 宣告的變數儲存
+            目的：在 JavaScript 中，可以透過 Modal 物件 show()、hide() 方法，控制 Modal 顯示與隱藏
+            步驟說明：
+              -> 先在 Modal html 標籤，加上 ref="orderTimeModal" 屬性
+              -> this.$refs.orderTimeModal，就可以取得 Modal 的 Dom 元素
+              -> new bootstrap.Modal() 建構函式，產生 Modal 物件，建構函式的參數是 Dom 元素
+              -> 最後把 Modal 物件，指定給 Vue data 宣告的變數儲存，自行使用 show()、hide() 方法
+
+          2. 監聽 Bootstrap Modal 的 hidden.bs.modal 事件
+            目的：當 Modal 隱藏時，執行對應的 Vue 方法邏輯
+            -> 只能用原生的 JavaScript 綁定事件方法 addEventListener() 來實作
+        */
+       //#endregion
+        // 綁定預訂時間的 Bootstrap Modal 物件，並監聽 hidden.bs.modal 隱藏事件
+        this.orderTimeModal = new bootstrap.Modal(this.$refs.orderTimeModal);
+        document.getElementById('orderTimeModal').addEventListener("hidden.bs.modal", this.onTimeModalHidden);
+
+        // 綁定外送地址的 Bootstrap Modal 物件，並監聽 hidden.bs.modal 隱藏事件
+        this.addressModal = new bootstrap.Modal(this.$refs.addressModal);
+        document.getElementById('addressModal').addEventListener("hidden.bs.modal", this.onAddressModalHidden);
+      },
+      methods: {
+        // 檢查會員登入狀態
+        checkMemberLoginStatus() {
+          if (localStorage.getItem('memberName')) {
+            document.querySelector('li.is-login').setAttribute("style", "display: block;");
+            document.querySelector('li.not-login').setAttribute("style", "display: none;");
+            document.querySelector('.login-regist-text').textContent = "歡迎 " + localStorage.getItem('memberName');
+          } else {
+            document.querySelector('li.is-login').setAttribute("style", "display: none;");
+            document.querySelector('li.not-login').setAttribute("style", "display: block;");
+          }
+        },
+        // 會員登出
+        logout() {
+          localStorage.removeItem("memberId");
+          localStorage.removeItem("memberName");
+          window.location.href = "/views/index.html";
+        },
+        // 載入會員於此餐廳的購物車資料
+        loadCheckoutInfo() {
+          let paramObj = {
+            memberId: this.member.memberId,
+            restaurantId: this.restaurant.restaurantId,
+          };
+          axios({
+            method: 'GET',
+            url: 'http://localhost:8080/menu-cart/checkout',
+            params: paramObj,
+          })
+          .then((response) => {
+            console.log('response', response.data.data);
+            let checkoutInfo = response.data.data;
+            if (checkoutInfo) {
+              this.member = checkoutInfo.member;
+              this.restaurant = checkoutInfo.restaurant;
+
+              // 如果後端回傳的購物車資料存在
+              if (checkoutInfo.cart) {
+                let checkoutCart = checkoutInfo.cart;
+                this.cart.cartId = checkoutCart.cartId;
+                this.cart.orderType = checkoutCart.orderType;
+                this.cart.deliveryFee = checkoutCart.deliveryFee;
+                this.cart.platformFee = checkoutCart.platformFee;
+
+                // 計算購物車的小計
+                let subTotal = 0;
+                // 購物車商品
+                this.cart.itemArr = checkoutCart.itemList;
+                this.cart.itemArr.forEach((item) => {
+                  // 每樣商品的小計
+                  item.totalPrice = item.price * item.quantity;
+                  subTotal += item.totalPrice;
+                })
+
+                // 將需要的購物車資訊，存到其他變數使用
+                this.order.orderType = checkoutCart.orderType;
+                this.order.deliveryFee = checkoutCart.deliveryFee;
+                this.order.platformFee = checkoutCart.platformFee;
+                this.order.subTotal = subTotal;
+                this.order.total = this.order.subTotal + this.order.deliveryFee + this.order.platformFee;
+              }
+
+              // 針對頁面所需資料，進行處理
+              // 如果是外送訂單，外送地址預設為會員的地址
+              if (this.order.orderType === 'DELIVERY' && this.member.address) {
+                this.deliveryAddress = this.member.address;
+              }
+            }
+          })
+          .then(() => {
+            // 初始化餐廳營業時段
+            this.initBusinessTime();
+          })
+          .catch((error) => {
+            console.log('error', error);
+          })
+        },
+        // 初始化預訂時間的時間選項
+        initBusinessTime() {
+          // 根據目前時間、餐廳的營業開始時間、結束時間，每15分鐘產生一個時間選項
+          let startMoment = moment(this.restaurant.openTime, 'HH:mm');
+          let endMoment = moment(this.restaurant.closeTime, 'HH:mm');
+
+          // 從今天開始，到未來6天，總共7天，每天都產生一個日期選項
+          for (let i=0; i<=6; i++) {
+            // 當對 Momoent 物件進行修改、複製，視情況要使用 clone() 方法
+            // 會產生獨立記憶體位址的 Moment 物件，才不會影響到原本的物件
+            let startMomentCopy = startMoment.clone().add(i, 'day');
+            // 餐廳營業結束時間，減去30分鐘，作為預約的最後時間選項
+            let endMomentCopy = endMoment.clone().add(i, 'day').subtract('30', 'minutes');
+
+            // 每一天的時間選項，dateObj 主要處理日期，包含今天、往後6天，總共7天
+            // timeObjArr，存每一天中，餐廳營業時間內每15分鐘切割的時間選項
+            // 要儲存 Momoent 物件，一定要使用 clone() 方法，才會複製獨立的 Moment 物件
+            let dateTimeObj = {
+              dateObj: startMomentCopy.clone(),
+              timeObjArr: [],
+            }
+
+            // i=0 是今天，要判斷現在時間，是否已經超過餐廳開始營業時間
+            if (i === 0) {
+              let now = moment().seconds(0).milliseconds(0);
+
+              if (now.isAfter(startMoment)) {
+                startMomentCopy = now;
+                // 如果現在時間 > 餐廳開始營業時間
+                // 預約的第一個時間選項，為現在時間+30分鐘 (不然會馬上可以預約)
+                startMomentCopy = startMomentCopy.add(30, 'minutes');
+
+                if (startMomentCopy.minutes() <= 30) {
+                  startMomentCopy.minutes(30);
+                } else {
+                  startMomentCopy.add(1, 'hours');
+                  startMomentCopy.minutes(0);
+                }
+              }
+            }
+
+            while (startMomentCopy.isSameOrAfter(startMoment)
+              && startMomentCopy.isSameOrBefore(endMomentCopy)) {
+               // 儲存 Momoent 物件，一定要用 clone() 方法，才是獨立的 Moment 物件記憶體位址
+              dateTimeObj.timeObjArr.push(startMomentCopy.clone());
+              startMomentCopy.add(15, 'minutes');
+            }
+            this.order.orderTime.dateTimeArr.push(dateTimeObj);
+          }
+        },
+        selectOrderTimeType(type) {
+          this.order.orderTime.type = type;
+          if (type === 'RIGHT_NOW') {
+            this.order.orderTime.isTimeOptionSubmit = false;
+            this.order.orderTime.dateSelect = moment();
+            this.order.orderTime.timeSelect = null;
+          }
+          else if (type === 'BOOKING') {
+            // 顯示預訂時間的 Modal
+            this.orderTimeModal.show();
+          }
+        },
+        // 預定時間的 Modal 隱藏時，檢查資料狀態
+        onTimeModalHidden() {
+          if (this.order.orderTime.isTimeOptionSubmit === false
+            || !this.order.orderTime.timeSelect) {
+            this.order.orderTime.type = 'RIGHT_NOW';
+            this.order.orderTime.isTimeOptionSubmit= false;
+            this.order.orderTime.timeSelect = null;
+          }
+        },
+        selectOrderDate(momentObj) {
+          this.order.orderTime.dateSelect = momentObj;
+        },
+        selectTimeOption(momentObj) {
+          this.order.orderTime.timeSelect = momentObj;
+        },
+        getExtraTime(momentObj) {
+          let extraTime = momentObj.clone().add(30, 'minutes');
+          return extraTime.format('HH:mm');
+        },
+        submitTimeOption() {
+          this.order.orderTime.type = 'BOOKING';
+          this.order.orderTime.isTimeOptionSubmit= true;
+          // 隱藏預訂時間的 Modal
+          this.orderTimeModal.hide();
+        },
+        // 以下為編輯外送地址 Modal、Google Map 地圖程式碼
+        editAddress() {
+          // 初始化 Map
+          this.initMap();
+          // 初始化地址自動提示
+          this.initAddressAutoComplete();
+          this.addressModal.show();
+        },
+        // 儲存選擇的外送地址
+        submitAddress() {
+          //#region
+          /*
+            下面會用到，檢查物件是否為空物件 {} 的方法
+            Object.keys，會回傳一個陣列，陣列中的元素是物件所有屬性的 key
+            -> 物件是空物件 {} 時，Object.keys() 會回傳一個空陣列 []
+
+            當有選擇外送地點時，就計算餐廳地址、外送地點的距離
+            -> 如果超過範圍，就提示使用者重新選擇外送地點      
+            
+            使用 google.maps.geometry.spherical.computeDistanceBetween
+            計算兩個經緯度地點間距離
+            要引入 Goole Map API 的 Libraries geometry 才能使用
+          */
+          //#endregion
+          if (this.selectedPlace.formatted_address 
+            && Object.keys(this.selectedPlace.geometry.location).length > 0) {
+            // 餐廳經緯度物件
+            let restaurantGeoData = {
+              lat: this.restaurant.latitude,
+              lng: this.restaurant.longitude,
+            };
+            // 選擇的外送地點經緯度物件
+            let selectedPlaceGeoData = {
+              lat: this.selectedPlace.geometry.location.lat(),
+              lng: this.selectedPlace.geometry.location.lng(),
+            };
+
+            // computeDistanceBetween 方法計算距離，原始單位公尺，轉換成公里
+            let distance = google.maps.geometry.spherical.computeDistanceBetween(restaurantGeoData, selectedPlaceGeoData) / 1000;
+            console.log('餐廳與外送地點距離(km):', distance);
+
+            // 餐廳地址，和外送地點的距離，如果超過8公里
+            // 顯示 SweetAlert 視窗，提示使用者重新選擇外送地點
+            if (distance > 8) {
+              this.selectedPlace.formatted_address = null;
+              this.selectedPlace.geometry.location = {};      
+
+              Swal.fire({
+                // 自訂圖示
+                iconHtml: '<img src="/images/error-1.png">',
+                title: "無法外送",
+                // 自訂內文
+                html: `
+                  <div class="custom-text-wrapper">
+                    <span>您的外送地址距離餐廳太遠，請重新選擇外送地址</span>
+                  </div>
+                `,
+                position: 'center',
+                confirmButtonText: "確認",
+                showCloseButton: true,
+                customClass: {
+                    // 加上自訂的 class，再透過 class 去找內部的組件修改 css 樣式，這樣就不會影響頁面上其他的 SweetAlert2 視窗樣式
+                    popup: 'custom-delivery-address-error-popup',
+                    // 自訂 icon 父層加上 class，方便修改 css
+                    icon: 'custom-icon-wrapper'
+                  },
+              });
+            }
+          }
+
+          this.deliveryAddress = this.selectedPlace.formatted_address;
+          this.addressModal.hide();
+        },
+        // 當選擇外送地址 Modal 隱藏
+        onAddressModalHidden() {
+          this.selectedPlace.formatted_address = null;
+          this.selectedPlace.geometry.location = {};
+        },
+        // 送出訂單
+        submitMenuOrder() {
+          /*
+            confirmUrl，第三方支付 (LINE Pay、綠界金流)，支付成功後要導向的頁面
+            cancelUrl，第三方支付 (LINE Pay、綠界金流)，支付取消後要導向的頁面
+          */
+          let confirmUrl = `${window.location.protocol}//${window.location.host}/views/member/member-menu-order.html`
+          let cancelUrl = `${window.location.protocol}//${window.location.host}/views/member/member-menu-order.html`
+          let paramObject = {
+            cartId: this.cart.cartId,
+            deliveryAddress: null,
+            paymentType: this.order.orderPayment.type,
+            reservationTime: null,
+            confirmUrl: confirmUrl,
+            cancelUrl: cancelUrl,
+          }
+          
+          if (this.order.orderType === 'DELIVERY') {
+            paramObject.deliveryAddress = this.deliveryAddress;
+          }
+
+          if (this.order.orderTime.type === 'RIGHT_NOW') {
+            paramObject.reservationTime = moment().add(15, 'minutes').
+            seconds(0).format('YYYY-MM-DD HH:mm');
+          } 
+          else if (this.order.orderTime.type === 'BOOKING') {
+            paramObject.reservationTime = this.order.orderTime.timeSelect.format('YYYY-MM-DD HH:mm');
+          }
+          // 新增訂單、刪除購物車請求
+          axios({
+            method: 'POST',
+            url: 'http://localhost:8080/menu-order/create',
+            data: paramObject
+          })
+          .then((response) => {
+            let result = response.data.data;
+            //#region
+            /*
+              如果付款方式選擇 LINE Pay，要跳轉到 LINE Pay 網頁付款頁面
+              新增訂單請求，後端回傳 Response 中的 linePayWebPaymentUrl 屬性
+              代表 LINE Pay 的網頁付款網址，如果不是 null，就跳轉到付款頁面
+            */
+            //#endregion
+            if (result.linePayWebPaymentUrl) {
+              window.location.href = result.linePayWebPaymentUrl;
+            }
+            // 目前其他付款方式，在訂單建立後，直接跳轉到查看會員訂單頁面
+            else {
+              window.location.href = '../member/member-menu-order.html';
+            }
+          })
+          .catch((error) => {
+            console.log('error', error);
+          })
+        },
+        // 初始化選擇外送地址 Google Map
+        initMap() {
+          // 預設地點：資展國際-高雄訓練中心
+          let defaultLocation = {
+            lat: 22.628937909729284, // 緯度
+            lng: 120.29297382698681 // 經度
+          };
+
+          // #region
+          /* 建立地圖實例物件，並指定給 map 變數儲存
+            google.maps.Map 建構函式，此傳入兩個參數
+            第一個參數，指定地圖要放置的 DOM 元素，document.getElementById('map')
+            第二個參數，值為一個物件，用於地圖參數設定
+              center：地圖中心點座標
+              zoom：地圖縮放等級
+                -> 1-20，數字愈大，地圖愈細：1是世界地圖，20就會到街道
+              mapTypeId：地圖種類
+                -> roadmap 一般道路地圖、satellite 衛星空照圖、hybrid 混合地圖、terrain 地形圖
+          */
+          // #endregion
+          this.map = new google.maps.Map(document.getElementById('map'), {
+            center: defaultLocation,
+            zoom: 16,
+            mapTypeId: 'terrain',
+          });
+
+          // 初始化地圖 marker
+          this.marker = new google.maps.Marker({
+            map: this.map,
+            // position: defaultLocation, // 放置預設地點的 marker
+            draggable: true, // 圖標是否可以拖移
+          });
+
+          //#region
+          /*
+            如果外送地址本來就存在，要更新搜尋框地址、更新圖標位置
+            geocodeAddress() 方法，為自定義的方法，參數傳入中文地址
+              1. 把中文地址轉換成經緯度，因為放置圖標 marker 需要根據經緯度物件
+              2. 更新搜尋框的中文地址
+          */
+          //#endregion
+          if (this.deliveryAddress) {
+            this.selectedPlace.formatted_address = this.deliveryAddress;
+            this.geocodeAddress(this.selectedPlace.formatted_address);
+          }
+
+          /*
+            監聽圖標 marker 的 dragend 拖移結束事件，當拖移結束時
+              1. marker 的 getPosition 方法，會回傳圖標的經緯度物件
+              2. 自定義的 geocodeLatLng() 方法，把經緯度轉成中文地址，並更新地址搜尋框
+          */
+          this.marker.addListener('dragend', () => {
+            let positon = this.marker.getPosition();
+            this.geocodeLatLng(positon);
+          });
+        },
+        // 把中文地址 -> 經緯度資訊，參數是中文地址
+        geocodeAddress(address) {
+          let geocoder = new google.maps.Geocoder();
+          geocoder.geocode({ address: address }, (results, status) => {
+            if (status === 'OK' && results[0]) {
+              /*
+                result[0]，是回傳的地址物件
+                results[0].formatted_address，中文地址
+                results[0].geometry.location，經緯度物件，屬性有 lng 經度、lat 緯度
+              */
+              let location = results[0].geometry.location;
+
+              // 更新地址搜尋框
+              this.selectedPlace.formatted_address = results[0].formatted_address;
+              this.selectedPlace.geometry.location = results[0].geometry.location;
+
+              // 更新地圖 marker
+              this.updateMapMarker(location);
+            } 
+            else {
+              console.log('中文地址 -> 經緯度資訊，地址轉換失敗：', status);
+            }
+          });
+        },
+        // 把地址經緯度物件 -> 中文地址，參數是經緯度物件
+        geocodeLatLng(location) {
+          let geocoder = new google.maps.Geocoder();
+          geocoder.geocode({ location: location }, (results, status) => {
+            if (status === 'OK' && results[0]) {
+              //#region
+              /*
+                地址搜尋框，更新成 marker 拖移後的新地址
+                results[0]，轉換後的地址物件
+                results[0].formatted_address，中文地址
+                results[0].geometry.location，經緯度物件，屬性有 lng 經度、lat 緯度
+              */
+              //#endregion
+              this.selectedPlace.formatted_address = results[0].formatted_address;
+              this.selectedPlace.geometry.location = results[0].geometry.location;
+            } else {
+              console.log('經緯度資訊 -> 中文地址，地址轉換失敗：', status);
+            }
+          });
+        },
+        // 更新地圖 marker 位置，參數是經緯度物件
+        updateMapMarker(position) {
+          if (this.marker) {
+            // 更新 marker 位置
+            this.marker.setPosition(position);
+            // 把地圖的中心點，平滑移動到 marker 的位置
+            this.map.panTo(position);
+          }
+        },
+        /* 檢查外送地址是否有效，控制送出訂單按鈕 disabled 狀態
+          因為地址可能都用打字的，而沒有選擇搜尋框的 auto-complete 選項
+          -> 檢查中文地址，是否可以轉換成有效的經緯度
+         */
+        checkDeliveryAddressValid(address) {
+          let geocoder = new google.maps.Geocoder();
+          geocoder.geocode({ address: address }, (results, status) => {
+            if (status === 'OK' && results[0]) {
+              return true;
+            } else {
+              console.log('檢查外送中文地址 -> 合法經緯度，轉換失敗:');
+              this.deliveryAddress = null;
+              this.selectedPlace.formatted_address = null;
+              this.selectedPlace.geometry.location = {};
+              return false;
+            }
+          });
+        },
+        // 初始化地址搜尋框自動提示，Autocomplete 
+        initAddressAutoComplete() {
+
+          // 地址提示參數設置
+          let options = {
+            // 限制地址提示範圍在台灣
+            componentRestrictions: { country: 'tw' }
+          };
+
+          //#region
+          /*
+            創建 Autocomplete 實例，指定 autocomplete 變數儲存
+            第一個參數：地址搜尋框的 DOM 元素
+            第二個參數：配置項物件
+            */
+          //#endregion
+          this.autocomplete = new google.maps.places.Autocomplete(
+            document.getElementById('address-input'),
+            options
+          );
+
+          // 當使用者選擇提示地址會觸發，監聽 Autocomplete 的 place_changed 事件，
+          this.autocomplete.addListener('place_changed', () => {
+
+            // 取得選擇的地址物件
+            let place = this.autocomplete.getPlace();
+
+            // 確認地址物件有經緯度
+            if(place.geometry) {
+              // 儲存選擇的地址資訊，formatted_address 是中文地址，geometry.location 是經緯度
+              this.selectedPlace.formatted_address = place.formatted_address;
+              this.selectedPlace.geometry.location = place.geometry.location;
+
+              // 更新地圖標記 marker
+              this.updateMapMarker(this.selectedPlace.geometry.location);
+            }
+          });
+        },
+        // 改變付款方法
+        selectPayment(type) {
+          this.order.orderPayment.type = type;
+        },
+        // 驗證信用卡號 (16位數字)
+        validateCardNumber() {
+          // 輸入非數字，取代成空字串 ''
+          this.order.orderPayment.creditCard.number = this.order.orderPayment.creditCard.number.replace(/\D/g, '');
+
+          // 每輸入4個數字，中間加上空白，最後再 trim() 去除前後空白
+          this.order.orderPayment.creditCard.number = this.order.orderPayment.creditCard.number.replace(/(\d{4})/g, '$1 ').trim();
+
+          let regex = /^\d{4}\s\d{4}\s\d{4}\s\d{4}$/;
+          this.isCardNumberValid = regex.test(this.order.orderPayment.creditCard.number);
+        },
+        // 驗證信用卡到期日 (月月/年年)
+        validateExpiredDate() {
+          // 如果輸入只有 "/"，則清空輸入
+          if (this.order.orderPayment.creditCard.expiredDate === '/') {
+            this.order.orderPayment.creditCard.expiredDate = '';
+          } 
+          else {
+            // 輸入非數字，取代成空字串 ''
+            this.order.orderPayment.creditCard.expiredDate = this.order.orderPayment.creditCard.expiredDate.replace(/\D/g, '');
+
+            // 每輸入2個數字，中間加上 '/'
+            if (this.order.orderPayment.creditCard.expiredDate.length > 2) {
+              this.order.orderPayment.creditCard.expiredDate = this.order.orderPayment.creditCard.expiredDate.replace(/(\d{2})(\d+)/, '$1/$2');
+            }
+
+            let regex =  /^(0[1-9]|1[0-2])\/\d{2}$/;
+            this.isExpiredDateValid = regex.test(this.order.orderPayment.creditCard.expiredDate);
+          }
+        },
+        // 驗證信用卡安全碼 CVC (3位數字)
+        validateCvc() {
+          this.order.orderPayment.creditCard.cvc = this.order.orderPayment.creditCard.cvc.replace(/\D/g, '');
+          let regex = /^\d{3}$/;
+          this.isCvcValid = regex.test(this.order.orderPayment.creditCard.cvc);
+        },
+        // 格式化數字，加上千分位
+        formatNumber(number) {
+          return numeral(number).format('0,0');
+        },
+      },
+    });
+
+  </script>
+
+</body>
+</html>

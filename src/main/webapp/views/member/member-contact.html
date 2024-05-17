@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>客服中心</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://unpkg.com/axios@1.6.7/dist/axios.min.js"></script>
+  <script src="https://unpkg.com/vue@3.4.21/dist/vue.global.prod.js"></script>
+  <link href="/css/frontstage-template.css" rel="stylesheet"/>
+
+
+</head>
+<body id="app">
+  <header class="frontstage-template-header"  data-bs-theme="dark">
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+      <div class="container-fluid nav-outer-flex-container">
+        <div class="nav-container">
+          <a class="navbar-brand" href="/views/index.html"><img src="/favicon.ico" alt="覓食Go圖標預定地" width="50px" height="50px"></a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+            aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+          </button>
+        </div>
+        <div class="collapse navbar-collapse nav-inner-flex-container" id="navbarNavDropdown">
+          <div class="nav-container">
+            <ul class="navbar-nav nav-function-setting">
+              <li class="nav-item">
+                <a class="nav-link" href="/views/index.html"><b>尋找餐廳</b></a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/views/mall/mall-index.html"><b>購物商城</b></a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/views/member/member-contact.html"><b>聯絡我們</b></a>
+              </li>
+            </ul>
+          </div>
+          <div class="nav-container">
+            <ul class="navbar-nav">
+              <li class="nav-item not-login">
+                <a class="nav-link" href="/views/member/member-login.html">
+                  <b>登入 / 註冊</b>
+                </a>
+              </li>
+              <li class="nav-item dropdown is-login">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                  aria-expanded="false">
+                  <b class="login-regist-text">會員您好</b>
+                </a>
+                <ul class="dropdown-menu">
+                  <li>
+                    <a class="dropdown-item login-dropdown-item" href="/views/member/member-menu-order.html">歷史訂單</a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item login-dropdown-item" href="/views/member/member-reserve.html">預約訂單</a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item login-dropdown-item" href="/views/member/member-coupon.html">折扣券</a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item login-dropdown-item" href="#" @click="logout">登出</a>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+
+
+<div class="container-fluid p-5 text-white text-center" style="background-color:#4FB1DB; margin-top: 60px;">
+  <h1>客服中心</h1>
+  <p></p> 
+</div>
+  
+<div class="container mt-5">
+  
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label for="username" class="form-label">姓名</label>
+        <input type="text" class="form-control" id="username"
+        v-model="name"
+        placeholder="輸入姓名" required>
+      </div>
+      <div class="col-md-6 mb-3">
+        <label for="email" class="form-label">電子信箱</label>
+        <input type="email" class="form-control" id="email" 
+        v-model="email"
+        placeholder="輸入電子信箱" required>
+      </div>
+      <div class="col-md-12 mb-3">
+        <label for="feedback" class="form-label">問題與建議</label>
+        <textarea class="form-control" id="feedback" rows="4" 
+        v-model="contenttext"
+        placeholder="請輸入您的問題或建議" required></textarea>
+      </div>
+      
+    </div>
+    <button class="btn btn-primary" type="submit" @click="addContact">提交</button>
+    <button style="margin-left: 5px;" class="btn btn-danger" type="reset">清除</button>
+  
+</div>
+<footer class="frontstage-template-footer">
+  Copyright © 覓食Go All rights reserved.
+</footer>
+<script>
+
+  const {createApp, ref,onMounted} = Vue
+
+  const app = createApp({
+    setup() {
+      const name = ref('');
+      const email = ref('');
+      const contenttext = ref('');
+      const status = ref('nofinish');
+      const createdTime = ref('');
+     
+      
+      
+
+
+      function logout() {
+          localStorage.removeItem("memberId");
+          localStorage.removeItem("memberName");
+          window.location.href = "/views/index.html";
+        }
+
+
+      //新增審查表單
+      function addContact() {
+
+
+        const contact = {
+          name: name.value,
+          email: email.value,
+          contenttext: contenttext.value,
+          status: status.value,
+          createdTime: new Date().getTime()
+
+        };
+        console.log(contact);
+
+
+        //新增聯絡
+        axios.post('http://localhost:8080/contacts/create',contact)
+          .then(function (response) {
+            console.log(response);
+
+            Swal.fire({
+              title: "提交成功",
+              icon: "success"
+            }).then(function () {
+              
+            })
+            
+          })
+          .catch(function (error) {
+            Swal.fire({
+              title: "新增失敗,請檢查輸入是否正確",
+              icon: "error",
+            });
+          });
+        }
+        onMounted(() => {
+          checkMemberLoginStatus();
+          });
+        
+        function checkMemberLoginStatus() {
+          if (localStorage.getItem('memberName')) {
+            document.querySelector('li.is-login').setAttribute("style", "display: block;");
+            document.querySelector('li.not-login').setAttribute("style", "display: none;");
+            document.querySelector('.login-regist-text').textContent = "歡迎 " + localStorage.getItem('memberName');
+          } else {
+            document.querySelector('li.is-login').setAttribute("style", "display: none;");
+            document.querySelector('li.not-login').setAttribute("style", "display: block;");
+          }
+        }
+
+
+
+
+      return {
+        addContact,
+        name,
+        email,
+        contenttext,
+        status,
+        createdTime,
+        logout,
+        checkMemberLoginStatus
+       
+
+      }
+
+    }
+  })
+
+  app.mount("#app")
+
+</script>
+</body>
+</html>

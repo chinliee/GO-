@@ -1,0 +1,1746 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>管理員後台-餐點訂單</title>
+
+  <!-- 樣板需要的 css 資源-->
+  <script src="https://kit.fontawesome.com/cda74843f9.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="/css/sb-admin-2.min.css">
+  <link rel="stylesheet" href="/css/sb-admin-2-custom-admin.css">
+
+  <!-- Bootstrap 5 -->
+  <link rel="stylesheet" href="/css/bootstrap-5.3.2.css" />
+  <!-- Bootstrap Table 會使用到的 Bootstrap icon -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" />
+  <!-- Bootstrap Table -->
+  <link rel="stylesheet" href="/css/bootstrap-table-1.22.1.css">
+  <!-- Awesomplete -->
+  <link href="https://cdn.jsdelivr.net/npm/awesomplete@1.1.5/awesomplete.min.css" rel="stylesheet">
+  <!-- Sweet Alert2 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.min.css">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    .bootstrap-table {
+      width: 1100px;
+      overflow-x: auto;
+      margin: 0 auto;
+    }
+    /* Bootstrap Table 的 Toolbar 樣式 */
+    .fixed-table-toolbar {
+      background-color: #417560;
+      color: white;
+      padding: 10px 30px;
+      margin: 15px 0;
+      border-radius: 5px;
+      box-shadow: 0 0 10px 2px #ccc;
+    }
+    /* Toolbar 右側區塊按鈕(匯出、調整欄位顯示...按鈕) */
+    .fixed-table-toolbar .columns-right.btn-group.float-right button {
+      background-color: #2c3e50;
+    }
+    #myToolbar .toolbar-option-container {
+      display: flex;
+      align-items: center;
+      gap: 60px;
+      font-weight: 900;
+    }
+    /* 每頁資料筆數區域、匯出資料範圍區域 */
+    #myToolbar .pagesize-select-box, .export-data-option-box {
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    #myToolbar .pagesize-select-box select {
+      font-size: 16px;
+      width: 75px;
+      height: 33px;
+      border-radius: 5px;
+    }
+    #myToolbar .export-data-option-box select {
+      font-size: 16px;
+      width: 130px;
+      height: 33px;
+      border-radius: 5px;
+    }
+    /* 匯出資料按鈕，當選擇勾選資料範圍，卻還沒有勾選的時候
+      按鈕 disabled 時加上樣式 */
+    .fixed-table-toolbar .export.btn-group button[aria-label="Export data"][disabled] {
+      background-color: #6c757d;
+      /* 只加 cursor: not-allowed 沒效果，因為預設 pointer-events 被設定為 none，
+        要恢復滑鼠事件設定，not-allowed 才有效果 */
+      cursor: not-allowed;
+      pointer-events: auto;
+    }
+    /* 多條件查詢區域 */
+    .search-conatiner {
+      margin-top: 15px;
+      font-weight: 900;
+    }
+    /* 展開、縮合按鈕區塊 */
+    .btn-toggle-search-area-box {
+      color: black;
+      display: flex;
+      align-items: center;
+      img {
+        width: 25px;
+        height: 25px;
+      }
+      img.img-collapse {
+        width: 32px;
+        height: 32px;
+      }
+    }
+    .seach-area-title span.badge {
+      font-size: 16px;
+      color: black;
+    }
+    /* 展開、縮合按鈕 */
+    .fixed-table-toolbar .btn-toggle-search-area {
+      background-color: transparent;
+      border: none;
+    }
+    /* 查詢條件 */
+    .search-area-box {
+      width: 650px;
+      font-size: 16px;
+      color: black;
+      background-color: #fff;
+      padding: 20px;
+      margin-top: 10px;
+      border-radius: 5px;
+    }
+    .search-area-box span {
+      flex-shrink: 0;
+    }
+    .search-area-box input.form-control,select.form-select {
+      width: 215px;
+      font-size: 15px;
+      font-weight: 900;
+    }
+    /* 查詢時間範圍的錯誤訊息 */
+    .search-area-box div.error-message {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 14px;
+      margin-top: 5px;
+      color: red;
+      img {
+        width: 15px;
+        height: 15px;
+      }
+    }
+    /* 多條件查詢按鈕區域 */
+    .btn-search-container {
+      margin-top: 10px;
+      text-align: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+    }
+    /* 送出查詢按鈕、清除條件按鈕 */
+    button.btn-search-submit, button.btn-clear-search-param {
+      flex-basis: 50%;
+      height: 35px;
+      font-size: 16px;
+      font-weight: 900;
+      color: white;
+      background-color: #E21B70;
+      border-radius: 5px;
+      border: 0;
+    }
+    button.btn-search-submit[disabled] {
+      cursor: not-allowed;
+      background-color: #ccc;
+    }
+    button.btn-clear-search-param {
+      background-color: #758cbd;
+    }
+    /* table 區域 */
+    /* table 欄位標題列 */
+    .bootstrap-table .fixed-table-container .table thead th {
+      background-color: linen;
+      color: navy;
+      font-size: 18px;
+      font-weight: 900;
+      text-align: center;
+    }
+    /* table 資料列 */
+    .table tbody tr td {
+      font-size: 16px;
+      font-weight: 900;
+      height: 70px;
+    }
+    /* 會員姓名 td */
+    tbody .td-member-name {
+      min-width: 150px;
+      max-width: 150px;
+      /* 超過寬度允許換行 */
+      white-space: normal;
+      /* 同一個單字就可以換行 */
+      word-wrap: break-word; 
+    }
+    /* 會員帳號 td */
+    tbody .td-member-email {
+      min-width: 250px;
+      max-width: 250px;
+      text-align: left !important;
+      white-space: normal;
+      word-wrap: break-word; 
+    }
+    /* 餐廳名稱 td */
+    tbody .td-restaurant-name {
+      min-width: 200px;
+      max-width: 200px;
+      white-space: normal;
+      word-wrap: break-word; 
+    }
+    /* 訂單類型 td */
+    tbody .td-orderType,.td-status {
+      min-width: 100px;
+      max-width: 100px;
+    }
+    tbody .td-orderType span.badge {
+      font-size: 14px;
+    }
+    /* 訂單狀態 td */
+    tbody .td-status span.badge{
+      font-size: 14px;
+    }
+    tbody .td-status span.bg-cancel-myclass {
+      color: white;
+      background-color: red;
+    }
+    tbody .td-status span.bg-process-myclass {
+      color: white;
+      background-color:	#DEB887;
+    }
+    /* 訂單金額 td */
+    tbody .td-order-price-total {
+      min-width: 100px;
+      max-width: 100px;
+    }
+    /* 訂單時間 td */
+    tbody .td-createdTime {
+      min-width: 180px;
+      max-width: 180px;
+    }
+    /* 操作功能 td */
+    /* 操作按鈕 */
+    tbody .td-operate {
+      min-width: 180px;
+      max-width: 180px;
+    }
+    tbody .td-operate button {
+      font-size: 14px;
+      font-weight: 900;
+      padding: 5px;
+      margin: 0 3px;
+      border: 0;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: transform 0.3s linear;
+    }
+    tbody .td-operate button:not([disabled]):hover {
+      cursor: pointer;
+      transform: scale(1.1);
+    }
+    .td-operate button.btn-show-orderData {
+      color: black;
+      background-color: #b8d2c7;
+    }
+    .td-operate .btn-cancel-menuOrder {
+      color: white;
+      background-color: red;
+    }
+    .td-operate .btn-cancel-menuOrder[disabled] {
+      cursor: not-allowed;
+      background-color: #ccc;
+    }
+    /* 點選資料列勾選 checkbox，Bootstrap Table 會自動加上 selected class
+      原本預設背景顏色會變深灰色，修改顏色 */
+      .table tbody tr.selected {
+      background-color: rgb(255, 255, 255);
+    }
+    /* 展開訂單明細區塊 */
+    tr.detail-view td {
+      background-color:#edfdf8;
+    }
+    tr.detail-view .detail-info {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 0 35px;
+      img {
+        width: 25px;
+        height: 25px;
+      }
+    }
+    tr.detail-view .menu-item-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-bottom: 5px;
+      border-bottom: 1px solid #ccc;
+    }
+    tr.detail-view .detail-price-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    tr.detail-view .menu-item,.price-item {
+      line-height: 25px;
+      position: relative;
+    }
+    tr.detail-view span.field-name {
+      margin-left: 10px;
+    }
+    tr.detail-view span.price-value {
+      position: absolute;
+      left: 300px;
+    }
+    /* 偽元素 */
+    tr.detail-view .menu-item::before {
+      /* 內容設為空字串，一定要加，否則不會顯示 */
+      content: ''; 
+      width: 6px;
+      height: 6px;
+      position: absolute;
+      top: 50%;
+      transform: translate(-180%, -50%);
+      background-color: #E21B70;
+      border-radius: 50%;
+    }
+    /* 明細價錢，小計、外送費、服務費、 總計*/
+    tr.detail-view .detail-price-wrapper {
+      color: navy;
+    }
+    tr.detail-view .price-item.price-total {
+      font-size: 18px;
+    }
+    /* table 下方，總共資料筆數、分頁區域 */
+    .bootstrap-table .fixed-table-pagination {
+      margin-top: 5px;
+    }
+    /* 總共幾筆資料文字 */
+    .bootstrap-table .fixed-table-pagination .pagination-detail .pagination-info {
+      font-size: 16px;
+      font-weight: 900;
+      padding: 8px 10px;
+      color: white;
+      background-color: #3498db;
+      border-radius: 5px;
+    }
+    /* 頁數區域 */
+    .bootstrap-table .fixed-table-pagination ul.pagination li.page-item a {
+      height: 100%;
+      display: flex;
+      align-items: center;
+    }
+    .bootstrap-table .fixed-table-pagination ul.pagination li.page-item.active a {
+      background-color: #3498db;
+      border-color: #3498db;
+    }
+    /* 輸入頁數跳轉區域 */
+    .bootstrap-table .fixed-table-pagination .pagination .page-jump-to {
+      margin-left: 8px;
+    }
+    .bootstrap-table .fixed-table-pagination .pagination .page-jump-to button {
+      font-size: 16px;
+      font-weight: 900;
+      color: white;
+      background-color: #3498db;
+      border-radius: 5px;
+      border: 0;
+    }
+    /* Awesomplete.js，會員信箱欄位 auto-complete 功能的 css 修改 */
+    .awesomplete .awesomplete-dropdown {
+      border-color: #ccc;
+      background-color: #fff;
+    }
+    .awesomplete ul#awesomplete_list_1 {
+      padding: 5px;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      overflow: auto;
+    }
+    .awesomplete ul#awesomplete_list_1 li {
+      font-size: 16px;
+      font-weight: 900;
+      padding: 5px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .awesomplete ul#awesomplete_list_1 li:hover {
+      color: #fff;   
+      background-color: #3498db;
+    }
+    .awesomplete ul#awesomplete_list_1 li[aria-selected="true"] {
+      color: #fff;   
+      background-color: #3498db;
+    }
+    /* Awesomplete 改變匹配文字的顏色與背景 */
+    .awesomplete ul#awesomplete_list_1 mark {
+      color: #fa8e13;
+      font-size: 15px;
+      background-color: transparent;
+      padding: 0;
+    }
+    /* 發送請求，畫面遮罩 */
+    .loading {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(128, 128, 128, 0.5);
+      z-index: 9999;
+    }
+    .loading img.img-loading {
+      width: 60px;
+      height: 60px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    /* 取消訂單的 Sweet Alert2 視窗
+      先在取消訂單 Sweet Alert2 的 JavaScript 加上一個自訂 class
+      再用 class 去找內部的組件修改 css 樣式，這樣就不會影響到頁面其他的 Sweet Alert2 的視窗樣式  */
+    .custom-cancel-order-popup {
+      width: 500px;
+      background-color: rgb(255, 251, 247);
+      border-radius: 10px;
+      box-shadow: 0 0 10px 2px #ccc;
+    }
+    /* 自訂 icon */
+    .custom-cancel-order-popup .custom-icon-wrapper {
+      border: 0;
+      img {
+        width: 80px;
+        height: 80px;
+      }
+    }
+    /* 標題 */
+    .custom-cancel-order-popup .swal2-title {
+      font-size: 28px;
+      color: navy;
+      padding-top: 10px;
+    }
+    /* 按鈕區域 */
+    .custom-cancel-order-popup .swal2-actions button {
+      font-weight: 900;
+      margin: 0 10px;
+    }
+    .custom-cancel-order-popup .swal2-actions button.swal2-confirm {
+      background-color: #3498db;
+    }
+    /* Bootstrap Modal 訂單詳細資料 */
+    .modal-orderData .modal-dialog {
+      min-width: 700px;
+      max-width: 700px;
+      height: 600px;
+    }
+    .modal-orderData .modal-content {
+      font-weight: 900;
+    }
+    .modal-orderData .modal-header {
+      padding: 20px 30px;
+    }
+    .modal-orderData .modal-header .modal-title-container {
+      flex-grow: 1;
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      color: navy;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 25px;
+      img {
+        width: 40px;
+        height: 40px;
+      }
+    }
+    .modal-orderData .modal-body {
+      padding: 30px 60px 10px 60px;
+      border: none;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+    .modal-orderData .modal-body .title {
+      background-color: linen;
+      text-align: center;
+      font-size: 22px;
+      letter-spacing: 2px;
+      font-weight: 900;
+      padding: 10px 5px;
+      border-radius: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      img {
+        width: 35px;
+        height: 35px;
+      }
+    }
+    .modal-orderData .modal-body .info-container {
+      font-size: 18px;
+      letter-spacing: 1px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .modal-orderData .modal-body .content-box {
+      padding: 0 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      img {
+        width: 20px;
+        height: 20px;
+      }
+    }
+    .modal-orderData .modal-body .content-box .item-box {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    .modal-orderData .item-box span.badge {
+      font-size: 16px;
+    }
+    .modal-orderData .item-box span.badge.bg-process-myclass {
+      color: white;
+      background-color: #DEB887;
+    }
+    .modal-orderData .menu-item-wrapper,.modal-orderData .detail-price-wrapper {
+      color: #666666;
+      font-weight: 900;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #ccc;
+    }
+    .modal-orderData .menu-item, .price-item  {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-orderData .detail-price-wrapper {
+      color: navy;
+    }
+    .modal-orderData .price-item.price-total {
+      font-size: 20px;
+    }
+    .modal-orderData .order-payment-wrapper {
+      color: #E21B70;
+      font-size: 20px;
+      font-weight: 900;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-orderData .payment-type {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 15px;
+
+      img.img-payment-type {
+        width: 40px;
+        height: 40px;
+      }
+    }
+    .modal-orderData .payment-type img.img-payment-type.img-linepay {
+      width: 100px;
+      height: auto;
+    }
+    .modal-orderData .modal-footer {
+      border: none;
+      justify-content: center;
+    }
+    /* Modal中的離開按鈕 */
+    .modal-orderData .modal-footer button {
+      font-weight: 900;
+      color: white;
+      background-color: #E21B70;
+      padding: 8px 25px;
+      border: 0;
+      border-radius: 5px;
+    }
+    [v-cloak] {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="app" v-cloak>
+    <div class='loading' v-show="htmlProp.isLoading">
+      <img class="img-loading" src="/images/loading-1.gif">
+    </div>
+
+    <!-- 模板外層容器 -->
+    <div id="wrapper">
+      <!-- 側邊 Sidebar -->
+      <ul class="navbar-nav sidebar sidebar-dark accordion bg-deep-blue" id="accordionSidebar">
+        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="#">
+          <div class="sidebar-brand-text mx-3">管理員後台</div>
+        </a>
+        <!-- 分隔線 -->
+        <hr class="sidebar-divider my-0">
+        <li class="nav-item">
+          <a class="nav-link" href="./admin-member.html">
+            <img src="/images/member-1.png">
+            <span>會員資料</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="./admin-menu-order.html">
+            <img src="/images/data-1.png">
+            <span>餐點訂單</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="./admin-statistic.html">
+            <img src="/images/money-report-1.png">
+            <span>銷售數據</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="./admin-ad-history.html">
+            <img src="/images/adhistory.png">
+            <span>廣告履歷</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="./admin-coupon.html">
+            <img src="/images/coupon.png">
+            <span>優惠卷</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="./admin-restaurant.html">
+            <img src="/images/edit.png">
+            <span>餐廳資訊</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="./admin-contact.html">
+            <img src="/images/customer-service.jpg">
+            <span>客服中心</span>
+          </a>
+        </li>
+        <!-- Sidebar 展開收合按鈕 -->
+        <div class="text-center d-none d-md-inline">
+          <button class="rounded-circle border-0" id="sidebarToggle"></button>
+        </div>
+      </ul>
+
+      <!-- 主內容區域，包含上方導覽列與各網頁內容 -->
+      <div id="content-wrapper" class="d-flex flex-column">
+        <div id="content">
+          <!-- 上方導覽列 -->
+          <nav class="navbar navbar-expand topbar mb-4 static-top" style="display: flex; justify-content: space-between;">
+            <div class="temp"></div>
+            <div class="nav-item dropdown no-arrow">
+              <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span class="mr-2 d-none d-lg-inline text-gray-600 small topbar-name">{{adminName}}</span>
+              </a>
+              <!-- 功能列表 -->
+              <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
+                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal" @click="logout">
+                  <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                  登出
+                </a>
+              </div>
+            </div>
+          </nav>
+          <!-- 各網頁內容 -->
+          <div class="container-fluid">
+            <!-- Bootstrap Table -->
+            <table id="menuOrderTable">
+            </table>
+            <!-- 要放在 Bootstrap Table 中，自定義的 Toolbar，只能自訂一個 -->
+            <div id="myToolbar" class="toolbar">
+              <div class="toolbar-option-container">
+                <div class="pagesize-select-box">
+                  <span class="title">每頁資料數</span>
+                  <select class="form-select form-select-sm pagesize-select"
+                    v-model="pageSizeSelect"
+                    @change="handlePageSizeChange">
+                    <option v-for="(option, index) in pageSizeOption" :key="index" :value="option">
+                      {{option}}
+                    </option>
+                  </select>
+                </div>
+                <div class="export-data-option-box">
+                  <span>匯出資料範圍</span>
+                  <select class="form-select form-select-sm pagesize-select"
+                    v-model="exportDataOptionSelect"
+                    @change="handleChangeExportOption">
+                    <option value="basic">當前頁面</option>
+                    <option value="selected">勾選的資料</option>
+                  </select>
+                </div>
+              </div>
+              <div class="search-conatiner">
+                <div class="btn-toggle-search-area-box">
+                  <div class="seach-area-title">
+                    <span class="badge bg-warning">多條件查詢</span>
+                  </div>
+                  <button class="btn btn-toggle-search-area" @click="toggleSearchArea">
+                    <img src="/images/search-1.png" v-show="!htmlProp.isSearchAreaShow">
+                    <img src="/images/fold-1.png" v-show="htmlProp.isSearchAreaShow" class="img-collapse">
+                  </button>
+                </div>
+                <div class="search-area-box" v-show="htmlProp.isSearchAreaShow">
+                  <div class="row search-param-container">
+                    <div class="col-6 mb-3">
+                      <!-- 讓欄位文字、input呈現水平，外層容器使用 Bootstrap d-flex class -->
+                      <div class="d-flex align-items-center gap-3">
+                        <span>會員姓名</span>
+                        <input type="text" class="form-control form-control-sm member-name" v-model="searchParam.memberName">
+                      </div>
+                    </div>
+                    <div class="col-6  mb-3">
+                      <div class="d-flex align-items-center gap-3">
+                        <span>會員帳號</span>
+                          <input type="text" class="form-control form-control-sm member-email"
+                          id="inputEmail"
+                          ref="inputEmail"
+                          v-model="searchParam.memberEmail"
+                          @input="handelSeachMemberEmailInput">
+                      </div>
+                    </div>
+                    <div class="col-6 mb-3">
+                      <div class="d-flex align-items-center gap-3">
+                        <span>餐廳編號</span>
+                        <input type="text" class="form-control form-control-sm restaurant-id"
+                          v-model="searchParam.restaurantId"
+                          @input="checkRestaurantIdIsInteger"
+                          maxlength="7">
+                      </div>
+                    </div>
+                    <div class="col-6 mb-3">
+                      <div class="d-flex align-items-center gap-3">
+                        <span>餐廳名稱</span>
+                        <input type="text" class="form-control form-control-sm restaurant-name" v-model="searchParam.restaurantName">
+                      </div>
+                    </div>
+                    <div class="col-6 mb-3">
+                      <div class="d-flex align-items-center gap-3">
+                        <span>訂單類型</span>
+                        <select class="form-select form-select-sm order-type"
+                          v-model="searchParam.orderType">
+                          <option selected value="">全部</option>
+                          <option value="DELIVERY">外送</option>
+                          <option value="TAKEOUT">外帶自取</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-6 mb-3">
+                      <div class="d-flex align-items-center gap-3">
+                        <span>訂單狀態</span>
+                        <select class="form-select form-select-sm order-status"
+                          v-model="searchParam.status">
+                          <option selected value="">全部</option>
+                          <option value="PROCESSING">進行中</option>
+                          <option value="FINISHED">已完成</option>
+                          <option value="CANCELED">已取消</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-6 mb-3">
+                      <div class="d-flex align-items-center gap-3">
+                        <span>起始時間</span>
+                        <input type="datetime-local" class="form-control form-control-sm order-created-time-start" 
+                          v-model="searchParam.orderCreatedTimeStart">
+                      </div>
+                      <div class="error-message error-created-time-start"
+                        v-if="isSearchStartTimeError">
+                        <img src="/images/cancel-1.png">
+                        <span>起始時間不可為空、或大於結束時間</span>
+                      </div>
+                    </div>
+                    <div class="col-6 mb-3">
+                      <div class="d-flex align-items-center gap-3">
+                        <span>結束時間</span>
+                        <input type="datetime-local" class="form-control form-control-sm order-created-time-end" 
+                          v-model="searchParam.orderCreatedTimeEnd">
+                      </div>
+                      <div class="error-message error-created-time-start"
+                      v-if="isSearchEndTimeError">
+                        <img src="/images/cancel-1.png">
+                        <span>結束時間不可為空、或小於起時時間</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="btn-search-container">
+                    <button class="btn-clear-search-param"
+                      @click="clearSearchParam">
+                      <span>清除條件</span>
+                    </button>
+                    <button class="btn-search-submit"
+                      :disabled="disabledSearchSubmit"
+                      @click="submitSearchOrder">
+                      <span>查詢</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Footer -->
+        <footer class="sticky-footer bg-white">
+          <div class="container my-auto">
+            <div class="copyright text-center my-auto">
+              <span>Copyright &copy; 覓食 GO</span>
+            </div>
+          </div>
+        </footer>
+      </div>
+    </div>
+
+    <!-- 訂單詳細資料 Modal -->
+    <div id="orderDataModal" ref="orderDataModal" class="modal fade modal-orderData" tabindex="-1" aria-labelledby="orderDataModal" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <div class="modal-title-container">
+              <img src="/images/data-1.png">
+              <span class="modal-title">
+                訂單詳細資料
+              </span>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="info-container member-info-container">
+              <div class="title">
+                <div class="title-icon-wrapper">
+                  <img src="/images/member-1.png">
+                </div>
+                <span>會員資訊</span>
+              </div>
+              <div class="content-box member-info-content">
+                <div class="item-box member-name-box">
+                  <img src="/images/member-card-1.png">
+                  <span class="info-name">會員姓名：</span>
+                  <span class="info-value">{{currentOrderData.member.name}}</span>
+                </div>
+                <div class="item-box member-email-box">
+                  <img src="/images/member-card-2.png">
+                  <span class="info-name">會員帳號：</span>
+                  <span class="info-value">{{currentOrderData.member.email}}</span>
+                </div>
+              </div>
+            </div>
+            <div class="info-container order-info-container">
+              <div class="title">
+                <div class="title-icon-wrapper">
+                  <img src="/images/order-finished.png">
+                </div>
+                <span>訂單資訊</span>
+              </div>
+              <div class="content-box order-info-content">
+                <div class="item-box restaurant-name-box">
+                  <img src="/images/no-restaurant-photo.png">
+                  <span class="info-name">餐廳名稱：</span>
+                  <span class="info-value">{{currentOrderData.restaurant.name}}</span>
+                </div>
+                <div class="item-box order-total-price-box">
+                  <img src="/images/cash.png">
+                  <span class="info-name">訂單消費：</span>
+                  <span class="info-value">$ {{formatNumber(currentOrderData.total)}}</span>
+                </div>
+                <div class="item-box order-type-box">
+                  <img src="/images/delivery-man-1.png">
+                  <span class="info-name">訂單類型：</span>
+                  <span class="info-value badge bg-primary"
+                    v-if="currentOrderData.orderType === 'DELIVERY'">
+                    外送
+                  </span>
+                  <span class="info-value badge bg-warning"
+                    v-if="currentOrderData.orderType === 'TAKEOUT'">
+                    外帶自取
+                  </span>
+                </div>
+                <div class="item-box order-status-box">
+                  <img src="/images/status-1.png">
+                  <span class="info-name">訂單狀態：</span>
+                  <span class="info-value badge bg-process-myclass"
+                    v-if="currentOrderData.status === 'CREATED' || currentOrderData.status === 'PROCESSING'">
+                    進行中
+                  </span>
+                  <span class="info-value badge bg-success"
+                    v-if="currentOrderData.status === 'FINISHED'">
+                    已完成
+                  </span>
+                  <span class="info-value badge bg-danger"
+                    v-if="currentOrderData.status === 'CANCELED'">
+                    已取消
+                  </span>
+                </div>
+                <div class="item-box order-createdTime-box">
+                  <img src="/images/time-1.png">
+                  <span class="info-name">訂單時間：</span>
+                  <span class="info-value">
+                    {{moment(currentOrderData.createdTime).format('YYYY-MM-DD HH:mm')}}
+                  </span>
+                </div>
+                <div class="item-box order-reservationTime-box">
+                  <img src="/images/schedule.png">
+                  <span class="info-name" 
+                    v-if="currentOrderData.orderType === 'DELIVERY'">
+                    外送時間：
+                  </span>
+                  <span class="info-name"
+                    v-if="currentOrderData.orderType === 'TAKEOUT'">
+                    取餐時間：
+                  </span>
+                  <span class="info-value">
+                    {{moment(currentOrderData.reservationTime).format('YYYY-MM-DD HH:mm')}}
+                  </span>
+                </div>
+                <div class="item-box restaurant-address-box">
+                  <img src="/images/location-1.png">
+                  <span class="info-name">餐廳位置：</span>
+                  <span class="info-value">{{currentOrderData.restaurant.address}}</span>
+                </div>
+                <div class="item-box delivery-address-box"
+                  v-if="currentOrderData.orderType === 'DELIVERY'">
+                  <img src="/images/location-2.png">
+                  <span class="info-name">外送地址：</span>
+                  <span class="info-value">{{currentOrderData.deliveryAddress}}</span>
+                </div>
+              </div>
+            </div>
+            <div class="info-container order-detail-info-container">
+              <div class="title">
+                <div class="title-icon-wrapper">
+                  <img src="/images/food-1.png">
+                </div>
+                <span>餐點資訊</span>
+              </div>
+              <div class="content-box order-detail-info-content">
+                <div class="menu-item-wrapper">
+                  <div v-for="(item, index) in currentOrderData.orderDetailArr" :key="index" class="menu-item">
+                    <span>
+                      {{item.menuName}} x {{formatNumber(item.quantity)}}
+                    </span>
+                    <span>
+                      $ {{formatNumber(item.price * item.quantity)}}
+                    </span>
+                  </div>
+                </div>
+                <div class="detail-price-wrapper">
+                  <div class="price-item" v-if="currentOrderData.orderType ==='DELIVERY'">
+                    <span>小計</span>
+                    <span>$ {{(currentOrderData.subTotal)}}</span>
+                  </div>
+                  <div class="price-item" v-if="currentOrderData.orderType ==='DELIVERY'">
+                    <span>外送服務費</span>
+                    <span>$ {{formatNumber(currentOrderData.deliveryFee)}}</span>
+                  </div>
+                  <div class="price-item" v-if="currentOrderData.orderType ==='DELIVERY'">
+                    <span>平台費</span>
+                    <span>$ {{formatNumber(currentOrderData.platformFee)}}</span>
+                  </div>
+                  <div class="price-item price-total">
+                    <span>總計</span>
+                    <span>$ {{formatNumber(currentOrderData.total)}}</span>
+                  </div>
+                </div>
+                <div class="order-payment-wrapper">
+                  <span>付款方式</span>
+                  <div class="payment-type cash" v-if="currentOrderData.paymentType === 'CASH'">
+                    <span>現金</span>
+                    <div>
+                      <img class="img-payment-type" src="/images/cash-2.png">
+                    </div>
+                  </div>
+                  <div class="payment-type linepay" v-if="currentOrderData.paymentType === 'LINE_PAY'">
+                    <div>
+                      <img class="img-payment-type img-linepay" src="/images/LINE-Pay-1.png">
+                    </div>
+                  </div>
+                  <div class="payment-type credit-card" v-if="currentOrderData.paymentType === 'CREDIT_CARD'">
+                    <span>信用卡</span>
+                    <div>
+                      <img class="img-payment-type" src="/images/credit-card-1.png">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn-close-modal" @click="closeOderModal">離開</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- 模板需要的 js 資源 -->
+  <script src="/js/jquery-3.7.1.js"></script>
+  <script src="/js/bootstrap-4.6.2.bundle.min.js"></script>
+  <script src="/js/sb-admin-2.min.js"></script>
+
+  <!-- Bootstrap 5 -->
+  <script src="/js/bootstrap-5.3.2.bundle.min.js"></script>
+  <!-- Vue -->
+  <script src="/js/vue-2.7.15.min.js"></script>
+  <!-- Bootstrap Table -->
+  <script src="/js/bootstrap-table-1.22.1.js"></script>
+  <!-- axios -->
+  <script src="/js/axios-1.6.2.min.js"></script>
+  <!-- Awesomplete.js -->
+  <script src="https://cdn.jsdelivr.net/npm/awesomplete@1.1.5/awesomplete.min.js"></script>
+  <!-- Moment.js，引入有 locales 設定的檔案，才能使用國際語系的功能  -->
+  <script src="/js/moment-with-locales-2.30.1.min.js"></script>
+  <!-- Sweet Alert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.all.min.js"></script>
+  <!-- Numeral.js -->
+  <script src="/js/numeral-2.0.6.min.js"></script>
+
+  <!-- BootStrap Table 擴充外掛 -->
+  <!-- 1. 輸入頁數跳轉的依賴 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-table@1.22.2/dist/extensions/page-jump-to/bootstrap-table-page-jump-to.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.22.2/dist/extensions/page-jump-to/bootstrap-table-page-jump-to.min.js"></script>
+  <!-- 2. 匯出檔案的擴充外掛 -->
+  <script src="https://cdn.jsdelivr.net/npm/tableexport.jquery.plugin@1.10.21/tableExport.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.22.2/dist/extensions/export/bootstrap-table-export.min.js"></script>
+  <!-- 這個需要額外加，才可以匯出 excel xlsx 格式的檔案 -->
+  <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+
+  <script>
+    // 設定 moment.js 的語系為中文
+    moment.locale('zh-tw');
+    const vm = new Vue({
+      el: '#app',
+      data() {
+        return {
+          searchParam: {
+            restaurantId: null,
+            restaurantName: null,
+            memberName: null,
+            memberEmail: null,
+            status: '', // 訂單狀態
+            orderType: '', // 訂單類型
+            orderCreatedTimeStart: null, // 訂單時間查詢區間，起始時間，用 long 毫秒數傳到後端
+            orderCreatedTimeEnd: null, // 訂單時間查詢區間，結束時間
+            memberArrBySerchEmail: [], // 查詢會員信箱，回傳符合的會員資料
+          },
+          // 訂單資料
+          menuOrderArr: [
+            {
+              orderId: null,
+              orderType: null,
+              status: null,
+              total: 0,
+              deliveryFee: 0,
+              platformFee: 0,
+              subTotal: 0,
+              paymentType: null,
+              reservationTime: null,
+              createdTime: null,
+              deliveryAddress: null,
+              member: {
+                memberId: null,
+                name: null,
+                email: null,
+              },
+              restaurant: {
+                restaurantId: null,
+                name: null,
+                address: null,
+              },
+              orderDetailArr: [
+                {
+                  menuName: null,
+                  price: 0,
+                  quantity: 0,
+                }
+              ]
+            }
+          ],
+          // 目前開啟訂單詳細資料 Modal 的訂單
+          currentOrderData: {
+              orderId: null,
+              orderType: null,
+              status: null,
+              total: 0,
+              deliveryFee: 0,
+              platformFee: 0,
+              subTotal: 0,
+              paymentType: null,
+              reservationTime: null,
+              createdTime: null,
+              deliveryAddress: null,
+              member: {
+                memberId: null,
+                name: null,
+                email: null,
+              },
+              restaurant: {
+                restaurantId: null,
+                name: null,
+                address: null,
+              },
+              orderDetailArr: [
+                {
+                  menuName: null,
+                  price: 0,
+                  quantity: 0,
+                }
+              ]
+            },
+          // 每頁資料筆數的下拉選單選項
+          pageSizeOption: [],
+          // 每頁資料筆數選單選擇的值
+          pageSizeSelect: 10,
+          exportDataOptionSelect: 'basic',
+          // html Dom 元素控制變化的屬性
+          htmlProp: {
+            isSearchAreaShow: false,
+            isLoading: false,
+          },
+          // Bootstrap Table 實例
+          menuOrderTable: null,
+          // Awesomplete 實例
+          emailAwesomplete: null,
+          // Bootstrap Modal 實例
+          orderDataModal: null,
+          // 管理員名稱
+          adminName: localStorage.getItem('adminName'),
+        }
+      },
+      computed: {
+        // 查詢時間範圍的起始時間，錯誤訊息顯示
+        isSearchStartTimeError() {
+          // 結束時間沒有選擇，不顯示錯誤訊息
+          if (!this.searchParam.orderCreatedTimeEnd) {
+            return false;
+          }
+          // 時間都有選擇，且起始時間 < 結束時間，不顯示錯誤訊息
+          if ((this.searchParam.orderCreatedTimeStart && this.searchParam.orderCreatedTimeEnd) && this.searchParam.orderCreatedTimeStart < this.searchParam.orderCreatedTimeEnd) {
+            return false;
+          }
+          // 回傳 true 代表顯示錯誤訊息
+          return true;
+        },
+        // 查詢時間範圍的結束時間，錯誤訊息顯示
+        isSearchEndTimeError() {
+          // 起始時間沒有選擇
+          if (!this.searchParam.orderCreatedTimeStart) {
+            return false;
+          }
+          // 時間都有選擇，且起始時間 < 結束時間
+          if ((this.searchParam.orderCreatedTimeStart && this.searchParam.orderCreatedTimeEnd) && this.searchParam.orderCreatedTimeStart < this.searchParam.orderCreatedTimeEnd) {
+            return false;
+          }
+          return true;
+        },
+        // 多條件查詢送出按鈕，禁用 disabled 狀態
+        disabledSearchSubmit() {
+          // 起始時間、結束時間都沒有選擇
+          if (!this.searchParam.orderCreatedTimeStart && !this.searchParam.orderCreatedTimeEnd) {
+            return false;
+          }
+          // 時間都有選擇，且起始時間 < 結束時間，代表合法的時間範圍
+          if ((this.searchParam.orderCreatedTimeStart && this.searchParam.orderCreatedTimeEnd) && this.searchParam.orderCreatedTimeStart < this.searchParam.orderCreatedTimeEnd) {
+            return false;
+          }
+          // 其他情況都禁用按鈕
+          return true;
+        },
+      },
+      mounted() {
+        // 先初始化 Bootstrap Table
+        this.initMenuOrderTable();
+
+        // 初始化每頁顯示筆數的下拉選單
+        this.initPageSizeSelect();
+
+        // 載入訂單資料
+        this.searchMenuOrder();
+
+        // 多條件查詢，會員帳號 input 搜尋框，要使用 Awesomplete.js 的自動完成功能，初始化 Awesomplete.js 的實例
+        this.initSearchEmailAutoComplete();
+
+        //#region
+        /**
+          將 Bootstrap Modal，綁定到 Vue 實體中的 data 變數
+            1. html 標籤要先加上 ref="orderTimeModal" 屬性，
+              -> this.$refs.orderTimeModal 會先取得 Modal 的 Dom 元素
+            2. 把 Dom 元素作為參數，傳入 Bootstrap Modal 的建構子
+              -> 得到 Bootstrap Modal 的物件實體，指定給 Vue Data 中的變數儲存，才能使用 show()、hide() 等方法
+        */
+        //#endregion
+        this.orderDataModal = new bootstrap.Modal(this.$refs.orderDataModal);
+      },
+      methods: {
+        // 查詢餐點訂單資料
+        searchMenuOrder() {
+          //發送請求前，顯示畫面遮罩
+          this.htmlProp.isLoading = true;
+
+          // 從 Bootstrap Table options 屬性中，取得目前的分頁資訊
+          let pageParam = {
+            // 目前頁數，Bootsrtap Table 的 pageNumber，第一頁是 1
+            // Spring Boot Pageable 物件的 page 屬性，第一頁是 0，所以這邊傳送到後端要-1
+            page: this.menuOrderTable.bootstrapTable('getOptions').pageNumber - 1,
+            size: this.menuOrderTable.bootstrapTable('getOptions').pageSize,
+          }
+
+          // 判斷會員信箱的值，是否有對應的 member 資料
+          let memberId = null;
+          // 信箱查詢框有值
+          if (this.searchParam.memberEmail) {
+            let matchMember = this.searchParam.memberArrBySerchEmail.find(member => member.email === this.searchParam.memberEmail);
+
+            // 信箱查詢框有值，且 email 有對應的 member 資料
+            if (matchMember) {
+              memberId = matchMember.memberId;
+            } 
+            else {
+              // 信箱查詢框有值，但 email 沒有對應的 member 資料
+              // memberId = -1 傳到後端，這樣就會查不到訂單資料，因為沒有 memberId = -1 的會員，不可以用 null，因為 null 是沒有輸入 email 這個查詢條件
+              memberId = -1;
+            }
+          }
+
+          // 把查詢時間範圍的起始時間、結束時間，轉換成 long 毫秒數，傳到後端
+          let orderCreatedTimeStart = this.searchParam.orderCreatedTimeStart ? moment(this.searchParam.orderCreatedTimeStart).valueOf() : null;
+          let orderCreatedTimeEnd = this.searchParam.orderCreatedTimeEnd ? moment(this.searchParam.orderCreatedTimeEnd).valueOf() : null;
+
+          // 多條件查詢參數
+          let searchParamObj = {
+            restaurantId: this.searchParam.restaurantId ? this.searchParam.restaurantId : null,
+            restaurantName: this.searchParam.restaurantName,
+            memberName: this.searchParam.memberName,
+            memberId: memberId,
+            status: this.searchParam.status,
+            orderType: this.searchParam.orderType,
+            orderCreatedTimeStart: orderCreatedTimeStart,
+            orderCreatedTimeEnd: orderCreatedTimeEnd,
+          }
+
+          axios({
+            method: 'POST',
+            url: 'http://localhost:8080/menu-order/search',
+            params: pageParam,
+            data: searchParamObj,
+          })
+          .then((response) => {
+            let pageableData = response.data.data;
+            this.menuOrderArr = pageableData.content.map(order => {
+              order.orderDetailArr = order.orderDetailList;
+              return order;
+            });
+
+            // 把後端回傳的資料，包含菜單資料、分頁資訊，更新 Bootstrap Table options 屬性
+            this.menuOrderTable.bootstrapTable('refreshOptions', {
+              data: this.menuOrderArr, // 更新菜單資料
+              // 目前頁數，Bootsrtap Table 的 pageNumber，第一頁是 1
+              // Spring Boot Pageable 物件的 page 屬性，第一頁是 0，所以這邊接收到後端的頁數資料，要再 + 1
+              pageNumber: pageableData.pageable.pageNumber + 1,
+              pageSize: pageableData.pageable.pageSize,
+              totalRows: pageableData.totalElements,
+              totalPages: pageableData.totalPages,
+            });
+          })
+          .catch((error) => {
+            console.log('error:', error);
+          })
+          .finally(() => {
+            // 請求結束，不論 response 成功或失敗，都會隱藏畫面遮罩
+            this.hideLoading();
+          });
+        },
+        // 送出多條件查詢
+        submitSearchOrder() {
+          // 更新 Bootstrap Table 分頁屬性，目前頁數回到1
+          this.menuOrderTable.bootstrapTable('refreshOptions', {
+            pageNumber: 1,
+          });
+
+          this.searchMenuOrder();
+        },
+        // 清除多條件查詢條件
+        clearSearchParam() {
+          this.searchParam.restaurantId = null;
+          this.searchParam.restaurantName = null;
+          this.searchParam.memberName = null;
+          this.searchParam.memberEmail = null;
+          this.searchParam.status = '';
+          this.searchParam.orderType = '';
+          this.searchParam.orderCreatedTimeStart = null;
+          this.searchParam.orderCreatedTimeEnd = null;
+          this.searchParam.memberArrBySerchEmail = [];
+        },
+        // 初始化 email 搜尋框使用的 Awesomplete.js
+        initSearchEmailAutoComplete() {
+          let inputEmail = this.$refs.inputEmail;
+
+          // 初始化 Awesomplete 實例
+          this.emailAwesomplete = new Awesomplete(inputEmail, {
+             // 輸入1個字就提供選項
+            minChars: 1,
+            // 當從選項列表中，選擇一個選項時
+            // 使用 replace 方法，把選擇的選項值，指定給 input 欄位
+            replace: (suggestion) => {
+              this.searchParam.memberEmail = suggestion.value;
+            }
+          });
+        },
+        // email 搜尋框的 input 事件，當輸入框輸入值的時候會觸發
+        handelSeachMemberEmailInput() {
+          axios({
+            method: 'GET',
+            url: 'http://localhost:8080/member/search',
+            params: {
+              email: this.searchParam.memberEmail,
+            }
+          })
+          .then((response) => {
+            let memberArr = response.data.data;
+            this.searchParam.memberArrBySerchEmail = memberArr;
+
+            // 處理後端回傳的會員陣列資料，並指定為 auto-complete 的選項來源，Awesomplete 實例的 list 屬性
+            this.emailAwesomplete.list = memberArr.map((member) => {
+              return member.email;
+            });
+
+            // 因為是動態更新 auto-complete 的選項，文件說要寫這行
+            // -> 手動強制更新選項列表，避免不會自動更新選項
+            this.emailAwesomplete.evaluate();
+          })
+          .catch((error) => {
+            console.log('error:', error);
+          })
+        },
+        // 取消訂單
+        cancelMenuOrder(row) {
+          Swal.fire({
+            // 自訂圖示
+            iconHtml: '<img src="/images/cancel-2.png">',
+            title: "確定要取消訂單嗎？",
+            position: 'center',
+            confirmButtonText: "確認",
+            showDenyButton: true,
+            denyButtonText: "取消",
+            showCloseButton: true,
+            // 加上自訂的 class，再透過 class 去找內部的組件修改 css 樣式
+            // 這樣就不會影響頁面上其他的 SweetAlert2 視窗樣式
+            customClass: {
+              popup: 'custom-cancel-order-popup',
+              icon: 'custom-icon-wrapper'
+            },
+          }).then((result) => {
+            if (result.isConfirmed) {
+              let paramObj = {
+                orderId: row.orderId,
+                status: 'CANCELED',
+              }
+              axios({
+                method: 'POST',
+                url: 'http://localhost:8080/menu-order/update/status',
+                data: paramObj,
+              })
+              .then((response) => {
+                if (response.data.status === 200) {
+                  // 取消訂單成功，重新查詢載入訂單資料
+                  this.searchMenuOrder();
+                }
+              })
+              .catch((error) => {
+                console.log('error:', error);
+              });
+            }
+          });
+        },
+        // 餐廳 ID 搜尋框，只能輸入整數
+        checkRestaurantIdIsInteger() {
+          // 輸入非數字的字元，就取代成空字串 '' 
+          this.searchParam.restaurantId = this.searchParam.restaurantId.replace(/[^\d]/g, '');
+        },
+        // 初始化 Bootstrap Table
+        initMenuOrderTable() {
+          this.menuOrderTable = $('#menuOrderTable').bootstrapTable({
+            classes: 'table table-bordered', // table 樣式
+            cache: false,  // ajax 請求是否用快取
+            clickToSelect: true, // 搭配第一欄的 checkbox 使用，點選資料列就會勾選 checkbox
+
+            // Toolbar 的設定
+            toolbar: '#myToolbar', // 自定義 Toolbar 的 HTML 元素，例如自定義每頁筆數選單放到自訂的Toolbar
+            showColumns: true, // 欄位顯示選擇按鈕
+            showFullscreen: true, // 全螢幕按鈕
+
+            // 分頁處理方式 client(前端)、server(後端)，預設是 client
+            sidePagination: "server", 
+            // 分頁相關設定
+            pagination: true, // 分頁
+            pageNumber: 1, // 預設頁數
+            pageSize: 10, // 預設每頁資料筆數
+            pageList: [10, 20, 50, 100], // 每頁資料筆數的選單
+            smartDisplay: false, // 智能隱藏、或顯示某些元素，關閉，預設為true
+
+            // 展開訂單明細
+            detailView: true,
+            detailFormatter: function(index, row, $element) {
+              let orderDetailArr = row.orderDetailArr;
+              let html = 
+              '<div class="detail-info"><div class="menu-item-wrapper">';
+                
+              orderDetailArr.forEach(item => {
+                html += `
+                  <div class="menu-item">
+                    <span class="field-name">
+                      ${item.menuName} x ${item.quantity}
+                    </span>
+                    <span class="price-value">
+                      $ ${(item.price * item.quantity).toLocaleString()}
+                    </span>
+                  </div>`;
+              });
+              html += '</div>';
+
+              if (row.orderType === 'DELIVERY') {
+                html += `
+                  <div class="detail-price-wrapper">
+                    <div class="price-item">
+                      <span class="field-name">小計</span>
+                      <span class="field-value price-value">
+                        $ ${row.subTotal.toLocaleString()}
+                      </span>
+                    </div>
+                    <div class="price-item">
+                      <span class="field-name">外送服務費</span>
+                      <span class="field-value price-value">
+                        $ ${row.deliveryFee.toLocaleString()}
+                      </span>
+                    </div>
+                    <div class="price-item">
+                      <span class="field-name">平台費</span>
+                      <span class="field-value price-value">
+                        $ ${row.platformFee.toLocaleString()}
+                      </span>
+                    </div>
+                    <div class="price-item price-total">
+                      <span class="field-name">總計</span>
+                      <span class="field-value price-value">
+                        $ ${row.total.toLocaleString()}
+                      </span>
+                    </div>
+                  </div>`;
+              }
+              else if (row.orderType === 'TAKEOUT') {
+                html += `
+                  <div class="detail-price-wrapper">
+                    <div class="price-item price-total">
+                      <span class="field-name">總計</span>
+                      <span class="field-value price-value">
+                        $ ${row.total.toLocaleString()}
+                      </span>
+                    </div>
+                  </div>`
+              }
+              html += '</div>';
+              return html;
+            },
+
+            /**
+             * data 屬性資料來源，設定 Table 的資料來源
+             * 在載入初始菜單資料的 searchMenuOrder() 方法中，ajax 成功載入資料後，
+             * 有使用 refreshOptions，設定資料來源 data、與分頁屬性，所以這邊 data 不用再設定
+            */
+            // data: vm.menuOrderArr, 
+            uniqueId: 'orderId', // 哪一個欄位是key
+            columns: [ // 欄位設定
+              {
+                checkbox : true,
+                // field 是每一個欄位的識別，就算是 checkbox 也要設定，否則匯出資料時，沒辦法忽略 checkbox 欄位不匯出
+                field: 'checkbox', 
+                align: 'center',
+              },
+              {
+                field: 'orderId',
+                title: '訂單編號',
+                align: 'center', // 欄位水平對齊方式
+              },
+              {
+                field: 'member.name',
+                title: '會員姓名',
+                align: 'center',
+                width: 100,
+                // 欄位的 td 加上自訂 class，方便後續 css 樣式設定
+                // 加上兩個自訂 class，用空格隔開
+                cellStyle: function(value, row, index) {
+                  return {
+                    classes: 'td td-member-name',
+                  };
+                },
+              },
+              {
+                field: 'member.email',
+                title: '會員帳號',
+                cellStyle: function(value, row, index) {
+                  return {
+                    classes: 'td td-member-email',
+                  };
+                }
+              },
+              {
+                field: 'restaurant.name',
+                title: '餐廳名稱',
+                align: 'center',
+                cellStyle: function(value, row, index) {
+                  return {
+                    classes: 'td td-restaurant-name',
+                  };
+                }
+              },
+              {
+                field: 'orderType',
+                title: '類型',
+                align: 'center',
+                formatter: function(value, row) {
+                  let html = '';
+                  if (value === 'DELIVERY') {
+                    html = `<span class="badge bg-primary">外送</span>`;
+                  } else if (value === 'TAKEOUT') {
+                    html = `<span class="badge bg-warning">外帶自取</span>`;
+                  }
+                  return html;
+                },
+                cellStyle: function(value, row, index) {
+                  return {
+                    classes: 'td td-orderType',
+                  };
+                }
+              },
+              {
+                field: 'status',
+                title: '狀態',
+                align: 'center',
+                width: 100,
+                formatter: function (value, row) {
+                  let html = '';
+                  if (value === 'CREATED' || value === 'PROCESSING') {
+                    html = `<span class="badge bg-process-myclass">進行中</span>`;
+                  } else if (value === 'FINISHED') {
+                    html = `<span class="badge bg-success">已完成</span>`;
+                  } else if (value === 'CANCELED') {
+                    html = `<span class="badge bg-cancel-myclass">已取消</span>`;
+                  }
+                  return html;
+                },
+                cellStyle: function(value, row, index) {
+                  return {
+                    classes: 'td td-status',
+                  };
+                },
+              },
+              {
+                field: 'total',
+                title: '金額',
+                align: 'center',
+                width: 80,
+                formatter: function(value, row) {
+                  return value.toLocaleString();
+                },
+                cellStyle: function(value, row, index) {
+                  return {
+                    classes: 'td td-order-price-total',
+                  };
+                }
+              },
+              {
+                field: 'createdTime',
+                title: '訂單時間',
+                align: 'center',
+                formatter: function (value, row) {
+                  return moment(value).format('YYYY-MM-DD HH:mm');
+                },
+                cellStyle: function(value, row, index) {
+                  return {
+                    classes: 'td td-createdTime',
+                  };
+                }
+              },
+              {
+                // 自定義的查看資訊、取消訂單按鈕
+                field: 'action',
+                title: '操作',
+                align: 'center',
+                // index 參數沒用到也要傳，不傳會報錯
+                formatter: function (index, row) {
+                  let html = 
+                    `<div>
+                      <button class="btn-show-orderData">
+                        查看資訊
+                      </button>`
+
+                  // 狀態已完成、取消的訂單，取消按鈕要 disabled
+                  if (row.status === 'FINISHED' || row.status === 'CANCELED') {
+                    html += 
+                    `
+                      <button class="btn-cancel-menuOrder" disabled>
+                        取消訂單
+                      </button>
+                    </div>`;
+                  } 
+                  else {
+                    html += 
+                    `
+                      <button class="btn-cancel-menuOrder">
+                        取消訂單
+                      </button>
+                    </div>`;
+                  }
+                  return html;
+                },
+                // 這個欄位中，指定 Dom 元素的事件
+                // 這邊的例子是，.btn-show-orderData 和 .btn-cancel-menuOrder 按鈕，綁定點擊事件會去執行 Vue Methods 的方法
+                events: {
+                  'click .btn-show-orderData': (e, value, row, index) => {
+                    // 阻止事件冒泡，避免觸發父層的點擊事件
+                    e.stopPropagation(); 
+                    vm.showOrderData(row);
+                  },
+                  'click .btn-cancel-menuOrder': (e, value, row, index) => {
+                    e.stopPropagation(); 
+                    vm.cancelMenuOrder(row);
+                  }
+                },
+                // 欄位的 td 加上自訂 class，方便後續 css 樣式設定
+                cellStyle: function(value, row, index) {
+                  return {
+                    classes: 'td td-operate',
+                  };
+                }
+              }
+            ],
+            formatNoMatches: function () { // 如果查詢不到資料，要顯示的內容
+              return '無符合條件的資料';
+            },
+            formatShowingRows: function (fromIndex, toIndex, totalSize) {
+              return `共${totalSize}筆資料`;
+            },
+            formatRecordsPerPage: function (pageSize) {
+              // return `每頁顯示${pageSize}筆`;
+              return ''; // 不顯示資訊
+            },
+            // 切換分頁時，觸發的事件
+            onPageChange: function (currentPage, pageSize) {
+              // 換頁就要重新發送請求到後端，取得新的資料
+              vm.searchMenuOrder();
+            },
+            // 以下是 Bootstrap Table 擴充套件的設定，要額外引入 css 和 js 套件才有效果
+            // 1. 輸入頁數跳轉外掛
+            showJumpTo: true,
+            // 跳轉頁面的文字，預設是 'GO'，修改文字
+            formatJumpTo: function () {
+              return '跳轉';
+            },
+            // 2. 匯出檔案外掛
+            showExport: true, 
+            exportDataType: 'basic', 
+            // 匯出資料的格式，下面都是預設 (不用設定這行就可以匯出)
+            // 除了 xlsx 格式要另外引入 sheetjs 依賴 (如果要匯出 pdf 也要額外引入依賴)
+            exportTypes: ['json', 'xml', 'csv', 'txt', 'sql', 'excel', 'xlsx'], 
+            forceExport: true, // 超過匯出上限，還是要強制匯出，預設為 false
+            // 匯出檔案參數
+            exportOptions: {
+              // 如果欄位是 checkbox 勾選用、操作按鈕欄位，要忽略匯出，注意上面 column 屬性中 checkbox 要設定 field 才能忽略！
+              // 這邊設定忽略 filed 屬性值是 'checkbox'、'action' 的欄位，或可以用索引值0(代表忽略第一個欄位不匯出)
+              ignoreColumn: ['checkbox', 'action'],
+              fileName: function () {
+                let now = moment().format('YYYY-MM-DD HH-mm-ss');
+                return '餐點訂單資料-' + now;
+              },
+            },
+          })
+        },
+        // 初始化每頁顯示筆數的下拉選單
+        initPageSizeSelect() {
+          // 取得 Bootstrap table 中 pageList 屬性值，也就是每頁資料筆數的選項
+          this.pageSizeOption = this.menuOrderTable.bootstrapTable('getOptions').pageList;
+        },
+        // 當每頁顯示筆數的下拉選單改變
+        handlePageSizeChange() {
+          // 更新 Bootstrap Table 分頁屬性，目前頁數回到1、及每頁資料筆數
+          this.menuOrderTable.bootstrapTable('refreshOptions', {
+            pageNumber: 1,
+            pageSize: this.pageSizeSelect,
+          });
+
+          // 重新查詢訂單資料
+          this.searchMenuOrder();
+        },
+        // 當匯出資料的範圍選項改變
+        handleChangeExportOption() {
+          // 改變 Bootstrap Table options 參數，匯出資料的範圍
+          this.menuOrderTable.bootstrapTable('refreshOptions', {
+            exportDataType: this.exportDataOptionSelect,
+          });
+        },
+        toggleSearchArea() {
+          this.htmlProp.isSearchAreaShow = !this.htmlProp.isSearchAreaShow;
+          // 縮合後，清空搜尋條件
+          if (!this.htmlProp.isSearchAreaShow) {
+            this.clearSearchParam();
+          }
+        },
+        // 查看訂單詳細資訊，開啟訂單資訊 Modal
+        showOrderData(row) {
+          this.currentOrderData = row;
+          this.orderDataModal.show();
+        },
+        // 關閉訂單資訊 Modal
+        closeOderModal() {
+          this.orderDataModal.hide();
+        },
+        // 隱藏畫面遮罩，一般請求完成速度很快，如果直接關閉遮罩，
+        // 會感覺到畫面閃爍問題，所以延遲 200 毫秒再關閉遮罩
+        hideLoading() {
+          setTimeout(() => {
+            this.htmlProp.isLoading = false;
+          }, 200);
+        },
+        // 格式化數字，加上千分位
+        formatNumber(number) {
+          return numeral(number).format('0,0');
+        },
+        // 管理員登出
+        logout() {
+          localStorage.removeItem("adminId");
+          localStorage.removeItem("adminName");
+          window.location.href = "./admin-login.html";
+        },
+      },
+    })
+  </script>
+
+</body>
+</html>

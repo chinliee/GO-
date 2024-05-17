@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>營業紀錄</title>
+
+    <!-- 樣板需要的 css 資源-->
+    <!-- Font Awesome -->
+    <script src="https://kit.fontawesome.com/cda74843f9.js" crossorigin="anonymous"></script>
+    <!-- 此處已包含 Bootstrap css 函式庫, 各自所需函式庫請用 CDN 方式引入(import Vue 方式會有問題) -->
+    <link rel="stylesheet" href="/css/sb-admin-2.min.css">
+    <!-- 模板客製化設定 -->
+    <link rel="stylesheet" href="/css/sb-admin-2-custom-restaurant.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+<!-- JavaScript Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ"
+    crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.5"></script>
+<script src="https://www.unpkg.com/vue@3.3.5/dist/vue.global.prod.js"></script>
+<script src="https://www.unpkg.com/axios@1.6.7/dist/axios.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+<!-- 台灣縣市行政區 -->
+<script src="https://cdn.jsdelivr.net/npm/tw-city-selector@2.1.1/dist/tw-city-selector.min.js"></script>
+</head>
+
+<body id="aaa">
+
+    <!-- 模板外層容器 -->
+    <div id="wrapper">
+
+        <!-- 側邊 Sidebar -->
+        <ul class="navbar-nav sidebar sidebar-dark accordion bg-deep-blue" id="accordionSidebar">
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="#">
+                <div class="sidebar-brand-text mx-3">餐廳後台</div>
+            </a>
+            <!-- 分隔線 -->
+            <hr class="sidebar-divider my-0">
+            <!-- 無下拉式選項 -->
+            <li class="nav-item">
+                <a class="nav-link" href="./restaurant-menu.html">
+                    <img src="/images/food-1.png">
+                    <span>餐點資訊</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="./restaurant-menu-order.html">
+                    <img src="/images/data-1.png">
+                    <span>餐點訂單</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="./restaurant-statistic.html">
+                    <img src="/images/money-report-1.png">
+                    <span>銷售數據</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="./restaurant-ad-buy.html">
+                    <img src="/images/buyad.png">
+                    <span>購買廣告</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="./restaurant-ad-history.html">
+                    <img src="/images/adhistory.png">
+                    <span>廣告履歷</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="restaurant-ckediotr.html">
+                    <img src="/images/food-2.png">
+                    <span>前台預覽</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="restaurant-data.html">
+                    <img src="/images/status-1.png">
+                    <span>基本資訊</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="restaurant-reserve.html">
+                    <img src="/images/money-report-2.png">
+                    <span>訂單預約</span></a>
+            </li>
+            <!-- 下拉式選項-->
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages"
+                    aria-expanded="true" aria-controls="collapsePages">
+                    <i class="fas fa-fw fa-folder"></i>
+                    <span>餐廳資訊</span>
+                </a>
+                <div id="collapsePages" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">餐廳資訊</h6>
+                        <a class="collapse-item" href="restaurant-record.html">營業資訊</a>
+                        <div class="collapse-divider"></div>
+                        <h6 class="collapse-header">預約情況</h6>
+                        <a class="collapse-item" href="restaurant-seat.html">座位資訊</a>
+                    </div>
+                </div>
+            </li>
+            <!-- Sidebar 展開收合按鈕 -->
+            <div class="text-center d-none d-md-inline">
+                <button class="rounded-circle border-0" id="sidebarToggle"></button>
+            </div>
+        </ul>
+
+        <!-- 主內容區域，包含上方導覽列與各網頁內容 -->
+        <div id="content-wrapper" class="d-flex flex-column">
+            <div id="content">
+                <!-- 上方導覽列 -->
+                <nav class="navbar navbar-expand topbar mb-4 static-top"
+                    style="display: flex; justify-content: space-between;">
+                    <div class="temp"></div>
+                    <div class="nav-item dropdown no-arrow">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="mr-2 d-none d-lg-inline text-gray-600 small topbar-name">{{restaurantNameMain}}</span>
+                        </a>
+                        <!-- 功能列表 -->
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                            aria-labelledby="userDropdown">
+                            <a @click="logout" class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
+                                <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                登出
+                            </a>
+                        </div>
+                    </div>
+                </nav>
+
+                <!-- 各網頁內容 -->
+                <div id="app" style="display: flex; align-items: center; width: 600px; margin: 20px auto;">
+                    <div class="input-group">
+                        <select v-model="selectedOption" @change="handleChange"
+                            class="form-select rounded-pill px-3 me-2" aria-label="Default select example"
+                            style="width: 100px;">
+                            <option value="">選擇查詢條件</option>
+                            <option value="timePer">時段</option>
+                            <option value="time">時間</option>
+                        </select>
+
+                        <input v-if="selectedOption === ''" type="text" readonly
+                            class="form-control rounded-pill px-3 me-2" placeholder="選擇查詢條件" style="width: 150px;">
+                        <select v-if="selectedOption === 'timePer'" v-model="timePer"
+                            class="form-control rounded-pill px-3 me-2" style="width: 150px;">
+                            <option disabled selected hidden>請選擇時段</option>
+                            <option value="早上">早上</option>
+                            <option value="中午">中午</option>
+                            <option value="下午">下午</option>
+                            <option value="晚上">晚上</option>
+                        </select>
+                        <input v-if="selectedOption === 'time'" type="time" v-model="timeSearch"
+                            class="form-control rounded-pill px-3 me-2" placeholder="請輸入時間" style="width: 150px;">
+
+                        <button v-if="selectedOption === ''" @click="callAllFind"
+                            class="btn btn-primary rounded-pill px-3 me-2">查詢</button>
+                        <button v-if="selectedOption === 'timePer'" class="btn btn-primary rounded-pill px-3 me-2"
+                            @click="callTimePer">查詢</button>
+                        <button v-if="selectedOption === 'time'" class="btn btn-primary rounded-pill px-3 me-2"
+                            @click="callTime">查詢</button>
+                        <button class="btn btn-primary rounded-pill px-3" data-bs-toggle="modal"
+                            data-bs-target="#addRecordModal">新增</button>
+                    </div>
+                </div>
+                <!-- ======================表格============================= -->
+                <!-- <button @click="aaa">取得本地存儲值</button> -->
+                <div class="container-fluid" style="max-width: 90%;">
+                    <table class="table table-hover shadow p-3 mb-5 bg-body rounded"
+                        style="width: 100%; margin-top: 20px; border-collapse: collapse; border-radius: 10px; overflow: hidden; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); background-color: #fff; font-family: 'Montserrat', sans-serif;">
+                        <thead>
+                            <tr style="background-color: #4da6ff; color: #fff; font-size: 16px;">
+                                <th scope="col" class="text-center"
+                                    style="padding: 12px; border: 1px solid #4da6ff; font-weight: bold;">#</th>
+                                <th scope="col" class="text-center"
+                                    style="padding: 12px; border: 1px solid #4da6ff; font-weight: bold;">營業時段</th>
+                                <th scope="col" class="text-center"
+                                    style="padding: 12px; border: 1px solid #4da6ff; font-weight: bold;">開始時段</th>
+                                <th scope="col" class="text-center"
+                                    style="padding: 12px; border: 1px solid #4da6ff; font-weight: bold;">結束時段</th>
+                                <th scope="col" class="text-center"
+                                    style="padding: 12px; border: 1px solid #4da6ff; font-weight: bold;">價格</th>
+                                <th scope="col" class="text-center"
+                                    style="padding: 12px; border: 1px solid #4da6ff; font-weight: bold;">備註</th>
+                                <th scope="col" class="text-center"
+                                    style="padding: 12px; border: 1px solid #4da6ff; font-weight: bold;">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(record,index) in restaurantrecord" key="record.restaurantrecordId">
+                                <td class="text-center"
+                                    style="padding: 12px; border: 1px solid #4da6ff; background-color: #f2f2f2; color: #333; font-size: 14px; line-height: 1.6; vertical-align: middle;">
+                                    {{index+1}}</td>
+                                <td class="text-center"
+                                    style="padding: 12px; border: 1px solid #4da6ff; background-color: #f2f2f2; color: #333; font-size: 14px; line-height: 1.6; vertical-align: middle;">
+                                    {{record.timePer}}</td>
+                                <td class="text-center"
+                                    style="padding: 12px; border: 1px solid #4da6ff; background-color: #f2f2f2; color: #333; font-size: 14px; line-height: 1.6; vertical-align: middle;">
+                                    {{record.startTime}}</td>
+                                <td class="text-center"
+                                    style="padding: 12px; border: 1px solid #4da6ff; background-color: #f2f2f2; color: #333; font-size: 14px; line-height: 1.6; vertical-align: middle;">
+                                    {{record.endTime}}</td>
+                                <td class="text-center"
+                                    style="padding: 12px; border: 1px solid #4da6ff; background-color: #f2f2f2; color: #333; font-size: 14px; line-height: 1.6; vertical-align: middle;">
+                                    {{record.price}}</td>
+                                <td class="text-center"
+                                    style="padding: 12px; border: 1px solid #4da6ff; background-color: #f2f2f2; color: #333; font-size: 14px; line-height: 1.6; vertical-align: middle;">
+                                    {{record.note}}</td>
+                                <td class="text-center"
+                                    style="padding: 12px; width: 200px; border: 1px solid #4da6ff; background-color: #f2f2f2; color: #333; font-size: 14px; line-height: 1.6; vertical-align: middle;">
+                                    <button type="button" class="btn btn-primary"
+                                        @click="callFindUpdate(record.restaurantrecordId)" data-bs-toggle="modal"
+                                        data-bs-target="#updateRecordModal">修改</button>
+                                    <button type="button" class="btn btn-danger"
+                                        @click="callDelete(record.restaurantrecordId)"
+                                        style="margin-left: 5px;">刪除</button>
+                                </td>
+
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+
+            <!-- ==========================互動視窗新增============================== -->
+            <div class="modal fade" id="addRecordModal" tabindex="-1" aria-labelledby="addRecordModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content"
+                        style="background-color: #fff; border-radius: 10px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);">
+                        <div class="modal-header" style="background-color: #4da6ff; color: #fff; border-bottom: none;">
+                            <h5 class="modal-title" id="addRecordModalLabel" style="font-weight: solid">新增記錄</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <!-- 模態內容 -->
+                        <div class="modal-body">
+
+                            <div class="row g-3">
+                                <div class="mb-3">
+                                    <label for="Businesstime" class="form-label"
+                                        style="font-weight: bold; color: #333;">營業時段</label>
+                                    <select id="timeper" class="form-select" name="Businesstime" v-model="timePerInsert"
+                                
+                                        style="background-color: #f2f2f2; border-color: #ddd;">
+                                        <option value="" disabled selected hidden>請選擇時段</option>
+                                        <option value="早上">早上</option>
+                                        <option value="中午">中午</option>
+                                        <option value="下午">下午</option>
+                                        <option value="晚上">晚上</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="Startbusiness" class="form-label"
+                                        style="font-weight: bold; color: #333;">開始營業時間</label>
+                                    <input v-model="starttimeInsert" type="time" id="rstart" class="form-control"
+                                        name="Startbusiness" style="background-color: #f2f2f2; border-color: #ddd;">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="Closebusiness" class="form-label"
+                                        style="font-weight: bold; color: #333;">結束營業時間</label>
+                                    <input v-model="endtimeInsert" type="time" id="rend" class="form-control"
+                                        name="Closebusiness" style="background-color: #f2f2f2; border-color: #ddd;">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="Price" class="form-label"
+                                        style="font-weight: bold; color: #333;">價格</label>
+                                    <input v-model="priceInsert" type="number" id="price" class="form-control"
+                                        name="Price" style="background-color: #f2f2f2; border-color: #ddd;">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="Note" class="form-label"
+                                        style="font-weight: bold; color: #333;">備註</label>
+                                    <input v-model="noteInsert" type="text" id="note" class="form-control" name="Note"
+                                        style="background-color: #f2f2f2; border-color: #ddd;">
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <button @click="callInsert" type="button" class="btn btn-secondary mt-3"
+                                    data-bs-dismiss="modal" style="margin-right: 15px;">新增</button>
+                                <button type="button" class="btn btn-secondary mt-3" data-bs-dismiss="modal">關閉</button>
+                                <input type="hidden">
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- ==========================互動視窗修改============================== -->
+
+            <div class="modal fade" id="updateRecordModal" tabindex="-1" aria-labelledby="addRecordModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content"
+                        style="background-color: #fff; border-radius: 10px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);">
+                        <div class="modal-header" style="background-color: #4da6ff; color: #fff; border-bottom: none;">
+                            <h5 class="modal-title" id="addRecordModalLabel" style="font-weight: solid">新增記錄</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <!-- 模態內容 -->
+                        <div class="modal-body">
+                            <div class="row g-3">
+                                <div class="mb-3">
+                                    <label for="Businesstime" class="form-label"
+                                        style="font-weight: bold; color: #333;">營業時段</label>
+                                    <select id="timeper" v-model="timePerupdata" class="form-select" name="Businesstime"
+                                        style="background-color: #f2f2f2; border-color: #ddd;">
+                                        <option disabled selected hidden></option>
+                                        <option value="早上">早上</option>
+                                        <option value="中午">中午</option>
+                                        <option value="下午">下午</option>
+                                        <option value="晚上">晚上</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="Startbusiness" class="form-label"
+                                        style="font-weight: bold; color: #333;">開始營業時間</label>
+                                    <input v-model="starttimeupdata" type="time" id="rstart" class="form-control"
+                                        name="Startbusiness" style="background-color: #f2f2f2; border-color: #ddd;">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="Closebusiness" class="form-label"
+                                        style="font-weight: bold; color: #333;">結束營業時間</label>
+                                    <input v-model="endtimeupdata" type="time" id="rend" class="form-control"
+                                        name="Closebusiness" style="background-color: #f2f2f2; border-color: #ddd;">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="Price" class="form-label"
+                                        style="font-weight: bold; color: #333;">價格</label>
+                                    <input v-model="priceupdata" type="number" id="price" class="form-control"
+                                        name="Price" style="background-color: #f2f2f2; border-color: #ddd;">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="Note" class="form-label"
+                                        style="font-weight: bold; color: #333;">備註</label>
+                                    <input v-model="noteupdata" type="text" id="note" class="form-control" name="Note"
+                                        style="background-color: #f2f2f2; border-color: #ddd;">
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <button type="button" class="btn btn-secondary mt-3" data-bs-dismiss="modal"
+                                    @click="callUpdate(singleRecord.restaurantrecordId)"
+                                    style="margin-right: 15px;">修改</button>
+                                <button type="button" class="btn btn-secondary mt-3" data-bs-dismiss="modal">關閉</button>
+                                <input type="hidden">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="sticky-footer bg-white">
+                <div class="container my-auto">
+                    <div class="copyright text-center my-auto">
+                        <span>Copyright &copy; 覓食 GO</span>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+    <script>
+        const { createApp } = Vue;
+
+        const app = createApp({
+            data() {
+                return {
+                    selectedOption: '',
+                    restaurantrecord_id: null,
+                    timePer: '請選擇時段',
+                    DayPer: null,
+                    starttime3: null,
+                    endtime4: null,
+                    price5: null,
+                    note6: null,
+                    restaurant_id: null,
+                    timeSearch: null,
+
+                    timePerInsert: null,
+                    dayPerInsert: null,
+                    starttimeInsert: null,
+                    endtimeInsert: null,
+                    priceInsert: null,
+                    noteInsert: null,
+                    restaurantidInsert: null,
+
+                    timePerupdata: null,
+                    dayPerupdata: null,
+                    starttimeupdata: null,
+                    endtimeupdata: null,
+                    priceupdata: null,
+                    noteupdata: null,
+
+                    price11: null,
+
+                    singleRecord: [],
+                    restaurantRecordDelete: null,
+                    restaurantRecordInsert: [],
+                    restaurantrecord: [],
+                    restaurantNameMain:''
+                }
+            },
+            methods: {
+                callAllFind: function () {
+                    let data = {
+                        start: 0,
+                        rows: 100,
+                    };
+                    Swal.fire({
+                        text: "Loading......",
+                        allowOutsideClick: false,
+                        showConfirmButton: false,
+                    })
+                    setTimeout(function () {
+                        Swal.close()
+                    }, 1000);
+                    var restaurantId = localStorage.getItem('restaurantId');
+                    var restaurantName = localStorage.getItem('restaurantName');
+                    this.restaurantNameMain = restaurantName;
+                    axios.get("http://localhost:8080/restaurantRecords/" + restaurantId, { params: data }).then((response) => {
+                        this.restaurantrecord = response.data;
+
+                    }).catch(function (error) {
+                        console.log(error);
+                    })
+
+
+                },
+                callTimePer: function () {
+                    let data = {
+                        start: 0,
+                        rows: 100,
+                        timePer: this.timePer
+                    };
+                    var restaurantId = localStorage.getItem('restaurantId');
+                    axios.get("http://localhost:8080/restaurantRecordTimeper/records/" + restaurantId, { params: data }).then((response) => {
+                        this.restaurantrecord = response.data;
+                        console.log(response)
+                        Swal.fire({
+                            text: 'success',
+                            icon: 'success',
+                            allowOutsideClick: false,
+                            confirmButtonText: '確認',
+                        })
+                    }).catch(function (error) {
+                        console.log(error);
+                        console.log(data)
+                        Swal.fire({
+                            text: 'error',
+                            icon: 'error',
+                            allowOutsideClick: false,
+                            confirmButtonText: '確認',
+                        })
+                    })
+
+                },
+                callTime: function () {
+                    let data = {
+                        start: 0,
+                        row: 100,
+                        time: this.timeSearch,
+                    };
+                    var restaurantId = localStorage.getItem('restaurantId');
+                    axios.get("http://localhost:8080/restaurantRecordTime/records/" + restaurantId, { params: data }).then((response) => {
+                        this.restaurantrecord = response.data;
+                        console.log(this.restaurantrecord);
+                        Swal.fire({
+                            text: 'success',
+                            icon: 'success',
+                            allowOutsideClick: false,
+                            confirmButtonText: '確認',
+                        })
+                    }).catch(function (error) {
+
+                        console.log(error);
+                        Swal.fire({
+                            text: 'error',
+                            icon: 'error',
+                            allowOutsideClick: false,
+                            confirmButtonText: '確認',
+                        })
+                    })
+                },
+                callInsert: function () {
+                    var restaurantId = localStorage.getItem('restaurantId');
+                    let data = {
+                        start: 0,
+                        rows: 100,
+                        timePer: this.timePerInsert,
+                        startTime: this.starttimeInsert + ":00",
+                        endTime: this.endtimeInsert + ":00",
+                        price: this.priceInsert,
+                        note: this.noteInsert,
+                        restaurantId: restaurantId,
+                    };
+                    console.log(data);
+                    axios.post("http://localhost:8080/restaurantRecord", data).then((response) => {
+                        console.log("OK");
+                        vm.callAllFind();
+
+                    })
+                        .catch(function (error) {
+                            console.log(error);
+                            console.log(data);
+                        })
+                },
+                callDelete: function (record) {
+                    console.log(record)
+                    console.log(record.restaurantrecordId);
+                    Swal.fire({
+                        text: "確定刪除？",
+                        icon: 'warning',
+                        allowOutsideClick: false,
+                        confirmButtonText: '確認',
+                        showCancelButton: true,
+                        cancelButtonText: '取消',
+                    }).then(function (result) {
+                        if (result.isConfirmed) {
+                            axios.delete("http://localhost:8080/restaurantRecord/" + record).then((response) => {
+                                console.log("OK");
+                                vm.callAllFind();
+                                Swal.fire({
+                                    title: "Deleted!",
+                                    text: "刪除成功",
+                                    icon: "success",
+                                    confirmButtonText: '確認',
+                                });
+                            })
+                        } else {
+                            console.log("Cancel clicked")
+                        }
+                    })
+                        .catch(function (error) {
+                            console.log(error);
+
+                        })
+                },
+                callFindUpdate: function (record) {
+
+                    axios.get("http://localhost:8080/restaurantrecords/" + record).then((response) => {
+                        console.log("OK");
+                        this.singleRecord = response.data;
+                        this.timePerupdata = this.singleRecord.timePer;
+                        this.dayPerupdata = this.singleRecord.dayPer;
+                        this.starttimeupdata = this.singleRecord.startTime;
+                        this.endtimeupdata = this.singleRecord.endTime
+                        this.priceupdata = this.singleRecord.price;
+                        this.noteupdata = this.singleRecord.note;
+                        console.log(noteupdata)
+                        console.log(singleRecord.note)
+                    })
+                        .catch(function (error) {
+                            console.log(error);
+                        })
+                },
+                callUpdate: function (singleRecord) {
+                    var restaurantId = localStorage.getItem('restaurantId');
+
+                    let data = {
+                        timePer: this.timePerupdata,
+                        dayPer: this.dayPerupdata,
+                        startTime: this.starttimeupdata,
+                        endTime: this.endtimeupdata,
+                        price: this.priceupdata,
+                        note: this.noteupdata,
+                        restaurantId: restaurantId,
+                    };
+                    Swal.fire({
+                        text: "確定修改？",
+                        icon: 'warning',
+                        allowOutsideClick: false,
+                        confirmButtonText: '確認',
+                        showCancelButton: true,
+                        cancelButtonText: '取消',
+                    }).then(function (result) {
+                        if (result.isConfirmed) {
+                            axios.put("http://localhost:8080/restaurantRecord/" + singleRecord, data).then((response) => {
+                                console.log("OK");
+                                vm.callAllFind();
+                                Swal.fire({
+                                    title: "Updata!",
+                                    text: "修改成功",
+                                    icon: "success",
+                                    confirmButtonText: '確認',
+
+                                });
+                            })
+                        } else {
+                            console.log("Cancel clicked")
+                        }
+                    })
+                        .catch(function (error) {
+                            console.log(error);
+                            console.log(data);
+                        })
+                },
+                logout: function () {
+                    localStorage.removeItem('restaurantId');
+                    localStorage.removeItem('restaurantName');
+                    vm.checkLogin();
+                },
+                // 檢查是否為登入狀態，沒有則跳回登入頁面
+                checkLogin: function () {
+                    var restaurantId = localStorage.getItem('restaurantId');
+                    // 如果restaurantId存在且不為空時，允許進入頁面
+                    if (restaurantId !== null && restaurantId !== ' ') {
+                        this.checkLoginstate = true;
+                    } else {
+                        window.location.href = './restaurant-login.html';
+                        this.checkLoginstate = false;
+                    }
+                },
+            }
+        });
+        const vm = app.mount("#aaa");
+        vm.callAllFind();
+        vm.checkLogin();
+
+
+
+    </script>
+    <!-- 模板需要的 js 資源 -->
+    <script src="/js/jquery-3.7.1.js"></script>
+    <script src="/js/bootstrap-4.6.2.bundle.min.js"></script>
+    <script src="/js/sb-admin-2.min.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>前台樣版</title>
+
+    <!-- bootstrap 5.3.2 CSS -->
+    <link rel="stylesheet" href="/css/bootstrap-5.3.2.css" />
+    <!-- Bootstrap 5.3.2 JS -->
+    <script src="/js/bootstrap-5.3.2.bundle.min.js"></script>
+
+    <!-- vue 3.4.21 -->
+    <script src="https://unpkg.com/vue@3.4.21/dist/vue.global.prod.js"></script>
+    <script src="https://unpkg.com/axios@1.6.7/dist/axios.min.js"></script>
+
+    <!-- 前台CSS樣版 -->
+    <link href="/css/frontstage-template.css" rel="stylesheet"/>
+
+</head>
+<body id="app">
+
+  <!-- header -->
+  <header class="frontstage-template-header"  data-bs-theme="dark">
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+      <div class="container-fluid nav-outer-flex-container">
+        <div class="nav-container">
+          <a class="navbar-brand" href="/views/index.html"><img src="/favicon.ico" alt="覓食Go圖標預定地" width="50px" height="50px"></a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+            aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+          </button>
+        </div>
+        <div class="collapse navbar-collapse nav-inner-flex-container" id="navbarNavDropdown">
+          <div class="nav-container">
+            <ul class="navbar-nav nav-function-setting">
+              <li class="nav-item">
+                <a class="nav-link" href="/views/index.html"><b>尋找餐廳</b></a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/views/mall/mall-index.html"><b>購物商城</b></a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/views/member/member-contact.html"><b>聯絡我們</b></a>
+              </li>
+            </ul>
+          </div>
+          <div class="nav-container">
+            <ul class="navbar-nav">
+              <li class="nav-item not-login">
+                <a class="nav-link" href="/views/member/member-login.html">
+                  <b>登入 / 註冊</b>
+                </a>
+              </li>
+              <li class="nav-item dropdown is-login">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                  aria-expanded="false">
+                  <b class="login-regist-text">會員您好</b>
+                </a>
+                <ul class="dropdown-menu">
+                  <li>
+                    <a class="dropdown-item login-dropdown-item" href="/views/member/member-menu-order.html">歷史訂單</a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item login-dropdown-item" href="/views/member/member-reserve.html">預約訂單</a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item login-dropdown-item" href="/views/member/member-coupon.html">折扣券</a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item login-dropdown-item" href="#" @click="logout">登出</a>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- 中間區域，放頁面內容 -->
+
+  <!-- footer -->
+  <footer class="frontstage-template-footer">
+    Copyright © 覓食Go All rights reserved
+  </footer>
+
+  <script>
+    const { createApp, onMounted } = Vue
+
+    const app = createApp({
+      setup() {
+
+        onMounted(() => {
+          checkMemberLoginStatus();
+        });
+
+        function checkMemberLoginStatus() {
+          if (localStorage.getItem('memberName')) {
+            document.querySelector('li.is-login').setAttribute("style", "display: block;");
+            document.querySelector('li.not-login').setAttribute("style", "display: none;");
+            document.querySelector('.login-regist-text').textContent = "歡迎 " + localStorage.getItem('memberName');
+          } else {
+            document.querySelector('li.is-login').setAttribute("style", "display: none;");
+            document.querySelector('li.not-login').setAttribute("style", "display: block;");
+          }
+        }
+
+        function logout() {
+          localStorage.removeItem("memberId");
+          localStorage.removeItem("memberName");
+          window.location.href = "/views/index.html";
+        }
+
+        return {
+          checkMemberLoginStatus,
+          logout
+        }
+
+      }
+    })
+
+    app.mount("#app")
+
+  </script>
+</body>
+</html>

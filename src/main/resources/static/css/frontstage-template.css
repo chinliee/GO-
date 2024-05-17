@@ -1,0 +1,47 @@
+.frontstage-template-header {
+  background-color: #f7dba6;
+  margin-bottom: 50px;
+}
+
+.frontstage-template-header nav .nav-outer-flex-container .nav-container .navbar-nav .nav-item .dropdown-menu .login-dropdown-item:hover {
+  color: snow;
+  font-weight: bolder;
+  text-decoration: none;
+  transition-duration: 0.5s;
+}
+
+.frontstage-template-header nav .nav-outer-flex-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.frontstage-template-header nav .nav-outer-flex-container .nav-inner-flex-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.frontstage-template-header nav .nav-outer-flex-container .nav-inner-flex-container .nav-container .nav-function-setting .nav-item {
+  margin: 0 1vw;
+  vertical-align: middle;
+}
+
+.frontstage-template-header .navbar-nav .nav-item a.nav-link{
+  color: snow;
+  font-weight: bolder;
+}
+
+.frontstage-template-header nav .nav-outer-flex-container .nav-inner-flex-container .nav-container .nav-function-setting:last-child {
+  margin: 0;
+}
+
+.frontstage-template-footer {
+  margin-top: 60px;
+  background-color: #2B3035;
+  text-align: center;
+  color: white;
+  height: 70px; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

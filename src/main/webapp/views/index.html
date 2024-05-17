@@ -1,0 +1,539 @@
+<!doctype html>
+<html>
+
+<head>
+
+  <meta charset="utf-8">
+  <title>覓食Go</title>
+
+  <!-- bootstrap 5.3.2 CSS -->
+  <link rel="stylesheet" href="/css/bootstrap-5.3.2.css" />
+  <!-- Bootstrap 5.3.2 JS -->
+  <script src="/js/bootstrap-5.3.2.bundle.min.js"></script>
+
+  <!-- vue 3.4.21 -->
+  <script src="https://unpkg.com/vue@3.4.21/dist/vue.global.prod.js"></script>
+  <script src="https://unpkg.com/axios@1.6.7/dist/axios.min.js"></script>
+
+  <!-- 前台模板 -->
+  <link href="/css/frontstage-template.css" rel="stylesheet"/>
+
+  <style>
+    a {
+      text-decoration: none;
+    }
+
+    .card-generate-area .restaurant-name {
+      font-weight: bolder;
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    .ad-badge {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      padding: 2px 2px;
+      background-color: white;
+      border: 1px solid #000;
+      font-size: 10px;
+      color: #000;
+      border-radius: 3px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    @media (min-width: 992px) and (max-width: 1199.99px) {
+      #myCarousel {
+      padding: 20px 30vh;
+    }
+
+    .carousel-control-prev {
+      margin-left: 10vh;
+    }
+
+    .carousel-control-prev-icon {
+      background-color: lightgray;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+    }
+
+    .carousel-control-next {
+      margin-right: 10vh;
+    }
+
+  .carousel-control-next-icon {
+	background-color: lightgray;
+	border-radius: 50%;
+	width: 30px;
+	height: 30px;
+  }
+}
+
+@media (min-width: 1200px) {
+  #myCarousel {
+	padding: 20px 10vw;
+  }
+
+  .carousel-control-prev {
+	margin-left: 1vh;
+  }
+
+  .carousel-control-prev-icon {
+	background-color: lightgray;
+	border-radius: 50%;
+	width: 30px;
+	height: 30px;
+  }
+
+  .carousel-control-next {
+	margin-right: 1vh;
+  }
+
+  .carousel-control-next-icon {
+	background-color: lightgray;
+	border-radius: 50%;
+	width: 30px;
+	height: 30px;
+  }
+}
+
+.fab {
+  position: fixed;
+  z-index: 1;
+  border: 0;
+  border-radius: 50%;
+  left: 90vw;
+  bottom: 3vh;
+  width: 50px;
+  height: 50px;
+}
+.card-generate-area .card-container {
+  background-color: wheat;
+  transition-duration: 2s;
+}
+
+.card-generate-area .card-body {
+  text-decoration: none;
+  color: navy;
+}
+/* unvisited link */
+.card-generate-area .card-body:link {
+  text-decoration: none;
+  color: navy;
+}
+/* visited link */
+.card-generate-area .card-body:visited {
+  text-decoration: none;
+  color: navy;
+}
+/* mouse over link */
+.card-generate-area .card-body:hover {
+  text-decoration: none;
+  color: navy;
+}
+/* selected link */
+.card-generate-area .card-body:active {
+  text-decoration: none;
+  color: #3498db;
+}
+
+.card-generate-area .card-container:hover {
+  transition-duration: 2s;
+  transform: translate(-10px, -10px);
+  box-shadow: 5px 10px;
+  transition: ease;
+}
+
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/tw-city-selector@2.1.1/dist/tw-city-selector.min.js"></script> 
+</head>
+
+<body id="app">
+
+  <!-- header -->
+  <header class="frontstage-template-header"  data-bs-theme="dark">
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+      <div class="container-fluid nav-outer-flex-container">
+        <div class="nav-container">
+          <a class="navbar-brand" href="/views/index.html"><img src="../favicon.ico" alt="覓食Go圖標預定地" width="50px" height="50px"></a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+            aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+          </button>
+        </div>
+        <div class="collapse navbar-collapse nav-inner-flex-container" id="navbarNavDropdown">
+          <div class="nav-container">
+            <ul class="navbar-nav nav-function-setting">
+              <li class="nav-item">
+                <a class="nav-link" href="/views/index.html"><b>尋找餐廳</b></a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/views/mall/mall-index.html"><b>購物商城</b></a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/views/member/member-contact.html"><b>聯絡我們</b></a>
+              </li>
+            </ul>
+          </div>
+          <div class="nav-container">
+            <ul class="navbar-nav">
+              <li class="nav-item not-login">
+                <a class="nav-link" href="/views/member/member-login.html">
+                  <b>登入 / 註冊</b>
+                </a>
+              </li>
+              <li class="nav-item dropdown is-login">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                  aria-expanded="false">
+                  <b class="login-regist-text">會員您好</b>
+                </a>
+                <ul class="dropdown-menu">
+                  <li>
+                    <a class="dropdown-item login-dropdown-item" href="/views/member/member-menu-order.html">歷史訂單</a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item login-dropdown-item" href="/views/member/member-reserve.html">預約訂單</a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item login-dropdown-item" href="/views/member/member-coupon.html">折扣券</a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item login-dropdown-item" href="#" @click="logout">登出</a>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- 主內容 -->
+  <main>
+    <div id="myCarousel" class="carousel slide mb-6" data-bs-ride="carousel">
+      <div class="carousel-indicators">
+        <button type="button" data-bs-target="#myCarousel" data-bs-slide-to="0" class="active" aria-current="true"
+          aria-label="Slide 1"></button>
+        <button type="button" data-bs-target="#myCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+        <button type="button" data-bs-target="#myCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+      </div>
+      <div class="carousel-inner">
+        <div class="carousel-item active" style="text-align: center;">
+          <img src="/images/12.png" width="1000px">
+          <div class="container">
+            <div class="carousel-caption text-start">
+              <!-- 可設連結 -->
+              <!-- <p><a class="btn btn-lg btn-primary" href="#"></a></p> -->
+            </div>
+          </div>
+        </div>
+        <div class="carousel-item" style="text-align: center;">
+          <img src="/images/13.png" width="1000px">
+          </svg>
+          <div class="container">
+            <div class="carousel-caption">
+              <!-- 可設連結 -->
+              <!-- <p><a class="btn btn-lg btn-primary" href="#">Learn more</a></p> -->
+            </div>
+          </div>
+        </div>
+        <div class="carousel-item" style="text-align: center;">
+          <img src="/images/14.png" width="1000px">
+          <div class="container">
+            <div class="carousel-caption text-end">
+            </div>
+          </div>
+        </div>
+      </div>
+      <button class="carousel-control-prev" type="button" data-bs-target="#myCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#myCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      </button>
+    </div>
+
+  </main>
+
+  <div>
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" style="max-width: 350px;">
+        <div class="modal-content" style="background-color: #f8f9fa;">
+          <div class="modal-header">
+            <h5 class="modal-title text-center w-100" id="exampleModalLabel" style="font-weight: bold; color: #007bff;">
+              餐廳搜尋</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div id="restaurantSearchTab" class="tab mx-auto"
+              style="padding: 1px; border: 1px solid #f8f9fa; border-radius: 5px; background-color: #f8f9fa; text-align: center;">
+              <div class="form-group">
+                <div class="city-selector-set">
+                  <label for="city" style="font-weight: bold; color: #007bff;">縣市</label>
+                  <select v-model="county" class="county form-control text-center" v-model="county" id="city"
+                    name="county" style="border-radius: 3px;"></select>
+                </div>
+
+              </div>
+              <div class="form-group text-center">
+                <label for="type" style="font-weight: bold; color: #007bff;">類型</label>
+                <select v-model="style" class="form-control text-center" id="type" style="border-radius: 3px;">
+                  <option value="" disabled selected hidden>請選擇類別</option>
+                  <option value="外帶外送">外送</option>
+                  <option value="預約內用">預約</option>
+                </select>
+              </div>
+              <div v-if="style === '預約內用'" class="form-group row">
+                <div class="col-md-6">
+                  <label for="date" style="font-weight: bold; color: #007bff;">日期</label>
+                  <input v-model="openDay" type="date" class="form-control text-center" id="date"
+                    style="border-radius: 3px;">
+                </div>
+                <div class="col-md-6">
+                  <label for="people" style="font-weight: bold; color: #007bff;">人數</label>                  
+                    <select style="width: 100%; text-align: center; height: 40px" v-model="tableFor" >
+                      <option value="null" disabled selected hidden>請輸入人數</option>
+                      <option value="兩人桌">2人</option>
+                      <option value="四人桌">4人</option>
+                      <option value="六人桌">6人</option>
+                      <option value="八人桌">8人</option>
+                      <option value="十人桌">10人</option>
+                      <option value="十二人桌">12人</option>
+                      <option value="十四人桌">14人</option>
+                      <option value="十六人桌">16人</option>
+                      <option value="十八人桌">18人</option>
+                    </select>
+                </div>
+              </div>
+              <button @click="callFindShowImage" type="submit" class="btn btn-primary btn-block" data-bs-dismiss="modal"
+                style="background-color: #007bff; border-color: #007bff; margin-top: 20px;">搜尋</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <br />
+  <hr />
+
+  <!-- 廣告區域 -->
+  <div
+    style="margin: 10px;padding: 10px;display: grid;justify-items: center; grid-template-columns: repeat(4, 1fr);gap: 25px">
+    <div class="col" v-for="ad in state.ads" :key="ad.location">
+      <div class="card" v-if="ad.visible">
+        <a :href="ad.url" target="_blank">
+          <img v-if="isBase64(ad.photo)" :src="`data:image/jpeg;base64,${ad.photo}`" class="card-img-top" alt="Ad Photo"
+            style="height: 200px; width: 249.81px;">
+          <img v-else :src="ad.photo" class="card-img-top" alt="Ad Photo" style="height: 200px; width: 255.61px;">
+        </a>
+        <div class="card-body">
+          <h5 class="card-title">{{ ad.name }}</h5>
+          <p class="card-text">{{ ad.content }}</p>
+          <div class="ad-badge">廣告</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <br />
+
+  <!-- 餐廳卡片 -->
+  <div class="card-generate-area"
+    style="margin: 10px;padding: 10px;display: grid;justify-items: center; grid-template-columns: repeat(4, 1fr);gap: 25px">
+    <div v-for="(photo,index) in indexPhoto" :key="index" class="card-container col-sm border">
+      <a :href="generateLink(photo)">
+        <img :src="`data:image/jpeg;base64,${photo.photoFile}`" class="card-img-top" alt="餐廳圖片"
+          style="height: 200px;width: 300px;">
+        <div class="card-body">
+          <h5 class="restaurant-name">{{photo.name}}</h5>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- footer -->
+  <footer class="frontstage-template-footer">
+    Copyright © 覓食Go All rights reserved.
+  </footer>
+
+  <script>
+    const { createApp, ref, onMounted, computed } = Vue
+
+    const app = createApp({
+      setup() {
+        const adDatas = ref([]);
+        const indexPhoto = ref([]);
+        const imageUrl = ref('');
+        const county = ref('');
+        const openDay = ref('');
+        const style = ref('');
+        const tableFor = ref(null);
+
+
+
+        onMounted(() => {
+          loadAdDatas();
+          updateAdData(adDatas.value);
+          showImage();
+          checkMemberLoginStatus();
+          this.citySelector = new TwCitySelector({
+            el: '.city-selector',
+            elCounty: '.county',
+            // bootstrapStyle: true,
+          });
+        });
+
+        function checkMemberLoginStatus() {
+          if (localStorage.getItem('memberName')) {
+            document.querySelector('li.is-login').setAttribute("style", "display: block;");
+            document.querySelector('li.not-login').setAttribute("style", "display: none;");
+            document.querySelector('.login-regist-text').textContent = "歡迎 " + localStorage.getItem('memberName');
+          } else {
+            document.querySelector('li.is-login').setAttribute("style", "display: none;");
+            document.querySelector('li.not-login').setAttribute("style", "display: block;");
+          }
+        }
+        
+
+
+        function loadAdDatas() {
+          // 從 Local Storage 獲取廣告資訊
+          let ads = JSON.parse(localStorage.getItem('adDatas')) || [];
+          // 把廣告資訊加入到adDatas數組內
+          adDatas.value = ads;
+
+          // console.log(adDatas.value[0].name);
+          console.log(adDatas.value);
+        }
+
+        function showImage() {
+          axios.get('http://localhost:8080/restaurantPhotoFindAll', {
+            responseType: 'json'
+          })
+            .then(response => {
+              indexPhoto.value = response.data;
+              console.log(indexPhoto.value);
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              console.log(error);
+            });
+        };
+
+
+
+        function callFindShowImage() {
+         
+          let data = {
+            start: 0,
+            rows: 100,
+            county: county.value,
+            tableFor: tableFor.value,
+            style: style.value,
+            openDay: openDay.value
+          };
+
+          console.log(county.value);
+          console.log(tableFor.value);
+          console.log(style.value);
+          console.log(openDay.value);
+
+
+          axios.get('http://localhost:8080/restaurantPhoto/findByCountyAndStyle', {
+            params: data, responseType: 'json'
+
+
+
+          })
+            .then((response) => {
+              indexPhoto.value = response.data;
+              console.log(indexPhoto.value);
+              console.log(response.data);
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              console.log(error);
+            });
+        };
+
+        function generateLink(photo) {
+          if (photo.style.includes('外帶外送')) {
+            return `/views/restaurant/restaurant-shop.html?style=takeaway&restaurantId=${photo.restaurantId}`;
+          } else if (photo.style.includes('預約內用')) {
+            return `/views/restaurant/restaurant-introduce.html?style=reservation&restaurantId=${photo.restaurantId}`;
+          }
+
+        };
+
+
+        //初始化廣告卡片的資料
+        const state = ref({
+          ads: [
+            { location: 'A1', name: '廣告出租 A1', photo: "/images/buyadfor3000.jpg", url: '#', content: '廣告內容', visible: true },
+            { location: 'A2', name: '廣告出租 A2', photo: '/images/buyadfor3000.jpg', url: '#', content: '廣告內容', visible: true },
+            { location: 'A3', name: '廣告出租 A3', photo: '/images/buyadfor3000.jpg', url: '#', content: '廣告內容', visible: true },
+            { location: 'A4', name: '廣告出租 A4', photo: '/images/buyadfor3000.jpg', url: '#', content: '廣告內容', visible: true }
+          ],
+        });
+
+        function logout() {
+          localStorage.removeItem("memberId");
+          localStorage.removeItem("memberName");
+          window.location.href = "/views/index.html";
+        }
+
+        function isBase64(str) {
+          return str.includes(';base64,') || /^[A-Za-z0-9+/]+={0,2}$/.test(str);
+        }
+
+        //更新廣告數據的方法 
+        const updateAdData = (newAdData) => {
+          newAdData.forEach(adData => {
+            const index = state.value.ads.findIndex(ad => ad.location === adData.location);
+            if (index !== -1) {
+              state.value.ads[index] = { location: adData.location, photo: adData.photo, url: adData.url, content: adData.content, name: adData.name, visible: true };
+            } else {
+              state.value.ads.push({ location: adData.location, photo: adData.photo, url: adData.url, content: adData.content, name: adData.name, visible: true });
+            }
+          });
+        };
+
+
+
+
+        return {
+          // adData,
+          adDatas,
+          state,
+          // updateAdData,
+          isBase64,
+          indexPhoto,
+          showImage,
+          style,
+          callFindShowImage,
+          checkMemberLoginStatus,
+          logout,
+          county,
+          tableFor,
+          openDay,
+          generateLink
+        }
+
+      }
+    })
+
+    app.mount("#app")
+
+  </script>
+  <button type="button" class="fab" data-bs-toggle="modal" data-bs-target="#exampleModal"><img
+      src="/images/custom-fab-search-icon.svg"></button>
+  <script>
+    document.querySelector(".fab").addEventListener("click", event => { event.preventDefault(); }, false,);
+  </script>
+</body>
+
+
+</html>

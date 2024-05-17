@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta content="" name="keywords">
+  <meta content="" name="description">
+  <title>Meet Mall</title>
+
+
+  <link rel="stylesheet" href="./mall-css/reset.css" />
+    <link rel="stylesheet" href="./mall-css/styleshoe.css" />
+    <script type="module" src="./mall-js/mainshoe.js"></script>
+
+
+  <!-- Favicon -->
+  <!-- <link rel="icon" type="image/png" sizes="512x512" href="/ispan-springboot-project/src/main/resources/static/images/mallImages/MeetMallLogo.ico"> -->
+  <link rel="icon" href="/imagesmall/MeetMallfavicon.ico" type="image/icon">
+  <!-- <link href="img/favicon.ico" rel="icon"> -->
+
+  <!-- Google Web Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600&family=Nunito:wght@600;700;800&family=Pacifico&display=swap"
+    rel="stylesheet">
+
+  <!-- Icon Font Stylesheet -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+  <!-- Libraries Stylesheet -->
+  <link href="lib/animate/animate.min.css" rel="stylesheet">
+  <link href="lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+  <link href="lib/tempusdominus/css/tempusdominus-bootstrap-4.min.css" rel="stylesheet" />
+
+  <!-- Mall Bootstrap 5 -->
+  <link href="mall-css/bootstrap.min.css" rel="stylesheet">
+  <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-wEmeIV1mKuiNpC+IOBjI7aAzPcEZeedi5yW5f2yOq55WWLwNGmvvx4Um1vskeMj0" crossorigin="anonymous"> -->
+
+  <!-- Template Stylesheet -->
+  <link href="mall-css/style.css" rel="stylesheet">
+  <link href="./mall-css/mall-index-cart.css" rel="stylesheet" />
+
+  <!-- Font Awesome -->
+  <script src="https://kit.fontawesome.com/cda74843f9.js" crossorigin="anonymous"></script>
+  <!-- FancyBox -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css" />
+</head>
+<style>
+  /* 按鈕樣式 */
+  .frame {
+    width: 90%;
+    margin: 40px auto;
+    text-align: center;
+  }
+
+  button {
+    margin: 20px;
+  }
+
+  .custom-btn {
+    width: 130px;
+    height: 40px;
+    color: #fff;
+    border-radius: 5px;
+    padding: 10px 25px;
+    font-family: 'Lato', sans-serif;
+    font-weight: 500;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    display: inline-block;
+    box-shadow: inset 2px 2px 2px 0px rgba(255, 255, 255, .5),
+      7px 7px 20px 0px rgba(0, 0, 0, .1),
+      4px 4px 5px 0px rgba(0, 0, 0, .1);
+    outline: none;
+  }
+
+  /* 12 */
+  .btn-12 {
+    position: relative;
+    right: 20px;
+    bottom: 20px;
+    border: none;
+    box-shadow: none;
+    width: 130px;
+    height: 40px;
+    line-height: 42px;
+    -webkit-perspective: 230px;
+    perspective: 230px;
+  }
+
+  .btn-12 span {
+    background: rgb(75, 56, 31);
+    background: linear-gradient(0deg, rgb(255, 173, 42) 0%, rgb(255, 134, 14) 100%);
+    display: block;
+    position: absolute;
+    width: 130px;
+    height: 40px;
+    box-shadow: inset 2px 2px 2px 0px rgba(255, 255, 255, .5),
+      7px 7px 20px 0px rgba(0, 0, 0, .1),
+      4px 4px 5px 0px rgba(0, 0, 0, .1);
+    border-radius: 5px;
+    margin: 0;
+    text-align: center;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    -webkit-transition: all .3s;
+    transition: all .3s;
+    font-size: 16px;
+    /* 調整文字大小 */
+  }
+
+  .btn-12 span:nth-child(1) {
+    box-shadow:
+      -7px -7px 20px 0px rgba(21, 17, 134, 0.6),
+      -4px -4px 5px 0px #fff9,
+      7px 7px 20px 0px #0002,
+      4px 4px 5px 0px #0001;
+    -webkit-transform: rotateX(90deg);
+    -moz-transform: rotateX(90deg);
+    transform: rotateX(90deg);
+    -webkit-transform-origin: 50% 50% -20px;
+    -moz-transform-origin: 50% 50% -20px;
+    transform-origin: 50% 50% -20px;
+  }
+
+  .btn-12 span:nth-child(2) {
+    -webkit-transform: rotateX(0deg);
+    -moz-transform: rotateX(0deg);
+    transform: rotateX(0deg);
+    -webkit-transform-origin: 50% 50% -20px;
+    -moz-transform-origin: 50% 50% -20px;
+    transform-origin: 50% 50% -20px;
+  }
+
+  .btn-12:hover span:nth-child(1) {
+    box-shadow: inset 2px 2px 2px 0px rgba(255, 0, 0, 0.5),
+      7px 7px 20px 0px rgba(0, 0, 0, .1),
+      4px 4px 5px 0px rgba(0, 0, 0, .1);
+    -webkit-transform: rotateX(0deg);
+    -moz-transform: rotateX(0deg);
+    transform: rotateX(0deg);
+  }
+
+  .btn-12:hover span:nth-child(2) {
+    box-shadow: inset 2px 2px 2px 0px rgba(255, 255, 255, .5),
+      7px 7px 20px 0px rgba(0, 0, 0, .1),
+      4px 4px 5px 0px rgba(0, 0, 0, .1);
+    color: transparent;
+    -webkit-transform: rotateX(-90deg);
+    -moz-transform: rotateX(-90deg);
+    transform: rotateX(-90deg);
+  }
+
+
+  .card {
+    text-align: center;
+    /* 將文字置中 */
+    justify-content: center;
+    /* 將圖片水平置中 */
+  }
+
+  .card .card-img-top {
+    margin: 0 auto;
+    /* 將圖片水平置中 */
+    display: block;
+    /* 確保圖片佔據整個父元素的寬度 */
+    justify-content: center;
+    /* 將圖片水平置中 */
+
+  }
+
+
+  .leftAd {
+
+    position: absolute;
+    left: 170px;
+    top: 120px;
+    /* 確保 z-index 屬性生效 */
+    z-index: 50;
+    /* 設置比輪播內容更高的值 */
+    float: left;
+    /* margin-left: 0px; */
+    /* margin-right: -11px; */
+
+    width: 500px;
+    height: 500px;
+  }
+
+  .leftAd img {
+    height: 430px;
+    width: 390px;
+    border-radius: 10px;
+  }
+
+
+  /*** Hero Header ***/
+  .hero-header-da1 {
+    background: linear-gradient(rgba(216, 216, 216, 0.9), rgba(255, 255, 255, 0.9)), url(../img/bg-hero.jpg);
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+
+  .hero-header-da1 img {
+    animation: imgRotate 50s linear infinite;
+  }
+
+  @keyframes imgRotate {
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  .breadcrumb-item+.breadcrumb-item::before {
+    color: rgba(255, 255, 255, .5);
+  }
+</style>
+
+<body>
+  <div class="container-xxl bg-white p-0">
+    <!-- Spinner Start -->
+    <div id="spinner"
+      class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+      <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+        <span class="sr-only">Loading...</span>
+      </div>
+    </div>
+    <!-- Spinner End -->
+
+
+    <!-- Navbar Start -->
+    <div class="container-xxl position-relative p-0" style="height: 100px; background-color: rgb(1, 1, 32);">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-4 px-lg-5 py-3 py-lg-0">
+        <a href="mall-index.html" class="navbar-brand p-0">
+          <h1 class="text-primary m-0"><i class="fa fa-utensils me-3"></i>MeetMall</h1>
+          <!-- <img src="img/logo.png" alt="Logo"> -->
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+          <span class="fa fa-bars"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+          <div class="navbar-nav ms-auto py-0 pe-4">
+            <a href="../index.html" class="nav-item nav-link">首頁</a>
+            <a href="" class="nav-item nav-link">我的訂單</a>
+            <a href="" class="nav-item nav-link">關於我們</a>
+            <div class="nav-item dropdown">
+              <a href="#" class="nav-link dropdown-toggle active" data-bs-toggle="dropdown">訂位、點餐</a>
+              <div class="dropdown-menu m-0">
+                <a href="/views/index.html" class="dropdown-item">餐廳訂位</a>
+                <a href="/views/index.html" class="dropdown-item active">外帶外送</a>
+              </div>
+            </div>
+            <a href="/views/member/member-contact.html" class="nav-item nav-link">聯絡我們</a>
+          </div>
+          <!-- <button class="custom-btn btn-12 bodynotification"> 原本的購物車旋轉css
+            
+          </button> -->
+
+          <button type="button" class="btn btn-primary position-relative">
+            <a href="mall-shopping-cart.html"><span style="color: #fff;">購物車</span>
+              <span
+                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-count"
+                style="text-align: center;">0</span></a>
+          </button>
+
+        </div>
+      </nav>
+    </div>
+    <!-- Navbar & Hero End-->
+
+
+  <div class="leftAd">
+    <a href="mall-game.html">
+      <img src="/imagesmall/pizza3package.webp" class="" alt="imageleft1">
+    </a>
+  </div>
+
+  <div style="position: absolute; left: 600px; top: 150px;">
+    
+    <p style="font-weight: 900; font-size: 25px;color: black;">德國Dr.Oetker歐特家冷凍披薩</p>
+    <form action="" style="font-size: 20px; width: 600px;color: #3c3a3a;">
+      💃🏼異國美食來囉!!德國Dr.Oetker歐特家"9吋"【義式薄脆披薩🍕】 超高CP值美食 ‼️  有錢也不一定買得到阿~~~
+      <br>
+      <br>
+      A 經典窯烤 綜合蔬菜披薩(410g/盒) 
+      <br>
+      B 經典窯烤 菠菜瑞可達披薩(415g/盒)
+      <br>
+      C 義式摩佐瑞拉起司薄脆披薩9吋 (335g/盒)
+      <br>
+      <p>市價：380元/盒</p>
+      
+      <p style="color: red; font-size: 25px;">促銷價：320元/盒</p>
+      <button type="button" class="custom-btn btn-12" style="font-size: 20px; padding: 0px; width: 140px; height:70px; background-color: orange; text-align: center;" @click="addToCart(item)">加入購物車</button>
+    </form>
+    
+    
+    
+  </div>
+  
+<!-- 旋轉pizza -->
+
+  <div class="container my-5 py-5 hero-header-da1" style="position: absolute; float: right; top: 600px; width: 2500px;">
+    <div class="row align-items-center g-5">
+
+      <div class="col-lg-6 text-center text-lg-end overflow-hidden">
+        <img class="img-fluid" src="/imagesmall/pizzaround.png" alt="">
+      </div>
+    </div>
+  </div>
+
+
+
+
+
+
+  <!-- 主打商品！ -->
+
+  <div class="container-xxl pt-5 pb-3" style="position: absolute; right: 0px; top: 610px;">
+    <div class="container">
+      <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
+        <h5 class="section-title ff-secondary text-center text-primary fw-normal" style="font-size: 25px; color: rgb(5, 31, 109);">冷凍即食好方便</h5>
+        <h1 class="" style="margin: 0px;">半夜不怕肚子餓</h1>
+      </div>
+    </div>
+
+  </div>
+
+<!-- 商品描述 -->
+
+<div style="position: absolute; left: 800px; top: 750px; width: 500px;">
+  <form action="" style="font-size: 18px;">
+
+    <h2>商品介绍：</h2>
+
+    <p>
+      A 經典窯烤 綜合蔬菜披薩(410g/盒)<br>
+      B 經典窯烤 菠菜瑞可達披薩(415g/盒)<br>
+      C 義式摩佐瑞拉起司薄脆披薩9吋 (335g/盒)<br>
+      市價：380元/盒<br>
+      促銷價：320元/盒
+    </p>
+
+    <h3>商品特色：</h3>
+
+    <ul>
+      <li>A 經典窯烤 綜合蔬菜披薩(蛋奶素)</li>
+      <ul>
+        <li>打開就是滿滿的🥦蔬菜，紅黃綠繽紛色彩</li>
+        <li>打破小朋友不喜歡蔬菜的迷思，沒有奇怪的菜味</li>
+        <li>起司的鹹度加上蔬菜的水分，雖然是薄脆餅皮，也不會乾乾硬硬的</li>
+      </ul>
+      <li>B 經典窯烤 菠菜瑞可達披薩(五辛素)</li>
+      <ul>
+        <li>🥬菠菜＋起司的大力水手的組合，口感滿分!</li>
+        <li>上面有"瑞可達乾酪"，讓整體風味吃起來更加濃香</li>
+      </ul>
+      <li>C 歐特家 義式摩佐瑞拉起司薄脆披薩9吋 (五辛素)</li>
+      <ul>
+        <li>經典🍅番茄＋起司的組合，有點微微的青醬點綴提香，吃起來清爽不膩</li>
+        <li>剛烤好起司還會會流動，綠色的部分是青醬，番茄不會酸，餅皮相當酥脆</li>
+      </ul>
+    </ul>
+
+    <h3>加熱方式：</h3>
+
+    <ul>
+      <li></li>
+      <li></li>
+    </ul>
+
+    <h3>商品规格：</h3>
+    <li>產地：德國</li>
+
+    <ul>
+      <ul>
+        <li>A 經典窯烤 綜合蔬菜披薩(410g/盒)</li>
+        <li>B 經典窯烤 菠菜瑞可達披薩(415g/盒)</li>
+        <li>C 歐特家 義式摩佐瑞拉起司薄脆披薩(335g/盒)</li>
+      </ul>
+      <li>保存期限：</li>
+      <ul>
+        <li>A 經典窯烤 綜合蔬菜披薩：📅效期:2023/02/02</li>
+        <li>B 經典窯烤 菠菜瑞可達披薩：📅效期:2023/02/06</li>
+        <li>C 歐特家 義式摩佐瑞拉起司薄脆披薩：📅效期:2023/02/02</li>
+      </ul>
+      <li>保存方式：冷凍-18度c以下</li>
+    </ul>
+
+  </form>
+
+</div>
+
+<div style="position: absolute; left: 160px; top: 1450px;">
+
+
+        <!-- About Start -->
+        <div class="container-xxl py-5">
+          <div class="container">
+              <div class="row g-5 align-items-center">
+                  <div class="col-lg-6">
+                      <div class="row g-3">
+                          <div class="col-6 text-start">
+                              <img class="img-fluid rounded w-100 wow zoomIn" data-wow-delay="0.1s" src="/imagesmall/pizza-beauty1.jpeg">
+                          </div>
+                          <div class="col-6 text-start">
+                              <img class="img-fluid rounded w-75 wow zoomIn" data-wow-delay="0.3s" src="/imagesmall/pizzaau1.jpeg" style="margin-top: 25%;">
+                          </div>
+                          <div class="col-6 text-end">
+                              <img class="img-fluid rounded w-75 wow zoomIn" data-wow-delay="0.5s" src="/imagesmall/pizzaau2.webp">
+                          </div>
+                          <div class="col-6 text-end">
+                              <img class="img-fluid rounded w-100 wow zoomIn" data-wow-delay="0.7s" src="/imagesmall/pizzaoet2.jpg">
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col-lg-6">
+                      <h5 class="section-title ff-secondary text-start text-primary fw-normal">About Us</h5>
+                      <h1 class="mb-4">來自德國 <i class="fa fa-utensils text-primary me-2"></i>主廚推薦</h1>
+                      <p class="mb-4" style="font-size: 15px;">烤箱法：220°預熱5分鐘，烤10-15分鐘，視個人口感調整</p>
+                      <p class="mb-4" style="font-size: 15px;">微波法：700w 5-7分鐘，直到起司完全融化即可</p>
+                      <div class="row g-4 mb-4">
+                          <div class="col-sm-6">
+                              <div class="d-flex align-items-center border-start border-5 border-primary px-3">
+                                  <h1 class="flex-shrink-0 display-5 text-primary mb-0" data-toggle="counter-up">15</h1>
+                                  <div class="ps-4">
+                                      <p class="mb-0" style="font-size: 12px;">年</p>
+                                      <h6 class="text-uppercase mb-0" style="font-size: 18px;">淬煉</h6>
+                                  </div>
+                              </div>
+                          </div>
+                          <div class="col-sm-6">
+                              <div class="d-flex align-items-center border-start border-5 border-primary px-3">
+                                  <h1 class="flex-shrink-0 display-5 text-primary mb-0" data-toggle="counter-up">50</h1>
+                                  <div class="ps-4">
+                                      <p class="mb-0" style="font-size: 12px;">名</p>
+                                      <h6 class="text-uppercase mb-0" style="font-size: 18px;">一星主廚</h6>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                      <a class="btn btn-primary py-3 px-5 mt-2" href="">立即購買</a>
+                  </div>
+              </div>
+          </div>
+      </div>
+      <!-- About End -->
+
+
+    </div>
+
+
+
+
+
+
+
+
+
+
+<!-- 附加信息 -->
+<div style="position: absolute; left: 100px; top: 2120px; font-size: 18px;">
+
+  <h3>附加信息：</h3>
+
+  <p>※商品製造日期、有效期限、商品成份與相關注意事項皆標示於商品外包裝或商品上，相關說明皆以實際商品所示資訊為主</p>
+
+  <p>※商品因拍攝之圖檔顯示上可能略有差異，以實際商品為主</p>
+
+  <p>※如因商品文案與實品產生之消費爭議，雙方得協商進行等值商品更換或取消該商品之訂購</p>
+
+  <p>※如遇商品停售無法正常供貨領取，本公司將辦理商品退貨退款 (詳情請見當次活動說明或洽詢客服)</p>
+  
+</div>
+
+
+  <!-- 相似商品推薦 -->
+
+  <!-- Product Showcase Section -->
+  <div class="container mt-5" style="position: absolute; left: 45px; top: 2350px;">
+    <div class="row">
+      <!-- Product 1 -->
+      <div class="col-md-4">
+        <div class="card mb-4 shadow-sm">
+          <img src="/imagesmall/86945.jpg" class="bd-placeholder-img card-img-top" style="object-fit:none;"
+            width="100%" height="225" role="img">
+          <div class="card-body">
+            <h5 class="card-title" style="font-size: 18px;">Four'n Twenty澳洲安格斯牛肉派</h5>
+            <p class="card-text" style="font-size: 14px;">慢火燉煮香濃內餡，吃得到整塊澳洲牛肉</p>
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="btn-group">
+                <button type="button" class="btn btn-sm btn-outline-secondary" style="font-size: 20px;">詳細資訊</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" style="font-size: 20px;">加入購物車</button>
+              </div>
+              <small class="text-muted" style="font-size: 18px;">$129</small>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Product 2 -->
+      <div class="col-md-4">
+        <div class="card mb-4 shadow-sm">
+          <img src="/imagesmall/759044.jpg" class="bd-placeholder-img card-img-top" style="object-fit:none;" width="100%" height="225" role="img">
+          <div class="card-body">
+            <h5 class="card-title" style="font-size: 18px;">Woolworths酥炸魚柳條</h5>
+            <p class="card-text" style="font-size: 14px;">酥脆金黃，口感鮮嫩的魚柳條美味誘人</p>
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="btn-group">
+                <button type="button" class="btn btn-sm btn-outline-secondary" style="font-size: 20px;">詳細資訊</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" style="font-size: 20px;">加入購物車</button>
+              </div>
+              <small class="text-muted" style="font-size: 18px;">$249</small>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Product 3 -->
+      <div class="col-md-4">
+        <div class="card mb-4 shadow-sm">
+          <img src="/imagesmall/pizzahutturtle2.jpg" class="bd-placeholder-img card-img-top" style="object-fit: contain;" width="100%" height="225" role="img">
+          <div class="card-body">
+            <h5 class="card-title" style="font-size: 18px;">必勝客大芝心雙粿草仔龜比薩</h5>
+            <p class="card-text" style="font-size: 14px;">保證絕對沒有任何一隻烏龜受到傷害!</p>
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="btn-group">
+                <button type="button" class="btn btn-sm btn-outline-secondary" style="font-size: 20px;">詳細資訊</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" style="font-size: 20px;">加入購物車</button>
+              </div>
+              <small class="text-muted" style="font-size: 18px;">$399</small>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Repeat the structure for more products -->
+    </div>
+  </div>
+  <!-- End Product Showcase Section -->
+
+
+
+
+
+
+
+
+  <!-- Footer Start -->
+  <div class="container-fluid bg-dark text-light footer pt-5 mt-5 wow fadeIn" data-wow-delay="0.1s"
+    style="position: absolute; top: 2800px; margin-left: -140px;">
+    <div class="container py-5">
+      <div class="row g-5">
+        <div class="col-lg-3 col-md-6">
+          <h4 class="section-title ff-secondary text-start text-primary fw-normal mb-4">Company</h4>
+          <a class="btn btn-link" href="">關於我們</a>
+          <a class="btn btn-link" href="/views/member/member-contact.html">聯絡我們</a>
+          <a class="btn btn-link" href="/views/mall/mall-business-cooperation.html">招商專區</a>
+          <a class="btn btn-link" href="">商家登入</a>
+        </div>
+        <div class="col-lg-3 col-md-6">
+          <h4 class="section-title ff-secondary text-start text-primary fw-normal mb-4">Contact</h4>
+          <p class="mb-2"><i class="fa fa-map-marker-alt me-3"></i>高雄市前金區中正四路211號8樓之1</p>
+          <p class="mb-2"><i class="fa fa-phone-alt me-3"></i>07 321 6789</p>
+          <p class="mb-2"><i class="fa fa-envelope me-3"></i>iSpan@example.com</p>
+          <div class="d-flex pt-2">
+            <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-twitter"></i></a>
+            <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-facebook-f"></i></a>
+            <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-youtube"></i></a>
+            <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-linkedin-in"></i></a>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+          <h4 class="section-title ff-secondary text-start text-primary fw-normal mb-4">Opening</h4>
+          <h5 class="text-light fw-normal">星期一 - 星期六</h5>
+          <p>09AM - 07PM</p>
+          <h5 class="text-light fw-normal">星期日</h5>
+          <p>10AM - 06PM</p>
+        </div>
+        <div class="col-lg-3 col-md-6">
+          <h4 class="section-title ff-secondary text-start text-primary fw-normal mb-4">Newsletter</h4>
+          <p>留下Email，爆殺優惠不錯過～</p>
+          <div class="position-relative mx-auto" style="max-width: 400px;">
+            <input id="emailInput" class="form-control border-primary w-100 py-3 ps-4 pe-5" type="text" placeholder="您的 email">
+            <button id="subscribeBtn" type="button" class="btn btn-primary py-2 position-absolute top-0 end-0 mt-2 me-2">訂閱</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="container">
+      <div class="copyright">
+        <div class="row">
+          <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+            <a class="border-bottom" href="#"></a>
+
+          </div>
+          <div class="col-md-6 text-center text-md-end">
+            <div class="footer-menu">
+              <a href="../index.html">首頁</a>
+              <a href="">Cookies</a>
+              <a href="">幫助</a>
+              <a href="">問與答</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Footer End -->
+
+
+  <!-- Back to Top -->
+  <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
+  </div>
+
+
+
+  <!-- JavaScript Libraries -->
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+  <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script> -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-p34f1UUtsS3wqzfto5wAAmdvj+osOnFyQFpp4Ua3gs/ZVWx6oOypYoCJhGGScy+8"
+    crossorigin="anonymous"></script>
+  <!-- 連到axios CDN  -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="lib/wow/wow.min.js"></script>
+  <script src="lib/easing/easing.min.js"></script>
+  <script src="lib/waypoints/waypoints.min.js"></script>
+  <script src="lib/counterup/counterup.min.js"></script>
+  <script src="lib/owlcarousel/owl.carousel.min.js"></script>
+  <script src="lib/tempusdominus/js/moment.min.js"></script>
+  <script src="lib/tempusdominus/js/moment-timezone.min.js"></script>
+  <script src="lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
+
+  <!-- Template Javascript -->
+  <script src="mall-js/main.js"></script>
+  <script src="./mall-js/mall-index-cart.js"></script>
+  <script>
+    document.getElementById('subscribeBtn').addEventListener('click', function() {
+      var email = document.getElementById('emailInput').value;
+      if (email.trim() !== '') {
+        swal("訂閱電子報成功", "超殺優惠不錯過！", "success");
+      } else {
+        swal("錯誤", "請輸入有效的電子郵件地址", "error");
+      }
+    });
+  </script>
+</body>
+
+</html>

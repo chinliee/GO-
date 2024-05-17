@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <!-- Favicon -->
+  <!-- <link rel="icon" type="image/png" sizes="512x512" href="/ispan-springboot-project/src/main/resources/static/images/mallImages/MeetMallLogo.ico"> -->
+  <link rel="icon" href="/imagesmall/MeetMallfavicon.ico" type="image/icon">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MeetMall購物車</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="mall-css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Font Awesome -->
+  <script src="https://kit.fontawesome.com/cda74843f9.js" crossorigin="anonymous"></script>
+  <style>
+    .item-remove {
+      background-color: #ffffff;
+      color: #030303;
+      border: none;
+      height: 30px;
+      padding: 3px 3px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .item-remove:hover {
+      color: #ffffff;
+      background-color: #e6384a;
+    }
+
+    .icon-container {
+      display: inline-block;
+      margin-right: 10px;
+      /* 調整圖示之間的間距 */
+      position: relative;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .icon-container i {
+      font-size: 4em;
+      /* 調整圖示的大小 */
+    }
+
+    /* 修改付款圖示的顏色 */
+    .icon-container a i {
+      color: #0f2083;
+      /* 這裡可以根據你的設計選擇更鮮艷的顏色 */
+    }
+
+    .payment-icons {
+      margin-top: 20px;
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    .payment-icons .icon-container {
+      margin-bottom: 10px;
+    }
+
+    .info-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-top: 2px;
+    }
+
+    .info-block {
+      /* border: 0px solid #ffffff; 我先把線拿掉了 */
+      padding: 5px;
+      margin-top: -20px;
+      font-size: 13px;
+      color: #000000;
+    }
+
+    /* 付款資訊的背景色 */
+    .payment-info {
+      background-color: #cfe2f3;
+      padding: 20px;
+      margin-top: 20px;
+      display: none;
+      border-radius: 5px;
+      color: #000000;
+      font-weight: 500;
+      /* 一開始隱藏 */
+    }
+
+    .form-control {
+      color: #000000;
+      font-size: 13px;
+    }
+
+
+    /* 減少 增加商品数量按钮 */
+
+    .btn-da1 {
+  background: rgb(243, 188, 61);
+  background: linear-gradient(0deg, rgb(255, 169, 83) 0%, rgb(255, 117, 18) 100%);
+  border: none;
+  border-radius: 5px;
+  height: 25px;
+  margin: 10px;
+  margin-top: -3px;
+  
+}
+.btn-da1:before {
+  height: 0%;
+  width: 2px;
+}
+.btn-da1:hover {
+  color: rgb(248, 0, 41);
+  box-shadow:  2px 2px 3px 0 rgb(247, 161, 48),
+              -2px -2px 3px 0 rgba(116, 125, 136, .5), 
+    inset -2px -2px 4px 0 rgba(255,255,255,.2),
+    inset 2px 2px 4px 0 rgba(255, 165, 40, 0.662);
+}
+
+
+
+
+
+
+
+
+.product-info {
+  display: flexbox;
+  align-items: center;
+}
+
+.product-name,
+.product-price {
+  margin-bottom: 10px; /* 修复默认的外边距 */
+}
+
+.quantity-control {
+  display: flex;
+  align-items: center;
+  width: 100px;
+}
+
+
+
+
+
+
+
+
+  </style>
+</head>
+
+<body id="app">
+  <!-- Your existing HTML content here -->
+  <section class="h-100 h-custom" style="background-color: #eee" class="container py-5 h-100">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+      <div class="col">
+        <div class="card">
+          <div class="card-body p-4">
+            <div class="row">
+              <div class="col-lg-7">
+                <h5 class="mb-3">
+                  <a href="mall-index.html" class="text-body"><i
+                      class="fas fa-long-arrow-alt-left me-2"></i>繼續購物～買起來！</a>
+                </h5>
+                <p class="mb-1"
+                  style="font-size: 30px; font-weight: 600; margin-left: 5px; font-family: 'Permanent Marker';">購物小車車
+                </p>
+                <!-- Cart items loop -->
+                <div v-for="(cartItem, index) in cartItems" :key="index">
+                  <div class="card mb-3">
+                    <div class="card-body" style="height: 120px;">
+                      <div class="d-flex justify-content-between align-items-center">
+                        <div class="product-info">
+                          <img style="width: 100px; object-fit: cover" :src="'data:image/jpeg;base64,' + cartItem.productPhoto" alt="Product Image" />
+                        </div>
+                        <div class="product-info">
+                          <p class="product-name" style="position:static; margin-left: -120px; top: 50px; text-align: center; font-size: 18px; font-weight: 800; color: #000000;">{{ cartItem.productName }}</p>
+                        </div>
+                        
+                        <div>
+                            
+                            <div class="product-info" style="position: absolute; right: 260px; top: 50px;">
+                              <p class="product-price">${{ cartItem.productPrice }}</p>
+                            </div>
+                    </div>
+                        <!-- 商品数量控制按钮 -->
+                        <div class="quantity-control" style="position: absolute;  right: 80px; top: 50px;">
+                          <button type="button" class="custom-btn btn-da1" @click="decreaseQuantity(cartItem)">
+                            <i class="fas fa-minus"></i>
+                          </button>
+                          <p class="quantity">{{ cartItem.quantity }}</p>
+                          <button type="button" class="custom-btn btn-da1" @click="increaseQuantity(cartItem)">
+                            <i class="fas fa-plus"></i>
+                          </button>
+                        </div>
+                        <button class="item-remove" type="button" @click="removeItem(cartItem.id)">移除</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- 减少商品数量按钮 -->
+<!-- 商品数量 -->
+              <!-- 增加商品数量按钮 -->
+
+
+
+
+
+              <div class="col-lg-5">
+
+
+
+
+                <div class="card bg-primary text-white rounded-3 shipping-info">
+                  <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                      <h5 class="mb-0">收件資訊</h5>
+                      <img src="/imagesmall/pacmanred.png" class="img-fluid rounded-3"
+                        style="width: 45px" alt="pacman" />
+                    </div>
+
+
+
+
+
+
+
+                    <!-- 收件資訊區域 -->
+                    <div class="info-block">
+                      <div class="info-title">訂購人資料</div>
+                      <button type="button" class="btn btn-primary btn-sm item-remove" @click="autoFillOrderInfo" style="float: right; background-color: #6674cd; border-radius: 5px;">Demo自動填寫</button>
+                      <!-- 訂購人資料表單 -->
+                      <div class="form-outline form-white mb-4">
+                        <label for="order_name">訂購人姓名</label>
+                        <input type="text" id="order_name" class="form-control form-control-lg" v-model="orderName"
+                          placeholder="請輸入訂購人姓名" />
+
+                        <label for="order_phone">聯絡電話</label>
+                        <input type="tel" id="order_phone" name="order_phone" class="form-control form-control-lg" v-model="orderPhone"
+                          placeholder="請輸入聯絡電話" />
+
+                        <label for="order_address">送貨地址</label>
+                        <input type="text" id="order_address" name="order_address" class="form-control form-control-lg" v-model="orderAddress"
+                          placeholder="請輸入地址" />
+                      </div>
+                    </div>
+                    
+
+                    <div class="info-block">
+                      <div class="info-title">收貨人資料</div>
+                      <button type="button" class="btn btn-primary btn-sm item-remove" @click="autoFillRecipientInfo2" style="float: right; background-color: #6674cd; border-radius: 5px;">Demo自動填寫</button>
+                      <!-- 收貨人資料的表單 -->
+                      <!-- <div>
+                        <input type="checkbox" id="same_as_order_checkbox" name="same_as_order" v-model="isSameAsOrder" @click="updateRecipientInfo" />
+<label for="same_as_order_checkbox">同訂購人資料</label>
+
+                                
+                    </div> -->
+
+                      <div class="form-outline form-white mb-4">
+                        <label for="recipient_name">收貨人姓名</label>
+                        <input type="text" id="recipient_name" class="form-control form-control-lg" v-model="recipientName"
+                          placeholder="請輸入收貨人姓名" />
+
+                        <label for="recipient_phone">聯絡電話</label>
+                        <input type="tel" id="recipient_phone" name="recipient_phone" v-model="recipientPhone"
+                          class="form-control form-control-lg" placeholder="請輸入聯絡電話" />
+
+                        <label for="recipient_address">送貨地址</label>
+                        <input type="text" id="recipient_address" name="recipient_address" v-model="recipientAddress"
+                          class="form-control form-control-lg" placeholder="請輸入送貨地址" />
+
+                        <label for="recipient_note">備註 (最多25個字)</label>
+                        <textarea id="recipient_note" name="recipient_note" class="form-control" maxlength="25"></textarea>
+                      </div>
+                    </div>
+
+                    <div class="info-block">
+                      <div class="info-title">發票資料</div>
+                      <!-- 發票資料的選擇按鈕 -->
+                      <div class="options">
+                        <label>
+                          <input type="radio" name="invoice_type" value="personal"
+                            @change="showPersonalOptions"> 個人電子發票
+                        </label>
+                        <!-- Personal Options -->
+                        <div class="personal-options" style="display: none;">
+                          <label>
+                            <input type="radio" name="personal_option" value="member"> 會員載具
+                          </label>
+                          <label>
+                            <input type="radio" name="personal_option" value="barcode"> 手機條碼載具
+                          </label>
+                          <input type="text" name="company_tax_id" placeholder="請輸入手機條碼載具">
+                        </div>
+                        <br>
+                        <label>
+                          <input type="radio" name="invoice_type" value="donation" @change="showDonationOptions"> 愛心發票捐贈
+                        </label>
+                        <!-- Donation Options -->
+                        <div class="donation-options" style="display: none;">
+                          <label>
+                            <span style="color: rgb(0, 26, 157); font-weight: 500;">{{ selectedFoundation }}</span>
+                          </label>
+                        </div>
+                        <br>
+                        <label>
+                          <input type="radio" name="invoice_type" value="company" @change="showCompanyOptions"> 公司電子發票
+                        </label>
+                      </div>
+
+
+
+
+
+                      <!-- Company Options -->
+                      <div class="company-options" style="display: none;">
+                        <input type="text" name="company_tax_id" placeholder="請輸入統一編號">
+                      </div>
+
+
+
+
+
+
+
+
+
+                    </div>
+
+                    <button class="fas fa-long-arrow-alt-right ms-1 " style="color: #000000; background-color: #fc5a5a; border-radius: 8px; height: 30px;" @click="showPaymentInfo()">付款</button>
+
+                  </div>
+                </div>
+                <div class="payment-info" style="display:static;">
+                  <hr class="my-4" />
+
+
+                  <h5 class="mb-3">付款資訊</h5>
+                  <!-- Payment methods icons -->
+                  <div class="payment-icons">
+                    <div v-for="method in paymentMethods" :key="method">
+                      <div class="icon-container">
+                        <a href="#!" type="button" @click="selectPaymentMethod(method)">
+                          <i :class="methodIcons[method]"></i>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+
+
+
+
+
+                  <!-- Payment information form -->
+                  <form v-if="selectedPaymentMethod !== null" class="mt-4">
+                    <div v-if="selectedPaymentMethod === 'visa' || selectedPaymentMethod === 'mastercard'">
+                      <div class="form-outline form-white mb-4">
+                        <input type="text" id="typeName" class="form-control form-control-lg" size="17"
+                          placeholder="持卡人姓名" />
+                        <label class="form-label" for="typeName">持卡人姓名</label>
+                      </div>
+                      <div class="form-outline form-white mb-4">
+                        <input type="text" id="typeText" class="form-control form-control-lg" size="17"
+                          placeholder="1234 5678 9012 3457" minlength="19" maxlength="19" />
+                        <label class="form-label" for="typeText">信用卡號碼</label>
+                      </div>
+                      <div class="row mb-4">
+                        <div class="col-md-6">
+                          <div class="form-outline form-white">
+                            <input type="text" id="typeExp" class="form-control form-control-lg" placeholder="MM/YYYY"
+                              size="7" id="exp" minlength="7" maxlength="7" />
+                            <label class="form-label" for="typeExp">有效日期</label>
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                          <div class="form-outline form-white">
+                            <input type="password" id="typeText" class="form-control form-control-lg"
+                              placeholder="&#9679;&#9679;&#9679;" size="1" minlength="3" maxlength="3" />
+                            <label class="form-label" for="typeText">信用卡背面末三碼</label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div v-if="selectedPaymentMethod === 'bankTransfer'">
+                      <p style="color: #000000;">您已選擇轉帳付款，請在成立訂單後的3小時內完成轉帳唷～，若超過時間，系統將會自動取消訂單，屆時要再麻煩您，再重新下單一次哦～</p>
+                    </div>
+
+                    <div v-if="selectedPaymentMethod === 'cashOnDelivery'">
+                      <p style="color: #000000;">您已選擇貨到現金付款，送貨人員配送時將與您聯繫，記得要寄放正確金額至大樓警衛室，或是有人在家收貨唷～</p>
+                    </div>
+                  </form>
+
+
+                  <hr class="my-4" />
+
+
+                  <!-- Total amount and checkout button -->
+                  <div class="d-flex justify-content-between">
+                    <p class="mb-2">商品總金額</p>
+                    <p class="mb-2">${{calculateProductTotalAmount()}}</p>
+                  </div>
+                  <div class="d-flex justify-content-between">
+                    <p class="mb-2">運費</p>
+                    <p class="mb-2">${{calculateShippingFee()}}</p>
+                  </div>
+                  <div class="d-flex justify-content-between mb-4">
+                    <p class="mb-2">結帳總金額</p>
+                    <p class="mb-2">${{calculateOrderTotalAmount()}}</p>
+                  </div>
+                  <button type="button" class=" btn-info btn-block btn-lg custom-btn btn-da1" style="height: 50px;"  @click="createOrder()">
+                    <div class="d-flex justify-content-between">
+                      <span>${{calculateOrderTotalAmount() }}</span>
+                      <span>確認結帳<i class="fas fa-long-arrow-alt-right ms-2"></i></span>
+                    </div>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+  </section>
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.7/dist/sweetalert2.all.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/moment/moment.min.js"></script>
+  <script type="module">
+    import { createApp } from "https://www.unpkg.com/vue@3.4.19/dist/vue.esm-browser.prod.js";
+
+    const app = createApp({
+      data() {
+        return {
+          cartItems: [],
+          selectedPaymentMethod: null,
+          selectedFoundation: '',
+          paymentMethods: ['cashOnDelivery', 'bankTransfer', 'visa', 'applePay', 'paypal'],
+          methodIcons: {
+            cashOnDelivery: 'fas fa-truck fa-2x',
+            bankTransfer: 'fas fa-university fa-2x', // 新增轉帳付款圖示
+            visa: 'fab fa-cc-visa fa-2x',
+            // mastercard: 'fab fa-cc-mastercard fa-2x',
+            applePay: 'fab fa-cc-apple-pay fa-2x',
+            paypal: 'fab fa-cc-paypal fa-2x',
+          },
+          
+          orderName: '', // 添加訂購人資料狀態
+      orderPhone: '', // 添加訂購人資料狀態
+      orderAddress: '', // 添加訂購人資料狀態
+      recipientName: '', // 收貨人姓名
+      recipientPhone: '', // 收貨人電話
+      recipientAddress: '', // 收貨人地址
+      isSameAsOrder: false, // 是否同訂購人資料
+
+      productTotalAmount: 0,
+          shippingFee: 0,
+          orderTotalAmount: 0
+        };
+      },
+      methods: {
+
+
+
+        // 增加商品数量
+  increaseQuantity(cartItem) {
+    cartItem.quantity++;
+    // 更新本地存储中的购物车数据
+    localStorage.setItem("cart", JSON.stringify(this.cartItems));
+  },
+  // 减少商品数量
+  decreaseQuantity(cartItem) {
+    if (cartItem.quantity > 1) {
+      cartItem.quantity--;
+      // 更新本地存储中的购物车数据
+      localStorage.setItem("cart", JSON.stringify(this.cartItems));
+    }
+  },
+
+
+
+
+
+
+        // 方便demo，自動填入訂購人資料
+        autoFillOrderInfo() {
+          document.getElementById('order_name').value = '莊岡達';
+          document.getElementById('order_phone').value = '0912345678';
+          document.getElementById('order_address').value = '高雄市前金區中正四路211號8號樓之1';
+        },
+        
+        // 更新收货人資料，根据是否勾选“同订购人资料”按钮来决定是否自动填入
+        updateRecipientInfo() {
+          if (this.isSameAsOrder) {
+            // 如果勾选了“同订购人资料”，则将订购人信息复制到收货人信息
+            this.recipientName = this.orderName;
+            this.recipientPhone = this.orderPhone;
+            this.recipientAddress = this.orderAddress;
+          } else {
+            // 如果未勾选“同订购人资料”，则清空收货人信息
+            this.recipientName = '';
+            this.recipientPhone = '';
+            this.recipientAddress = '';
+          }
+        },
+        
+        
+        // 自動填入訂購人資料到收貨人資料
+        autoFillRecipientInfo() {
+          if (this.isSameAsOrder) {
+            this.orderName = this.recipientName;
+            this.orderPhone = this.recipientPhone;
+            this.orderAddress = this.recipientAddress;
+            
+            // this.recipientName = this.orderName;
+            // this.recipientPhone = this.orderPhone;
+            // this.recipientAddress = this.orderAddress;
+          }
+        },
+        
+        
+        
+        // 方便demo，自動填入收貨人資料
+        autoFillRecipientInfo2() {
+          document.getElementById('recipient_name').value = '莊岡達他媽媽';
+          document.getElementById('recipient_phone').value = '0987654321';
+          document.getElementById('recipient_address').value = '高雄市前金區中正四路211號8號樓之1';
+          document.getElementById('recipient_note').value = '最棒的禮物，送給最棒的媽咪！愛老虎油～';
+
+
+        },
+        
+
+
+        showPersonalOptions() {
+          // 顯示個人電子發票的次選項
+          document.querySelector('.personal-options').style.display = 'block';
+          // 隱藏其他選項
+          document.querySelector('.donation-options').style.display = 'none';
+          document.querySelector('.company-options').style.display = 'none';
+        },
+        showDonationOptions() {
+          // 顯示愛心發票捐贈的懸浮視窗
+          Swal.fire({
+            title: '選擇要捐贈的基金會',
+            input: 'select',
+            inputOptions: {
+              '伊甸基金會': '伊甸基金會',
+              '肝病防治學術基金會': '肝病防治學術基金會',
+              '中華社會福利聯合勸募協會': '中華社會福利聯合勸募協會',
+              '漸凍人協會': '漸凍人協會',
+              '董氏基金會': '董氏基金會',
+              '台灣一起夢想公益協會': '台灣一起夢想公益協會',
+              '家扶基金會': '家扶基金會',
+              '家寶寶社福協會': '家寶寶社福協會',
+              '唐氏症基金會': '唐氏症基金會',
+              '環境資訊協會': '環境資訊協會',
+              '財團法人基督教芥菜種會': '財團法人基督教芥菜種會',
+              '其他': '若需選擇其他捐贈基金會，請至訂單中心頁面修改捐贈單位'
+            },
+            inputPlaceholder: '請選擇要捐贈的基金會',
+            showCancelButton: true,
+            confirmButtonText: '確定',
+            cancelButtonText: '取消'
+          }).then((result) => {
+            // 確認使用者是否選擇了基金會
+            if (result.isConfirmed) {
+              // 將選擇的基金會名稱設置給 selectedFoundation
+              this.selectedFoundation = result.value;
+              // 顯示捐贈選項
+              document.querySelector('.donation-options').style.display = 'block';
+            }
+          });
+          // 隱藏其他選項
+          document.querySelector('.personal-options').style.display = 'none';
+          document.querySelector('.company-options').style.display = 'none';
+        },
+
+
+        showCompanyOptions() {
+          // 顯示公司電子發票的輸入框
+          document.querySelector('.company-options').style.display = 'block';
+          // 隱藏其他選項
+          document.querySelector('.personal-options').style.display = 'none';
+          document.querySelector('.donation-options').style.display = 'none';
+        },
+
+
+        selectPaymentMethod(method) {
+          this.selectedPaymentMethod = method;
+        },
+        createOrder() {
+  const paramObject = {
+    memberId: localStorage.getItem("memberId"),
+    orderTotalAmount: 1000,
+    orderStatus: "PAID",
+    orderTime: Date.now(),
+    paymentTime: Date.now(),
+    shippingTime: Date.now(),
+    shippingAddress: "高雄市前金區中正四路211號8號樓之1",
+  };
+
+  console.log(paramObject);
+
+  axios
+    .post("http://localhost:8080/mall-order/create", paramObject)
+    .then((response) => {
+      console.log("Order created:", response.data);
+      // 弹出 SweetAlert 提示订单成功
+      Swal.fire({
+        icon: 'success',
+        title: '訂購成功！',
+        text: '您的訂單已成立，感謝您的訂購～將為您準備優質商品。',
+      }).then(() => {
+        // 在点击 SweetAlert 的确定按钮后执行跳转逻辑
+        window.location.href = "/views/mall/mall-index.html";
+      });
+      // 清空购物车
+      this.cartItems = [];
+      localStorage.removeItem("cart");
+    })
+    .catch((error) => {
+      console.error("Error creating order:", error);
+      // 处理错误情况
+      Swal.fire({
+        icon: 'error',
+        title: '訂購失敗',
+        text: '很抱歉，訂單創建時出現錯誤。',
+      });
+    });
+},
+
+
+        //計算商品部分的總金額
+        calculateProductTotalAmount() {
+          let productTotalAmount = 0;
+          for (let i = 0; i < this.cartItems.length; i++) {
+            productTotalAmount += this.cartItems[i].productPrice * this.cartItems[i].quantity;
+          }
+          return productTotalAmount;
+        },
+
+        //計算是否需要運費80元
+        calculateShippingFee() {
+          let shippingFee = 0;
+          if (this.calculateProductTotalAmount() < 499) {
+            shippingFee = 80;
+          }
+          return shippingFee;
+        },
+
+        //計算結帳的總金額
+        calculateOrderTotalAmount() {
+          let orderTotalAmount = 0;
+          // 算出商品總金額，若productTotalAmount<499，則加上運費80元
+          let productTotalAmount = this.calculateProductTotalAmount();
+          if (productTotalAmount < 499) {
+            orderTotalAmount = productTotalAmount + 80;
+          } else {
+            orderTotalAmount = productTotalAmount;
+          }
+          return orderTotalAmount;
+
+        },
+
+        removeItem(itemId) {
+          // 找到相互匹配ID的项目的索引值
+          const index = this.cartItems.findIndex((item) => item.id === itemId);
+          // 如果在購物車內，有找到相同的id，就移除
+          if (index !== -1) {
+            this.cartItems.splice(index, 1);
+            // 更新頁面的localStorage
+            localStorage.setItem("cart", JSON.stringify(this.cartItems));
+          }
+        },
+        showPaymentInfo() {
+          // 顯示付款資訊區域
+          this.selectedPaymentMethod = null;
+          document.querySelector('.payment-info').style.display = 'block';
+        }
+      },
+      mounted() {
+        const cartData = localStorage.getItem("cart");
+        if (cartData) {
+          this.cartItems = JSON.parse(cartData);
+        }
+      },
+    });
+
+    app.mount("#app");
+  </script>
+</body>
+
+</html>

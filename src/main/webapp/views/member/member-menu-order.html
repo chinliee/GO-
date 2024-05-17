@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>會員-餐點訂單紀錄</title>
+
+  <!-- Bootstrap 5 -->
+  <link rel="stylesheet" href="/css/bootstrap-5.3.2.css" />
+
+  <!-- 前台模板 -->
+  <link href="/css/frontstage-template.css" rel="stylesheet"/>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    .main-content {
+      width: 750px;
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    /* 訂單區域 */
+    .order-container {
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+    /* 進行中的訂單 */
+    .ongoing-order-container, .history-order-container {
+      padding: 30px;
+      border: 0;
+      box-shadow: 0 0 10px 2px #ccc;
+      border-radius: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+    /* 標題區塊 */
+    .title {
+      background-color: linen;
+      text-align: center;
+      font-size: 26px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      padding: 10px 5px;
+      border-radius: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+
+      img {
+        width: 50px;
+        height: 50px;
+      }
+    }
+    .order-box {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .order-box .no-order {
+      color:  gray;
+      text-align: center;
+      font-size: 20px;
+      font-weight: 900;
+      border-radius: 10px;
+      padding: 10px 5px;
+    }
+    /* 卡片共用的 css */
+    .card {
+      border-radius: 12px;
+    }
+    .card-body {
+      padding: 20px;
+    }
+    /* 訂單卡片 */
+    .order-card {
+      border-radius: 10px;
+      transition: scale 0.3s ease;
+    }
+    .order-card:hover {
+      background-color: #FDF2F7;;
+      box-shadow: 0 0 10px 5px #ccc;
+      scale: 1.05;
+    }
+    /* 完成的訂單卡片 */
+    .order-card.order-card-finished {
+      background-color: #f3fef3ab;
+    }
+    /* 取消的訂單卡片 */
+    .order-card.order-card-cancel {
+      background-color: #E5E5E5;
+      opacity: 0.6;
+    }
+    /* 餐廳照片 */
+    .restaurant-photo-box img {
+      max-width: 100%;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+    .order-info-box {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      cursor: pointer;
+    }
+    /* 餐廳名稱、訂單價錢 */
+    .order-price-wrapper {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 20px;
+      font-weight: 900;
+    }
+    .order-price-wrapper .restaurant-name {
+      color: navy;  
+      font-size: 24px;
+    }
+    /* 訂單類型、預定時間 */
+    .order-type-wrapper {
+      display: flex;
+      justify-content: space-between;
+      align-items:flex-end;
+      font-weight: 900;
+    }
+    .order-type-wrapper .data-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    /* 訂單狀態、訂單類型標籤 */
+    .order-type {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .order-type span.badge {
+      font-size: 14px;
+    }
+    /* 狀態進行中的標籤 */
+    .order-type-wrapper span.badge.bg-ing {
+      background-color: #DEB887;
+    }
+    /* 查看商店按鈕 */
+    .btn-goto-restaurant {
+      width: 100px;
+      height: 30px;
+      font-weight: 900;
+      color: white;
+      background-color: #E21B70;
+      border-radius: 5px;
+      border: 0;
+      transition: scale 0.3s ease;
+    }
+    .btn-goto-restaurant:hover {
+      scale: 1.1;
+    }
+    [v-cloak] {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app" v-cloak>
+    <!-- header -->
+    <header class="frontstage-template-header"  data-bs-theme="dark">
+      <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid nav-outer-flex-container">
+          <div class="nav-container">
+            <a class="navbar-brand" href="/views/index.html"><img src="/favicon.ico" alt="覓食Go圖標預定地" width="50px" height="50px"></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+              aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            </button>
+          </div>
+          <div class="collapse navbar-collapse nav-inner-flex-container" id="navbarNavDropdown">
+            <div class="nav-container">
+              <ul class="navbar-nav nav-function-setting">
+                <li class="nav-item">
+                  <a class="nav-link" href="/views/index.html"><b>尋找餐廳</b></a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/views/mall/mall-index.html"><b>購物商城</b></a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/views/member/member-contact.html"><b>聯絡我們</b></a>
+                </li>
+              </ul>
+            </div>
+            <div class="nav-container">
+              <ul class="navbar-nav">
+                <li class="nav-item not-login">
+                  <a class="nav-link" href="/views/member/member-login.html">
+                    <b>登入 / 註冊</b>
+                  </a>
+                </li>
+                <li class="nav-item dropdown is-login">
+                  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                    <b class="login-regist-text">會員您好</b>
+                  </a>
+                  <ul class="dropdown-menu">
+                    <li>
+                      <a class="dropdown-item login-dropdown-item" href="/views/member/member-menu-order.html">歷史訂單</a>
+                    </li>
+                    <li>
+                      <a class="dropdown-item login-dropdown-item" href="/views/member/member-reserve.html">預約訂單</a>
+                    </li>
+                    <li>
+                      <a class="dropdown-item login-dropdown-item" href="/views/member/member-coupon.html">折扣券</a>
+                    </li>
+                    <li>
+                      <a class="dropdown-item login-dropdown-item" href="#" @click="logout">登出</a>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <!-- 主內容 -->
+    <main class="main-content">
+      <div class="order-container">
+        <div class="ongoing-order-container">
+          <div class="title">
+            <div class="order-icon">
+              <img src="/images/delivery-man-1.png">
+            </div>
+            <span>進行中訂單</span>
+          </div>
+          <div class="order-box">
+            <div class="no-order" v-if="filterOngoingOrder.length === 0">
+              <span>目前無進行中訂單</span>
+            </div>
+            <div v-for="(order, index) in filterOngoingOrder" :key="order.orderId" 
+              class="card h-100 order-card">
+              <div class="card-body row">
+                <div class="restaurant-photo-box col-3">
+                  <img :src="order.restaurantPhotoSrc ? order.restaurantPhotoSrc: noRestaurantPhoto">
+                </div>
+                <div class="order-info-box col-9"
+                  @click="goToDetailPage(order)">
+                  <div class="order-price-wrapper">
+                    <div class="restaurant-name">
+                      <span>{{order.restaurantName}}</span>
+                    </div>
+                    <div class="order-price">
+                      <span>$ {{formatNumber(order.total)}}</span>
+                    </div>
+                  </div>                  
+                  <div class="order-type-wrapper">
+                    <div class="data-wrapper">
+                      <div class="order-type ing-order-type">
+                        <div>
+                          <span class="badge bg-ing">
+                            進行中
+                          </span>
+                        </div>
+                        <div v-if="order.orderType === 'DELIVERY'">
+                          <span class="badge bg-primary">外送</span>
+                        </div>
+                        <div v-if="order.orderType === 'TAKEOUT'">
+                          <span class="badge bg-warning">外帶自取</span>
+                        </div>
+                      </div>
+                      <div class="reservation-time">
+                        <span>
+                          {{moment(order.reservationTime).format('M月D日 dddd HH:mm')}}
+                        </span>
+                      </div>
+                    </div>
+                    <div class="btn-wrapper">
+                      <button class="btn-goto-restaurant"
+                        @click.stop="goToRestaurantPage(order)">
+                        查看商店
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="history-order-container">
+          <div class="title">
+            <div class="order-icon">
+              <img src="/images/order-finished.png">
+            </div>
+            <span>歷史訂單</span>
+          </div>
+          <div class="order-box">
+            <div class="no-order" v-if="filterHistoryOrder.length === 0">
+              <span>尚無歷史訂單</span>
+            </div>
+            <div v-for="(order, index) in filterHistoryOrder" :key="order.orderId" 
+              class="card h-100 order-card"
+              :class="{
+                'order-card-finished': order.orderStatus === 'FINISHED',
+                'order-card-cancel': order.orderStatus === 'CANCELED'
+              }"
+              >
+              <div class="card-body row">
+                <div class="restaurant-photo-box col-3">
+                  <img :src="order.restaurantPhotoSrc ? order.restaurantPhotoSrc: noRestaurantPhoto">
+                </div>
+                <div class="order-info-box col-9"
+                  @click="goToDetailPage(order)">
+                  <div class="order-price-wrapper">
+                    <div class="restaurant-name">
+                      <span>{{order.restaurantName}}</span>
+                    </div>
+                    <div class="order-price">
+                      <span>$ {{formatNumber(order.total)}}</span>
+                    </div>
+                  </div>                  
+                  <div class="order-type-wrapper">
+                    <div class="data-wrapper">
+                      <div class="order-type history-order-type">
+                        <div v-if="order.orderStatus === 'FINISHED'">
+                          <span class="badge bg-success">已完成</span>
+                        </div>
+                        <div v-if="order.orderStatus === 'CANCELED'">
+                          <span class="badge bg-danger">已取消</span>
+                        </div>
+                        <div v-if="order.orderType === 'DELIVERY'">
+                          <span class="badge bg-primary">外送</span>
+                        </div>
+                        <div v-if="order.orderType === 'TAKEOUT'">
+                          <span class="badge bg-warning">外帶自取</span>
+                        </div>
+                      </div>
+                      <div class="reservation-time">
+                        <span>
+                          {{moment(order.reservationTime).format('M月D日 dddd HH:mm')}}
+                        </span>
+                      </div>
+                    </div>
+                    <div class="btn-wrapper">
+                      <button class="btn-goto-restaurant"
+                        @click.stop="goToRestaurantPage(order)">
+                        查看商店
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+    
+    <!-- footer -->
+    <footer class="frontstage-template-footer">
+      Copyright © 覓食Go All rights reserved
+    </footer>
+  </div>
+
+  <!-- Bootstrap 5 -->
+  <script src="/js/bootstrap-5.3.2.bundle.min.js"></script>
+  <!-- Vue -->
+  <script src="/js/vue-2.7.15.min.js"></script>
+  <!-- axios -->
+  <script src="/js/axios-1.6.2.min.js"></script>
+  <!-- Numeral.js -->
+  <script src="/js/numeral-2.0.6.min.js"></script>
+  <!-- Moment.js，引入有 locales 設定的檔案，才能使用國際語系的功能  -->
+  <script src="/js/moment-with-locales-2.30.1.min.js"></script>
+
+  <script>
+    // 設定 moment.js 的語系為中文
+    moment.locale('zh-tw');
+    const vm = new Vue({
+      el: '#app',
+      data() {
+        return {
+          // 從 localStorage 取得，登入會員的 memberId
+          memberId: localStorage.getItem("memberId"),
+          orderArr: [],
+          noRestaurantPhoto: '/images/no-restaurant-photo.png',
+        }
+      },
+      computed: {
+        filterOngoingOrder() {
+          let ongoingOrderArr = [];
+          ongoingOrderArr = this.orderArr.filter(order => order.orderStatus === 'CREATED' || order.orderStatus === 'PROCESSING');
+          return ongoingOrderArr;
+        },
+        filterHistoryOrder() {
+          let historyOrderArr = [];
+          historyOrderArr = this.orderArr.filter(order => order.orderStatus === 'FINISHED' || order.orderStatus === 'CANCELED');
+          return historyOrderArr;
+        }
+      },
+      mounted() {
+        // 檢查會員登入狀態，用於 header 樣式切換
+        this.checkMemberLoginStatus();
+
+        // 載入會員餐點訂單
+        this.loadMenuOrderForMember();
+      },
+      methods: {
+        // 檢查會員登入狀態
+        checkMemberLoginStatus(){
+          if (localStorage.getItem('memberName')) {
+            document.querySelector('li.is-login').setAttribute("style", "display: block;");
+            document.querySelector('li.not-login').setAttribute("style", "display: none;");
+            document.querySelector('.login-regist-text').textContent = "歡迎 " + localStorage.getItem('memberName');
+          } else {
+            document.querySelector('li.is-login').setAttribute("style", "display: none;");
+            document.querySelector('li.not-login').setAttribute("style", "display: block;");
+          }
+        },
+        // 會員登出
+        logout() {
+          localStorage.removeItem("memberId");
+          localStorage.removeItem("memberName");
+          window.location.href = "/views/index.html";
+        },
+        // 載入餐點訂單
+        loadMenuOrderForMember() {
+          let paramObj = {
+            memberId: this.memberId,
+          }
+          axios({
+            method: 'GET',
+            url: 'http://localhost:8080/menu-order/list/member',
+            params: paramObj,
+          })
+          .then((response) => {
+            this.orderArr = response.data.data;
+          })
+          .catch((error) => {
+            console.log('error:', error);
+          })
+        },
+        goToDetailPage(order) {
+          // 跳轉到訂單明細頁面，並帶上 orderId 參數
+          window.location.href = './member-menu-order-detail.html?orderId=' + order.orderId;
+        },
+        goToRestaurantPage(order) {
+          window.location.href = '../restaurant/restaurant-shop.html?restaurantId=' + order.restaurantId;
+        },
+        // 格式化數字，加上千分位
+        formatNumber(number) {
+          return numeral(number).format('0,0');
+        },
+      },
+    })
+  </script>
+</body>
+
+</html>

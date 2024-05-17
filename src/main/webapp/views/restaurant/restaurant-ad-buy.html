@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>餐廳後台-購買廣告</title>
+
+  <!-- 樣板需要的 css 資源-->
+  <script src="https://kit.fontawesome.com/cda74843f9.js" crossorigin="anonymous"></script>
+  <link href="/css/sb-admin-2.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/sb-admin-2-custom-restaurant.css">
+
+  <!-- Bootstrap 5 -->
+  <link rel="stylesheet" href="/css/bootstrap-5.3.2.css" />
+  <!-- Bootstrap Table 會使用到的 Bootstrap icon -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" />
+  <!-- Bootstrap Table -->
+  <link rel="stylesheet" href="/css/bootstrap-table-1.22.1.css">
+  <!-- Awesomplete -->
+  <link href="https://cdn.jsdelivr.net/npm/awesomplete@1.1.5/awesomplete.min.css" rel="stylesheet">
+  <!-- Sweet Alert2 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.min.css">
+  <!-- 日期外掛flatpickr -->
+  <link href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/zh.js"></script>
+
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    .bootstrap-table {
+      width: 1100px;
+      overflow-x: auto;
+      margin: 0 auto;
+    }
+
+    /* Bootstrap Table 的 Toolbar 樣式 */
+    .fixed-table-toolbar {
+      background-color: #3498db;
+      color: white;
+      padding: 10px 30px;
+      margin: 15px 0;
+      border-radius: 5px;
+      box-shadow: 0 0 10px 2px #ccc;
+    }
+
+    /* Toolbar 右側區塊按鈕(匯出、調整欄位顯示...按鈕) */
+    .fixed-table-toolbar .columns-right.btn-group.float-right button {
+      background-color: #2c3e50;
+    }
+
+    #myToolbar .toolbar-option-container {
+      display: flex;
+      align-items: center;
+      gap: 60px;
+      font-weight: 900;
+    }
+
+    /* 每頁資料筆數區域、匯出資料範圍區域 */
+    #myToolbar .pagesize-select-box,
+    .export-data-option-box {
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    #myToolbar .pagesize-select-box select {
+      font-size: 16px;
+      width: 75px;
+      height: 33px;
+      border-radius: 5px;
+    }
+
+    #myToolbar .export-data-option-box select {
+      font-size: 16px;
+      width: 130px;
+      height: 33px;
+      border-radius: 5px;
+    }
+
+    /* 匯出資料按鈕，當選擇勾選資料範圍，卻還沒有勾選的時候
+      按鈕 disabled 時加上樣式 */
+    .fixed-table-toolbar .export.btn-group button[aria-label="Export data"][disabled] {
+      background-color: #6c757d;
+      /* 只加 cursor: not-allowed 沒效果，因為預設 pointer-events 被設定為 none，
+        要恢復滑鼠事件設定，not-allowed 才有效果 */
+      cursor: not-allowed;
+      pointer-events: auto;
+    }
+
+    /* 多條件查詢區域 */
+    .search-conatiner {
+      margin-top: 15px;
+      font-weight: 900;
+    }
+
+    /* 展開、縮合按鈕區塊 */
+    .btn-toggle-search-area-box {
+      color: black;
+      display: flex;
+      align-items: center;
+
+      img {
+        width: 25px;
+        height: 25px;
+      }
+
+      img.img-collapse {
+        width: 32px;
+        height: 32px;
+      }
+    }
+
+    .seach-area-title span.badge {
+      font-size: 16px;
+      color: black;
+    }
+
+    /* 展開、縮合按鈕 */
+    .fixed-table-toolbar .btn-toggle-search-area {
+      background-color: transparent;
+      border: none;
+    }
+
+    /* 查詢條件 */
+    .search-area-box {
+      width: 650px;
+      font-size: 16px;
+      color: black;
+      background-color: #fff;
+      padding: 20px;
+      margin-top: 10px;
+      border-radius: 5px;
+    }
+
+    .search-area-box span {
+      flex-shrink: 0;
+    }
+
+    .search-area-box input.form-control,
+    select.form-select {
+      width: 215px;
+      font-size: 15px;
+      font-weight: 900;
+    }
+
+    /* 查詢時間範圍的錯誤訊息 */
+    .search-area-box div.error-message {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 14px;
+      margin-top: 5px;
+      color: red;
+
+      img {
+        width: 15px;
+        height: 15px;
+      }
+    }
+
+    /* 多條件查詢按鈕區域 */
+    .btn-search-container {
+      margin-top: 10px;
+      text-align: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+    }
+
+    /* 送出查詢按鈕、清除條件按鈕 */
+    button.btn-search-submit,
+    button.btn-clear-search-param {
+      flex-basis: 50%;
+      height: 35px;
+      font-size: 16px;
+      font-weight: 900;
+      color: white;
+      background-color: #E21B70;
+      border-radius: 5px;
+      border: 0;
+    }
+
+    button.btn-search-submit[disabled] {
+      cursor: not-allowed;
+      background-color: #ccc;
+    }
+
+    button.btn-clear-search-param {
+      background-color: #758cbd;
+    }
+
+    /* table 區域 */
+    /* table 欄位標題列 */
+    .bootstrap-table .fixed-table-container .table thead th {
+      background-color: linen;
+      color: navy;
+      font-size: 18px;
+      font-weight: 900;
+      text-align: center;
+    }
+
+    /* table 資料列 */
+    .table tbody tr td {
+      font-size: 16px;
+      font-weight: 900;
+      height: 70px;
+    }
+
+    /* 會員姓名 td */
+    tbody .td-member-name {
+      min-width: 150px;
+      max-width: 150px;
+      /* 超過寬度允許換行 */
+      white-space: normal;
+      /* 同一個單字就可以換行 */
+      word-wrap: break-word;
+    }
+
+    /* 會員帳號 td */
+    tbody .td-member-email {
+      min-width: 250px;
+      max-width: 250px;
+      text-align: left !important;
+      white-space: normal;
+      word-wrap: break-word;
+    }
+
+    /* 訂單類型 td */
+    tbody .td-orderType,
+    .td-status {
+      min-width: 100px;
+      max-width: 100px;
+    }
+
+    tbody .td-orderType span.badge {
+      font-size: 14px;
+    }
+
+    /* 訂單狀態 td */
+    tbody .td-status span.badge {
+      font-size: 14px;
+    }
+
+    tbody .td-status span.bg-cancel-myclass {
+      color: white;
+      background-color: red;
+    }
+
+    tbody .td-status span.bg-process-myclass {
+      color: white;
+      background-color: #DEB887;
+    }
+
+    /* 訂單金額 td */
+    tbody .td-order-price-total {
+      min-width: 100px;
+      max-width: 100px;
+    }
+
+    /* 訂單時間 td */
+    tbody .td-createdTime {
+      min-width: 180px;
+      max-width: 180px;
+    }
+
+    /* 操作功能 td */
+    /* 操作按鈕 */
+    tbody .td-operate {
+      min-width: 180px;
+      max-width: 180px;
+    }
+
+    tbody .td-operate button {
+      font-size: 14px;
+      font-weight: 900;
+      padding: 5px;
+      margin: 0 3px;
+      border: 0;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: transform 0.3s linear;
+    }
+
+    tbody .td-operate button:not([disabled]):hover {
+      cursor: pointer;
+      transform: scale(1.1);
+    }
+
+    .td-operate button.btn-show-orderData {
+      color: black;
+      background-color: #b8d2c7;
+    }
+
+    .td-operate .btn-cancel-menuOrder {
+      color: white;
+      background-color: red;
+    }
+
+    .td-operate .btn-cancel-menuOrder[disabled] {
+      cursor: not-allowed;
+      background-color: #ccc;
+    }
+
+    /* 點選資料列勾選 checkbox，Bootstrap Table 會自動加上 selected class
+      原本預設背景顏色會變深灰色，修改顏色 */
+    .table tbody tr.selected {
+      background-color: rgb(255, 255, 255);
+    }
+
+    /* 展開訂單明細區塊 */
+    tr.detail-view td {
+      background-color: #edfdf8;
+    }
+
+    tr.detail-view .detail-info {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 0 35px;
+
+      img {
+        width: 25px;
+        height: 25px;
+      }
+    }
+
+    tr.detail-view .menu-item-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-bottom: 5px;
+      border-bottom: 1px solid #ccc;
+    }
+
+    tr.detail-view .detail-price-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    tr.detail-view .menu-item,
+    .price-item {
+      line-height: 25px;
+      position: relative;
+    }
+
+    tr.detail-view span.field-name {
+      margin-left: 10px;
+    }
+
+    tr.detail-view span.price-value {
+      position: absolute;
+      left: 300px;
+    }
+
+    /* 偽元素 */
+    tr.detail-view .menu-item::before {
+      /* 內容設為空字串，一定要加，否則不會顯示 */
+      content: '';
+      width: 6px;
+      height: 6px;
+      position: absolute;
+      top: 50%;
+      transform: translate(-180%, -50%);
+      background-color: #E21B70;
+      border-radius: 50%;
+    }
+
+    /* 明細價錢，小計、外送費、服務費、 總計*/
+    tr.detail-view .detail-price-wrapper {
+      color: navy;
+    }
+
+    tr.detail-view .price-item.price-total {
+      font-size: 18px;
+    }
+
+    /* table 下方，總共資料筆數、分頁區域 */
+    .bootstrap-table .fixed-table-pagination {
+      margin-top: 5px;
+    }
+
+    /* 總共幾筆資料文字 */
+    .bootstrap-table .fixed-table-pagination .pagination-detail .pagination-info {
+      font-size: 16px;
+      font-weight: 900;
+      padding: 8px 10px;
+      color: white;
+      background-color: #3498db;
+      border-radius: 5px;
+    }
+
+    /* 頁數區域 */
+    .bootstrap-table .fixed-table-pagination ul.pagination li.page-item a {
+      height: 100%;
+      display: flex;
+      align-items: center;
+    }
+
+    .bootstrap-table .fixed-table-pagination ul.pagination li.page-item.active a {
+      background-color: #3498db;
+    }
+
+    /* 輸入頁數跳轉區域 */
+    .bootstrap-table .fixed-table-pagination .pagination .page-jump-to {
+      margin-left: 8px;
+    }
+
+    .bootstrap-table .fixed-table-pagination .pagination .page-jump-to button {
+      font-size: 16px;
+      font-weight: 900;
+      color: white;
+      background-color: #3498db;
+      border-radius: 5px;
+      border: 0;
+    }
+
+    /* Awesomplete.js，會員信箱欄位 auto-complete 功能的 css 修改 */
+    .awesomplete .awesomplete-dropdown {
+      border-color: #ccc;
+      background-color: #fff;
+    }
+
+    .awesomplete ul#awesomplete_list_1 {
+      padding: 5px;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      overflow: auto;
+    }
+
+    .awesomplete ul#awesomplete_list_1 li {
+      font-size: 16px;
+      font-weight: 900;
+      padding: 5px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .awesomplete ul#awesomplete_list_1 li:hover {
+      color: #fff;
+      background-color: #3498db;
+    }
+
+    .awesomplete ul#awesomplete_list_1 li[aria-selected="true"] {
+      color: #fff;
+      background-color: #3498db;
+    }
+
+    /* Awesomplete 改變匹配文字的顏色與背景 */
+    .awesomplete ul#awesomplete_list_1 mark {
+      color: #fa8e13;
+      font-size: 15px;
+      background-color: transparent;
+      padding: 0;
+    }
+
+    /* 發送請求，畫面遮罩 */
+    .loading {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(128, 128, 128, 0.5);
+      z-index: 9999;
+    }
+
+    .loading img.img-loading {
+      width: 60px;
+      height: 60px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    /* 取消訂單的 Sweet Alert2 視窗
+      先在取消訂單 Sweet Alert2 的 JavaScript 加上一個自訂 class
+      再用 class 去找內部的組件修改 css 樣式，這樣就不會影響到頁面其他的 Sweet Alert2 的視窗樣式  */
+    .custom-cancel-order-popup {
+      width: 500px;
+      background-color: rgb(255, 251, 247);
+      border-radius: 10px;
+      box-shadow: 0 0 10px 2px #ccc;
+    }
+
+    /* 自訂 icon */
+    .custom-cancel-order-popup .custom-icon-wrapper {
+      border: 0;
+
+      img {
+        width: 80px;
+        height: 80px;
+      }
+    }
+
+    /* 標題 */
+    .custom-cancel-order-popup .swal2-title {
+      font-size: 28px;
+      color: navy;
+      padding-top: 10px;
+    }
+
+    /* 按鈕區域 */
+    .custom-cancel-order-popup .swal2-actions button {
+      font-weight: 900;
+      margin: 0 10px;
+    }
+
+    .custom-cancel-order-popup .swal2-actions button.swal2-confirm {
+      background-color: #3498db;
+    }
+
+    /* Bootstrap Modal 訂單詳細資料 */
+    .modal-orderData .modal-dialog {
+      min-width: 700px;
+      max-width: 700px;
+      height: 600px;
+    }
+
+    .modal-orderData .modal-content {
+      font-weight: 900;
+    }
+
+    .modal-orderData .modal-header {
+      padding: 20px 30px;
+    }
+
+    .modal-orderData .modal-header .modal-title-container {
+      flex-grow: 1;
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      color: navy;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 25px;
+
+      img {
+        width: 40px;
+        height: 40px;
+      }
+    }
+
+    .modal-orderData .modal-body {
+      padding: 30px 60px 10px 60px;
+      border: none;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+
+    .modal-orderData .modal-body .title {
+      background-color: linen;
+      text-align: center;
+      font-size: 22px;
+      letter-spacing: 2px;
+      font-weight: 900;
+      padding: 10px 5px;
+      border-radius: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+
+      img {
+        width: 35px;
+        height: 35px;
+      }
+    }
+
+    .modal-orderData .modal-body .info-container {
+      font-size: 18px;
+      letter-spacing: 1px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .modal-orderData .modal-body .content-box {
+      padding: 0 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+
+      img {
+        width: 20px;
+        height: 20px;
+      }
+    }
+
+    .modal-orderData .modal-body .content-box .item-box {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .modal-orderData .item-box span.badge {
+      font-size: 16px;
+    }
+
+    .modal-orderData .item-box span.badge.bg-process-myclass {
+      color: white;
+      background-color: #DEB887;
+    }
+
+    .modal-orderData .menu-item-wrapper,
+    .modal-orderData .detail-price-wrapper {
+      color: #666666;
+      font-weight: 900;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #ccc;
+    }
+
+    .modal-orderData .menu-item,
+    .price-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-orderData .detail-price-wrapper {
+      color: navy;
+    }
+
+    .modal-orderData .price-item.price-total {
+      font-size: 20px;
+    }
+
+    .modal-orderData .order-payment-wrapper {
+      color: #E21B70;
+      font-size: 20px;
+      font-weight: 900;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-orderData .payment-type {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 15px;
+
+      img.img-payment-type {
+        width: 40px;
+        height: 40px;
+      }
+    }
+
+    .modal-orderData .payment-type img.img-payment-type.img-linepay {
+      width: 100px;
+      height: auto;
+    }
+
+    .modal-orderData .modal-footer {
+      border: none;
+      justify-content: center;
+    }
+
+    /* Modal中的離開按鈕 */
+    .modal-orderData .modal-footer button {
+      font-weight: 900;
+      color: white;
+      background-color: #E21B70;
+      padding: 8px 25px;
+      border: 0;
+      border-radius: 5px;
+    }
+
+    [v-cloak] {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="app" v-cloak>
+
+    <!-- 模板外層容器 -->
+    <div id="wrapper">
+      <!-- 側邊 Sidebar -->
+      <ul class="navbar-nav sidebar sidebar-dark accordion bg-deep-blue" id="accordionSidebar">
+        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="#">
+          <div class="sidebar-brand-text mx-3">餐廳後台</div>
+        </a>
+        <!-- 分隔線 -->
+        <hr class="sidebar-divider my-0">
+        <li class="nav-item">
+          <a class="nav-link" href="./restaurant-menu.html">
+            <img src="/images/food-1.png">
+            <span>餐點資訊</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="./restaurant-menu-order.html">
+            <img src="/images/data-1.png">
+            <span>餐點訂單</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="./restaurant-statistic.html">
+            <img src="/images/money-report-1.png">
+            <span>銷售數據</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="./restaurant-ad-buy.html">
+            <img src="/images/buyad.png">
+            <span>購買廣告</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="./restaurant-ad-history.html">
+            <img src="/images/adhistory.png">
+            <span>廣告履歷</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="restaurant-ckediotr.html">
+            <img src="/images/food-2.png">
+            <span>前台預覽</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="restaurant-data.html">
+            <img src="/images/status-1.png">
+            <span>基本資訊</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="restaurant-reserve.html">
+            <img src="/images/money-report-2.png">
+            <span>訂單預約</span>
+          </a>
+        </li>
+        <!-- 下拉式選項-->
+        <li class="nav-item">
+          <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages"
+            aria-expanded="true" aria-controls="collapsePages">
+            <i class="fas fa-fw fa-folder"></i>
+            <span>餐廳資訊</span>
+          </a>
+          <div id="collapsePages" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+              <h6 class="collapse-header">餐廳資訊</h6>
+              <a class="collapse-item" href="restaurant-record.html">營業資訊</a>
+              <div class="collapse-divider"></div>
+              <h6 class="collapse-header">預約情況</h6>
+              <a class="collapse-item" href="restaurant-seat.html">座位資訊</a>
+            </div>
+          </div>
+        </li>
+        <!-- Sidebar 展開收合按鈕 -->
+        <div class="text-center d-none d-md-inline">
+          <button class="rounded-circle border-0" id="sidebarToggle"></button>
+        </div>
+      </ul>
+
+      <!-- 主內容區域，包含上方導覽列與各網頁內容 -->
+      <div id="content-wrapper" class="d-flex flex-column">
+        <div id="content">
+          <!-- 上方導覽列 -->
+          <nav class="navbar navbar-expand topbar mb-4 static-top"
+            style="display: flex; justify-content: space-between;">
+            <div class="temp"></div>
+            <div class="nav-item dropdown no-arrow">
+              <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown"
+                aria-haspopup="true" aria-expanded="false">
+                <span class="mr-2 d-none d-lg-inline text-gray-600 small topbar-name">{{restaurantName ||
+                  '餐廳名稱'}}</span>
+              </a>
+              <!-- 功能列表 -->
+              <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
+                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal" @click="handleLogout">
+                  <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                  登出
+                </a>
+              </div>
+            </div>
+          </nav>
+
+          <!-- 各網頁內容 -->
+          <div class="container-fluid">
+            <div class="container">
+
+
+              <div class="row row-cols-1 row-cols-md-4 g-3">
+                <div class="col" v-for="(location, index) in locations" :key="index">
+                  <div class="card">
+                    <img src="/images/buyadfor3000.jpg" class="card-img-top" alt="..." @click="selectLocation(location)"
+                      data-bs-toggle="modal" data-bs-target="#smalladprice">
+                    <div class="card-body">
+                      <h5 class="card-title">廣告出租每日3000</h5>
+                      <p class="card-text">廣告位置:{{ location }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+
+
+
+
+
+
+              <div id="smalladprice" class="modal" tabindex="-1">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title">小廣告牆詳細介紹</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                      <form role="form">
+                        <div class="form-group">
+                          <label for="priceday">位置</label>
+                          <input type="text" class="form-control" id="location" v-model="selectedLocation" readonly>
+                        </div>
+                        <div class="form-group">
+                          <label for="priceday">每日價格</label>
+                          <input type="text" class="form-control" id="priceday" v-model="priceDay" readonly>
+                        </div>
+                        <div class="form-group">
+                          <label for="adstarttime">希望開始日期</label>
+                          <input type="text" class="form-control" id="adstarttime" name="startTime" v-model="startTime"
+                            placeholder="請選擇日期">
+                        </div>
+                        <div class="form-group">
+                          <label for="buyday">購買天数</label>
+                          <input type="number" class="form-control" id="buyday" name="days" v-model="buyDay"
+                            placeholder="請輸入天數" min="1" max="365" step="1">
+                        </div>
+                        <div class="form-group">
+                          <label for="photoupload">廣告照片上傳</label>
+                          <input type="file" class="form-control" :key="inputKey" id="photoupload" name="photo"
+                            @change="handleFileChange" />
+                          <img v-if="photoUrl" :src="photoUrl" alt="Image preview" style="max-width: 200px;" />
+                        </div>
+                        <div class="form-group">
+                          <label for="resturl">廣告內容</label>
+                          <input type="text" class="form-control" id="restcontent" name="content" v-model="content"
+                            placeholder="請輸入內容">
+                        </div>
+                        <div class="form-group">
+                          <label for="resturl">餐廳網頁連結</label>
+                          <input type="text" class="form-control" id="resturl" name="url" v-model="url"
+                            placeholder="www.xxxx.com">
+                        </div>
+                        <div class="form-group">
+                          <label for="totalprice">總金額</label>
+                          <input type="text" class="form-control" id="totalprice" name="price" v-model="totalPrice"
+                            readonly>
+                        </div>
+                      </form>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
+                      <button type="button" class="btn btn-primary" @click="addAdtoCheck">提交審核</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- Footer -->
+        <footer class="sticky-footer bg-white">
+          <div class="container my-auto">
+            <div class="copyright text-center my-auto">
+              <span>Copyright &copy; 覓食 GO</span>
+            </div>
+          </div>
+        </footer>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 模板需要的 js 資源 -->
+  <!-- jQuery -->
+  <script src="/js/jquery-3.7.1.js"></script>
+  <!-- Bootstrap 4 -->
+  <script src="/js/bootstrap-4.6.2.bundle.min.js"></script>
+  <script src="/js/sb-admin-2.min.js"></script>
+
+  <!-- Bootstrap 5 -->
+  <script src="/js/bootstrap-5.3.2.bundle.min.js"></script>
+  <!-- Vue -->
+  <script src="/js/vue-2.7.15.min.js"></script>
+
+  <script src="https://unpkg.com/vue@3.4.21/dist/vue.global.prod.js"></script>
+  <!-- Bootstrap Table -->
+  <script src="/js/bootstrap-table-1.22.1.js"></script>
+  <!-- axios -->
+  <script src="/js/axios-1.6.2.min.js"></script>
+  <!-- Awesomplete.js -->
+  <script src="https://cdn.jsdelivr.net/npm/awesomplete@1.1.5/awesomplete.min.js"></script>
+  <!-- Moment.js，引入有 locales 設定的檔案，才能使用國際語系的功能  -->
+  <script src="/js/moment-with-locales-2.30.1.min.js"></script>
+  <!-- Sweet Alert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.all.min.js"></script>
+  <!-- Numeral.js -->
+  <script src="/js/numeral-2.0.6.min.js"></script>
+
+  <!-- BootStrap Table 擴充外掛 -->
+  <!-- 1. 輸入頁數跳轉的依賴 -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap-table@1.22.2/dist/extensions/page-jump-to/bootstrap-table-page-jump-to.min.css"
+    rel="stylesheet">
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.22.2/dist/extensions/page-jump-to/bootstrap-table-page-jump-to.min.js"></script>
+  <!-- 2. 匯出檔案的擴充外掛 -->
+  <script src="https://cdn.jsdelivr.net/npm/tableexport.jquery.plugin@1.10.21/tableExport.min.js"></script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.22.2/dist/extensions/export/bootstrap-table-export.min.js"></script>
+  <!-- 這個需要額外加，才可以匯出 excel xlsx 格式的檔案 -->
+  <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+
+  <script>
+
+    const { createApp, ref, onMounted, computed } = Vue
+
+    const app = createApp({
+      setup() {
+        const restaurantName = ref(localStorage.getItem('restaurantName'));
+        const restaurantId = ref(localStorage.getItem('restaurantId'));
+        const buyDay = ref(0); // 購買天數
+        const priceDay = ref(3000); // 每日價格，3000
+        let addAdData = ref({});//宣告空的addAdData
+
+        // let restaurantId = ref(0);
+        // let location = ref('');
+        let photo = ref(null);
+        let url = ref('');
+        let content = ref('');
+        let days = ref(0);
+        let price = ref(0);
+        let startTime = ref('');
+        let endTime = ref('');
+        let status = ref('');
+        let createdTime = ref(0);
+
+        const photoUrl = ref(null); //響應式顯示客戶端上傳圖片用于儲存圖片預覽
+
+        const inputKey = ref(0); // 用于重置<input type="file">
+
+        const selectedLocation = ref('');
+        const locations = ref(['A1', 'A2', 'A3', 'A4']);
+        const adDatas = ref([]);
+        const disabledDates = ref([]);
+
+
+        //接收LocalStorage restaurant資料
+        // const restaurant = ref({});
+        function getQueryParam(param) {
+          const urlParams = new URLSearchParams(window.location.search);
+          return urlParams.get(param);
+        }
+
+
+
+
+        // 使用Axios获取所有广告数据
+        const fetchAdDatas = async () => {
+          try {
+            const response = await axios.get("http://localhost:8080/adDatas");
+            adDatas.value = response.data;
+          } catch (error) {
+            console.error("Failed to fetch ad datas:", error);
+          }
+        };
+
+
+        //選中位置
+        function selectLocation(location) {
+          selectedLocation.value = location;
+          console.log(location);
+          disabledDates.value = adDatas.value
+            .filter(ad => ad.location === selectedLocation.value)
+            .map(ad => {
+              // 为开始日期添加 "T00:00:00Z"，确保日期不受时区影响
+              const from = ad.startTime;
+              // 为结束日期添加一天，并转换为 UTC 日期，确保结束日期被包含
+              const to = ad.endTime;
+              return { from, to };
+            });
+
+          console.log(disabledDates.value);
+          initializeFlatpickr();
+        }
+
+        //初始化Flatpickr实例
+        const initializeFlatpickr = () => {
+          flatpickr("#adstarttime", {
+            enableTime: false,
+            dateFormat: "Y-m-d",
+            minDate: "today",
+            locale: 'zh',
+            disable: disabledDates.value,
+            onChange: function (selectedDates, dateStr, instance) {
+              console.log("Selected date:", dateStr);
+            }
+          });
+        };
+
+        onMounted(() => {
+          // getLocalStorage();
+          fetchAdDatas();
+        });
+
+
+
+
+
+        //獲取LocalStorage restaurant資料
+        // function getLocalStorage() {
+        //   var restaurantJson = localStorage.getItem('restaurantId');
+        //   console.log(restaurantJson);
+        //   if (restaurantJson) {
+        //     // 將 JSON 字串轉換爲 JavaScript 對象
+        //     restaurant.value = JSON.parse(restaurantJson);
+
+        //     console.log('本地存儲值:', restaurant.value.restaurantId);
+        //     console.log('本地存儲值:', restaurant.value.restaurantName);
+        //   } else {
+        //     console.log('本機儲存中沒有名爲 "restaurant" 的值。');
+        //   }
+        // }
+
+
+
+
+        const totalPrice = computed(() => {
+          return buyDay.value * priceDay.value; // 計算總金額
+        });
+
+
+
+
+
+        //新增厚初始化數據下次新增時clear畫面
+        function clearForm() {
+          selectedLocation.value = '';
+          url.value = '';
+          content.value = '';
+          buyDay.value = 0;
+          totalPrice.value = 0;
+          startTime.value = '';
+          endTime.value = '';
+          status.value = '';
+          createdTime.value = '';
+          // 重置文件输入和清除图片预览
+          inputKey.value += 1;
+          photoUrl.value = null;
+
+        }
+
+        //獲取photo
+        function handleFileChange(e) {
+          const file = e.target.files[0];
+          photo.value = file;
+          if (file && file.type.startsWith('image/')) { // 确保文件存在且为图片类型
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              photoUrl.value = e.target.result; // 当文件读取完成后，设置图片预览的 URL
+            };
+            reader.readAsDataURL(file); // 读取文件内容作为 Data URL
+          } else {
+            photoUrl.value = null; // 如果不是图片文件，清除图片预览的 URL
+
+          }
+        }
+
+
+        //新增審查表單
+        function addAdtoCheck() {
+
+          const adData = {
+
+            location: selectedLocation.value,
+            url: url.value,
+            content: content.value,
+            days: buyDay.value,
+            price: totalPrice.value,
+            startTime: Date.parse(startTime.value),
+            endTime: Date.parse(startTime.value) + ((buyDay.value - 1) * 24 * 60 * 60 * 1000),
+            status: "nocheck",
+            createdTime: new Date().getTime()
+          };
+
+          const formData = new FormData();
+          formData.append('photo', photo.value);
+          formData.append('data', JSON.stringify(adData));
+
+          //新增廣告
+          axios.post(`http://localhost:8080/restaurants/${restaurantId.value}/adDatas`, formData)
+            .then(function (response) {
+              console.log(response);
+              Swal.fire({
+                title: "提交成功",
+                icon: "success"
+              }).then(function () {
+                clearForm();
+                $('#smalladprice').modal('hide');
+                fetchAdDatas();
+              })
+
+            })
+            .catch(function (error) {
+              Swal.fire({
+                title: "新增失敗,請檢查輸入是否正確",
+                icon: "error",
+              });
+            });
+        }
+
+        // 餐廳登出
+        function handleLogout() {
+          localStorage.removeItem('restaurantId');
+          localStorage.removeItem('restaurantName');
+          window.location.href = './restaurant-login.html';
+        }
+
+
+
+
+
+
+        return {
+          addAdtoCheck,
+          totalPrice,
+          buyDay,
+          priceDay,
+          location,
+          photo,
+          url,
+          content,
+          days,
+          price,
+          startTime,
+          endTime,
+          status,
+          createdTime,
+          handleFileChange,
+          photoUrl,
+          inputKey,
+          restaurantName,
+          restaurantId,
+          handleLogout,
+
+
+          //廣告牆位置綁定
+          locations,
+          selectLocation,
+          selectedLocation
+
+          //
+
+        }
+
+      }
+    })
+
+    app.mount("#app")
+
+
+  </script>
+
+</body>
+
+</html>

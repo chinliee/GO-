@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta content="" name="keywords">
+  <meta content="" name="description">
+  <title>Meet Mall</title>
+
+  <!-- Favicon -->
+  <!-- <link rel="icon" type="image/png" sizes="512x512" href="/ispan-springboot-project/src/main/resources/static/images/mallImages/MeetMallLogo.ico"> -->
+  <link rel="icon" href="/imagesmall/MeetMallfavicon.ico" type="image/icon">
+  <!-- <link href="img/favicon.ico" rel="icon"> -->
+
+  <!-- Google Web Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600&family=Nunito:wght@600;700;800&family=Pacifico&display=swap"
+    rel="stylesheet">
+
+  <!-- Icon Font Stylesheet -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+  <!-- Libraries Stylesheet -->
+  <link href="lib/animate/animate.min.css" rel="stylesheet">
+  <link href="lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+  <link href="lib/tempusdominus/css/tempusdominus-bootstrap-4.min.css" rel="stylesheet" />
+
+  <!-- Mall Bootstrap 5 -->
+  <link href="mall-css/bootstrap.min.css" rel="stylesheet">
+  <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-wEmeIV1mKuiNpC+IOBjI7aAzPcEZeedi5yW5f2yOq55WWLwNGmvvx4Um1vskeMj0" crossorigin="anonymous"> -->
+
+  <!-- Template Stylesheet -->
+  <link href="mall-css/style.css" rel="stylesheet">
+  <link href="./mall-css/mall-index-cart.css" rel="stylesheet" />
+
+  <!-- Font Awesome -->
+  <script src="https://kit.fontawesome.com/cda74843f9.js" crossorigin="anonymous"></script>
+  <!-- FancyBox -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css" />
+</head>
+<style>
+  /* 按鈕樣式 */
+  .frame {
+    width: 90%;
+    margin: 40px auto;
+    text-align: center;
+  }
+
+  button {
+    margin: 20px;
+  }
+
+  .custom-btn {
+    width: 130px;
+    height: 40px;
+    color: #fff;
+    border-radius: 5px;
+    padding: 10px 25px;
+    font-family: 'Lato', sans-serif;
+    font-weight: 500;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    display: inline-block;
+    box-shadow: inset 2px 2px 2px 0px rgba(255, 255, 255, .5),
+      7px 7px 20px 0px rgba(0, 0, 0, .1),
+      4px 4px 5px 0px rgba(0, 0, 0, .1);
+    outline: none;
+  }
+
+  /* 12 */
+  .btn-12 {
+    position: relative;
+    right: 20px;
+    bottom: 20px;
+    border: none;
+    box-shadow: none;
+    width: 130px;
+    height: 40px;
+    line-height: 42px;
+    -webkit-perspective: 230px;
+    perspective: 230px;
+  }
+
+  .btn-12 span {
+    background: rgb(75, 56, 31);
+    background: linear-gradient(0deg, rgb(255, 173, 42) 0%, rgb(255, 134, 14) 100%);
+    display: block;
+    position: absolute;
+    width: 130px;
+    height: 40px;
+    box-shadow: inset 2px 2px 2px 0px rgba(255, 255, 255, .5),
+      7px 7px 20px 0px rgba(0, 0, 0, .1),
+      4px 4px 5px 0px rgba(0, 0, 0, .1);
+    border-radius: 5px;
+    margin: 0;
+    text-align: center;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    -webkit-transition: all .3s;
+    transition: all .3s;
+    font-size: 16px;
+    /* 調整文字大小 */
+  }
+
+  .btn-12 span:nth-child(1) {
+    box-shadow:
+      -7px -7px 20px 0px rgba(21, 17, 134, 0.6),
+      -4px -4px 5px 0px #fff9,
+      7px 7px 20px 0px #0002,
+      4px 4px 5px 0px #0001;
+    -webkit-transform: rotateX(90deg);
+    -moz-transform: rotateX(90deg);
+    transform: rotateX(90deg);
+    -webkit-transform-origin: 50% 50% -20px;
+    -moz-transform-origin: 50% 50% -20px;
+    transform-origin: 50% 50% -20px;
+  }
+
+  .btn-12 span:nth-child(2) {
+    -webkit-transform: rotateX(0deg);
+    -moz-transform: rotateX(0deg);
+    transform: rotateX(0deg);
+    -webkit-transform-origin: 50% 50% -20px;
+    -moz-transform-origin: 50% 50% -20px;
+    transform-origin: 50% 50% -20px;
+  }
+
+  .btn-12:hover span:nth-child(1) {
+    box-shadow: inset 2px 2px 2px 0px rgba(255, 0, 0, 0.5),
+      7px 7px 20px 0px rgba(0, 0, 0, .1),
+      4px 4px 5px 0px rgba(0, 0, 0, .1);
+    -webkit-transform: rotateX(0deg);
+    -moz-transform: rotateX(0deg);
+    transform: rotateX(0deg);
+  }
+
+  .btn-12:hover span:nth-child(2) {
+    box-shadow: inset 2px 2px 2px 0px rgba(255, 255, 255, .5),
+      7px 7px 20px 0px rgba(0, 0, 0, .1),
+      4px 4px 5px 0px rgba(0, 0, 0, .1);
+    color: transparent;
+    -webkit-transform: rotateX(-90deg);
+    -moz-transform: rotateX(-90deg);
+    transform: rotateX(-90deg);
+  }
+
+
+  /* 輪播圖片 */
+  .carousel-inner {
+    width: 60%;
+    height: 400px;
+    margin: 0 auto;
+    border-radius: 10px;
+    display: flexbox;
+  }
+
+  .carousel-inner img {
+    width: 80%;
+    /* 或其他固定的寬度 */
+    height: 400px;
+    /* 或其他固定的高度 */
+    object-fit: cover;
+    /* 保持圖片比例並填滿容器 */
+    border-radius: 5px;
+    /* 可選：圖片圓角 */
+  }
+
+  /* 
+  .product1{
+  margin-left: 5px;
+  margin-right: 500px;
+  margin-bottom: 5px;
+  } */
+
+  .card {
+    text-align: center;
+    /* 將文字置中 */
+    justify-content: center;
+    /* 將圖片水平置中 */
+  }
+
+  .card .card-img-top {
+    margin: 0 auto;
+    /* 將圖片水平置中 */
+    display: block;
+    /* 確保圖片佔據整個父元素的寬度 */
+    justify-content: center;
+    /* 將圖片水平置中 */
+
+  }
+
+
+  .leftAd {
+
+    position: relative;
+    /* 確保 z-index 屬性生效 */
+    z-index: 50;
+    /* 設置比輪播內容更高的值 */
+    float: left;
+    margin-left: 0px;
+    margin-right: -11px;
+    width: 290px;
+    height: 400px;
+  }
+
+  .leftAd img {
+    height: 400px;
+    width: 290px;
+    border-radius: 10px;
+  }
+
+
+  .rightAd {
+    float: right;
+    margin: 0px;
+    margin-left: -10px;
+    margin-bottom: -100px;
+    width: 240px;
+    height: 178px;
+    border: 2px solid #ccc;
+    /* 添加邊框 */
+    border-radius: 5px;
+  }
+
+  .rightAd img {
+    height: 175px;
+    width: 240px;
+  }
+
+  .rightAd2 {
+    float: right;
+    margin: 0px;
+    margin-left: -3px;
+    margin-top: -23px;
+    width: 240px;
+    height: 223px;
+    border: 2px solid #ccc;
+    /* 添加邊框 */
+    border-radius: 5px;
+  }
+
+  .rightAd2 img {
+    height: 220px;
+    width: 240px;
+  }
+</style>
+
+<body id="app">
+  <div class="container-xxl bg-white p-0">
+    <!-- Spinner Start -->
+    <div id="spinner"
+      class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+      <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+        <span class="sr-only">Loading...</span>
+      </div>
+    </div>
+    <!-- Spinner End -->
+
+
+    <!-- Navbar Start -->
+    <div class="container-xxl position-relative p-0">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-4 px-lg-5 py-3 py-lg-0">
+        <a href="" class="navbar-brand p-0">
+          <h1 class="text-primary m-0"><i class="fa fa-utensils me-3"></i>MeetMall</h1>
+          <!-- <img src="img/logo.png" alt="Logo"> -->
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+          <span class="fa fa-bars"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+          <div class="navbar-nav ms-auto py-0 pe-4">
+            <a href="../index.html" class="nav-item nav-link">首頁</a>
+            <a href="" class="nav-item nav-link">我的訂單</a>
+            <a href="" class="nav-item nav-link">關於我們</a>
+            <div class="nav-item dropdown">
+              <a href="#" class="nav-link dropdown-toggle active" data-bs-toggle="dropdown">訂位、點餐</a>
+              <div class="dropdown-menu m-0">
+                <a href="/views/index.html" class="dropdown-item">餐廳訂位</a>
+                <a href="/views/index.html" class="dropdown-item active">外帶外送</a>
+              </div>
+            </div>
+            <a href="/views/member/member-contact.html" class="nav-item nav-link">聯絡我們</a>
+          </div>
+          <!-- <button class="custom-btn btn-12 bodynotification"> 原本的購物車旋轉css
+            
+          </button> -->
+
+          <button type="button" class="btn btn-primary position-relative">
+            <a href="mall-shopping-cart.html"><span style="color: #fff;">購物車</span>
+              <span
+                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-count"
+                style="text-align: center;">0</span></a>
+          </button>
+
+        </div>
+      </nav>
+      <div class="container-xxl py-5 bg-dark hero-header mb-5">
+        <!-- <div class="container text-center my-5 pt-5 pb-4">
+                <h1 class="display-3 text-white mb-3 animated slideInDown">Our Team</h1>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb justify-content-center text-uppercase">
+                        <li class="breadcrumb-item"><a href="#">Home</a></li>
+                        <li class="breadcrumb-item"><a href="#">Pages</a></li>
+                        <li class="breadcrumb-item text-white active" aria-current="page">Team</li>
+                    </ol>
+                </nav>
+            </div> -->
+        <!-- Navbar & Hero End-->
+      </div>
+
+    </div>
+
+
+    <div class="leftAd">
+      <a href="mall-game.html">
+        <img src="/imagesmall/indexpacman.png" class="" alt="imageleft1">
+      </a>
+    </div>
+
+
+
+    <div class="rightAd">
+
+      <figure class="figure" style=" display: right; flex-direction: row; align-items: flex-start;">
+        <a href="mall-game.html">
+          <img src="/imagesmall/card711.png" class="figure-img img-fluid" alt="imageleft1">
+          <figcaption class="figure-caption"></figcaption>
+        </a>
+      </figure>
+
+
+      <figure class="figure rightAd2" style=" display: right; flex-direction: row; align-items: flex-start;">
+        <a href="mall-game.html">
+          <img src="/imagesmall/鮭魚卵.webp" class="figure-img img-fluid" alt="imageleft1">
+          <figcaption class="figure-caption"></figcaption>
+        </a>
+      </figure>
+
+    </div>
+
+
+
+
+    <!-- 商城首頁輪播牆 -->
+
+
+    <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
+      <div class="carousel-indicators">
+        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active"
+          aria-current="true" aria-label="Slide 1"></button>
+        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1"
+          aria-label="Slide 2"></button>
+        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2"
+          aria-label="Slide 3"></button>
+      </div>
+      <div class="carousel-inner">
+        <div class="carousel-item active">
+          <img src="/imagesmall/Slide300coupon.jpg" class="d-block w-100" alt="1...">
+        </div>
+        <div class="carousel-item">
+          <img src="/imagesmall/Slide機車.jpg" class="d-block w-100" alt="2...">
+        </div>
+        <div class="carousel-item">
+          <img src="/imagesmall/Slide春遊時光.jpg" class="d-block w-100" alt="3...">
+        </div>
+      </div>
+
+    </div>
+
+
+    <!-- 主打商品！ -->
+
+    <div class="container-xxl pt-5 pb-3">
+      <div class="container">
+        <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
+          <h5 class="section-title ff-secondary text-center text-primary fw-normal" style="font-size: 25px;;">四月主打</h5>
+          <h1 class="" style="margin: 0px;">強檔商品</h1>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- <div class="leftAd">
+  <a href="mall-game.html">
+    <img src="/imagesmall/indexpacman.png" class="" alt="imageleft1">
+  </a>
+</div> -->
+
+
+    <!-- 商品迴圈開始 -->
+
+    <div class="container py-5">
+      <div class="row" style="flex-wrap: wrap;">
+        <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.1s" v-for="(item, index) in displayeditems"
+          :key="item.productId" style="width: 25%;">
+
+          <div class="team-item text-center rounded overflow-hidden">
+            <div class="rounded-circle m-4">
+              <a :href="'mall-product.html?id=' + item.productId">
+
+                <img class="img-fluid" :src="'data:image/jpeg;base64,' + item.productPhoto"
+                  style="width: 400px; height: 250px; border-radius: 5px;" class="card-img-top">
+            </div>
+            </a>
+            <div class="card-body">
+              <h5 class="card-title">{{ item.productName }}</h5>
+              <ul class="list-inline">
+                <!-- <li class="list-inline-item" style="color: slategray;">{{ item.productPrice }}</li> -->
+              </ul>
+            </div>
+            <div class="mb-5 d-flex justify-content-around">
+              <h3>${{ item.productPrice }}</h3>
+              <button class="btn btn-square btn-primary mx-1" href="" @click="addToCart(item)"
+                onclick="addNotification()"><i class="fa-solid fa-cart-shopping"></i></button>
+              <!-- <button class="btn btn-primary" data-bs-toggle="modal" :data-bs-target="'#exampleModal-' + item.productId">購買</button> -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <!-- Footer Start -->
+  <div class="container-fluid bg-dark text-light footer pt-5 mt-5 wow fadeIn" data-wow-delay="0.1s">
+    <div class="container py-5">
+      <div class="row g-5">
+        <div class="col-lg-3 col-md-6">
+          <h4 class="section-title ff-secondary text-start text-primary fw-normal mb-4">Company</h4>
+          <a class="btn btn-link" href="">關於我們</a>
+          <a class="btn btn-link" href="/views/member/member-contact.html">聯絡我們</a>
+          <a class="btn btn-link" href="/views/mall/mall-business-cooperation.html">招商專區</a>
+          <a class="btn btn-link" href="">商家登入</a>
+        </div>
+        <div class="col-lg-3 col-md-6">
+          <h4 class="section-title ff-secondary text-start text-primary fw-normal mb-4">Contact</h4>
+          <p class="mb-2"><i class="fa fa-map-marker-alt me-3"></i>高雄市前金區中正四路211號8樓之1</p>
+          <p class="mb-2"><i class="fa fa-phone-alt me-3"></i>07 321 6789</p>
+          <p class="mb-2"><i class="fa fa-envelope me-3"></i>iSpan@example.com</p>
+          <div class="d-flex pt-2">
+            <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-twitter"></i></a>
+            <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-facebook-f"></i></a>
+            <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-youtube"></i></a>
+            <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-linkedin-in"></i></a>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+          <h4 class="section-title ff-secondary text-start text-primary fw-normal mb-4">Opening</h4>
+          <h5 class="text-light fw-normal">星期一 - 星期六</h5>
+          <p>09AM - 07PM</p>
+          <h5 class="text-light fw-normal">星期日</h5>
+          <p>10AM - 06PM</p>
+        </div>
+        <div class="col-lg-3 col-md-6">
+          <h4 class="section-title ff-secondary text-start text-primary fw-normal mb-4">Newsletter</h4>
+          <p>留下Email，爆殺優惠不錯過～</p>
+          <div class="position-relative mx-auto" style="max-width: 400px;">
+            <input class="form-control border-primary w-100 py-3 ps-4 pe-5" type="text" placeholder="您的 email">
+            <button type="button" class="btn btn-primary py-2 position-absolute top-0 end-0 mt-2 me-2">訂閱</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="container">
+      <div class="copyright">
+        <div class="row">
+          <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+            <a class="border-bottom" href="#"></a>
+
+          </div>
+          <div class="col-md-6 text-center text-md-end">
+            <div class="footer-menu">
+              <a href="../index.html">首頁</a>
+              <a href="">Cookies</a>
+              <a href="">幫助</a>
+              <a href="">問與答</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Footer End -->
+
+
+  <!-- Back to Top -->
+  <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
+  </div>
+
+
+
+  <!-- JavaScript Libraries -->
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+  <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script> -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-p34f1UUtsS3wqzfto5wAAmdvj+osOnFyQFpp4Ua3gs/ZVWx6oOypYoCJhGGScy+8"
+    crossorigin="anonymous"></script>
+  <!-- 連到axios CDN  -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="lib/wow/wow.min.js"></script>
+  <script src="lib/easing/easing.min.js"></script>
+  <script src="lib/waypoints/waypoints.min.js"></script>
+  <script src="lib/counterup/counterup.min.js"></script>
+  <script src="lib/owlcarousel/owl.carousel.min.js"></script>
+  <script src="lib/tempusdominus/js/moment.min.js"></script>
+  <script src="lib/tempusdominus/js/moment-timezone.min.js"></script>
+  <script src="lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
+
+  <!-- Template Javascript -->
+  <script src="mall-js/main.js"></script>
+  <script src="./mall-js/mall-index-cart.js"></script>
+
+
+  <!-- 此篇的js -->
+
+  <script type="module">
+    // 連到Vue
+    import { createApp } from "https://www.unpkg.com/vue@3.4.19/dist/vue.esm-browser.prod.js";
+
+    // 使用vue及axios，抓取商品資料，動態顯示在頁面上
+    const app = createApp({
+      data() {
+        return {
+          items: [],
+          displayeditems: [], // 數組以保存要在網頁上顯示的前12筆產品數據
+          isShow: true,
+        };
+      },
+      mounted() {
+        axios
+          .get(`http://localhost:8080/products/all`)
+          .then((response) => {
+            console.log(response);
+            // 使用響應數據更新產品
+            this.items = response.data;
+            // 將前12筆產品資料存儲到displayedProducts中
+            this.displayeditems = this.items.slice(0, 12);
+            console.log(this.items);
+          })
+          .catch((error) => {
+            console.error("資料獲取失敗", error);
+            console.log("error" + error);
+          })
+
+
+
+        // 獲取localStorage中的購物車項目數據
+        let cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+
+        // 計算購物車項目的總數量
+        let itemCount = cartItems.reduce((total, item) => total + item.quantity, 0);
+
+        // 將購物車項目的總數量更新到計數器中
+        document.querySelector('.notification-count').innerText = itemCount;
+      },
+
+
+
+      // 商品加入購物車(先將商品點擊後加到localstorage，到購物車時再從localstorage取出來)
+      // 在Vue實例中的methods部分添加一個方法來處理加入購物車的事件
+      methods: {
+        addToCart(item) {
+          // 假設每個商品都有一個唯一的ID，這裡以商品ID作為存入cookies的鍵值
+          const itemId = item.productId;
+          console.log(itemId)
+
+          // 從cookies中讀取已存在的購物車內容，如果沒有就初始化一個空數組
+          let cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+
+          // 檢查購物車中是否已經有該商品，如果有就增加數量，如果沒有就添加到購物車
+          const existingItem = cartItems.find(cartItem => cartItem.productId === itemId);
+          if (existingItem) {
+            existingItem.quantity++;
+          } else {
+            cartItems.push({ productId: itemId, productName: item.productName, productPrice: item.productPrice, productPhoto: item.productPhoto, quantity: 1 });
+          }
+
+          // 將更新後的購物車內容存入cookies
+          localStorage.setItem('cart', JSON.stringify(cartItems));
+
+          // 更新購物車數量提示
+          this.updateCartItemCount();
+        },
+
+        // 更新購物車數量提示
+        updateCartItemCount() {
+          let cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+          let itemCount = cartItems.reduce((total, item) => total + item.quantity, 0);
+
+          // 將數量顯示在購物車圖示上
+          document.getElementById('cartItemCount').innerText = itemCount;
+        }
+      }
+
+    });
+
+    app.mount("#app");
+  </script>
+
+
+
+
+
+</body>
+
+</html>

@@ -1,0 +1,89 @@
+#wrapper a {
+  font-weight: bolder;
+}
+/* 側邊 sidebar */
+.navbar-nav.sidebar {
+  background-color: rgb(98, 138, 120);
+}
+.navbar-nav.sidebar .sidebar-brand-text {
+  font-size: 20px;
+  font-weight: bolder;
+  margin: 0 !important;
+}
+.navbar-nav.sidebar .nav-item {
+  margin-bottom: 5px;
+}
+.navbar-nav.sidebar .nav-item a span {
+  font-size: 15px !important;
+  color: aliceblue;
+}
+.navbar-nav.sidebar .nav-item img {
+  width: 20px;
+  height: 20px;
+  margin-right: 5px;
+}
+.navbar-nav.sidebar hr {
+  border-top: 1px solid aliceblue;
+}
+.navbar-nav.sidebar #sidebarToggle {
+  margin-top: 30px;
+}
+
+/* 上方導覽列 */
+#content-wrapper .navbar {
+  background-color: rgb(98, 138, 120);
+  height: 60px;
+  color: aliceblue;
+}
+#content-wrapper .navbar .topbar-name {
+  color: aliceblue !important;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+/* footer */
+footer {
+  margin-top: 30px;
+}
+footer .copyright {
+  font-size: 16px !important;
+  font-weight: bolder;
+  color: navy;
+}
+
+
+/* 此處可調整側邊欄寬度 */
+@media (min-width:768px) {
+
+  /* 側邊欄展開時寬度 */
+  .sidebar {
+    width: 150px !important
+  }
+  /* 側邊欄展開時列表與側邊欄之相對位置 */
+  .sidebar .nav-item .collapse,
+  .sidebar .nav-item .collapsing {
+    margin: 0 0.5rem;
+    /* width: 50px !important; */
+
+  }
+  .sidebar .nav-item .collapse .collapse-inner,
+  .sidebar .nav-item .collapsing .collapse-inner {
+    padding: .5rem 0;
+    min-width: 6.5rem;
+    font-size: .85rem;
+    margin: 0 0 1rem 0
+  }
+  /* 側邊欄展開時下拉式選項展開圖示位置 */
+  .sidebar .nav-item .nav-link {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 1rem;
+    width: 150px
+  }
+  /* 側邊欄折疊時寬度 */
+  .sidebar.toggled {
+    overflow: visible;
+    width: 6.5rem !important
+  }
+}

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>會員登入</title>
+    <script src="https://www.unpkg.com/axios@1.6.7/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.5"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: url('/images/13.png') no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        a {
+            text-decoration: none;
+            color: black;
+        }
+        a:visited {
+            text-decoration: none;
+            color: black;
+        }
+        a:hover {
+            text-decoration: none;
+            color: black;
+        }
+        a:active {
+            text-decoration: none;
+            color: black;
+        }
+    </style>
+</head>
+
+<body id="bbb">
+    <div
+        style="background-color: rgba(169, 165, 165, 0.8); border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.8); padding: 20px; width: 400px; max-width: 100%; height: 350px; font-size: 16px;">
+        <div style="font-size: 1.5em; font-weight: bold; margin-bottom: 20px;text-align: center; ">會員登入</div>
+        <div style="border-radius: 5px; padding: 10px; text-align: center; border: none;">
+            <label class="tx" for="username" style="display: block; margin-bottom: 5px; font-weight: bold;">電子信箱</label>
+            <input type="text" id="username" name="username" required v-model="email"
+                autocomplete="email"
+                style="width: 80%; padding: 10px; box-sizing: border-box; margin-bottom: 20px; font-size: 1.2em;">
+
+            <label for="password" style="display: block; margin-bottom: 5px; font-weight: bold;">登入密碼</label>
+            <input class="tx" type="password" id="password" name="password" required v-model="password"
+                autocomplete="current-password"
+                style="width: 80%; padding: 10px; box-sizing: border-box; margin-bottom: 20px; font-size: 1.2em;">
+
+            <div>
+                <a href="/views/member/member-regist.html" class="sa">會員註冊</a>
+                <a href="/views/admin/admin-login.html" class="sa" style="margin-left: 20px;">管理員登入</a>
+            </div>
+
+            <hr style="margin-bottom: 20px; margin-top: 10px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                    <input class="sa" type="button" value="Stanley"
+                        style="background-color: #263a52; color: #fff; padding: 6px 12px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; transition: background-color 0.3s ease; font-size: 0.8em; margin-right: 10px; width: auto;"
+                        @click="handleUser1">
+                    <input class="sa" type="button" value="Cynthia"
+                        style="background-color: #263a52; color: #fff; padding: 6px 12px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; transition: background-color 0.3s ease; font-size: 0.8em; margin-right: 10px; width: auto;"
+                        @click="handleUser2">
+                </div>
+                <input class="sa" type="button" id="loginButton" value="登入" @click="login"
+                    style="background-color: #263a52; color: #fff; padding: 10px 40px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; transition: background-color 0.3s ease; font-size: 1.1em; width: auto;">
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { createApp } from "https://www.unpkg.com/vue@3.3.5/dist/vue.esm-browser.prod.js"
+
+        const app = createApp({
+            data() {
+                return {
+                    email: null,
+                    password: null,
+                }
+            },
+            methods: {
+                login: function () {
+                    let data = {
+                        email: this.email,
+                        password: this.password,
+                    };
+                    axios.post("http://localhost:8080/member/login", data)
+                        .then((response) => {
+                            // 根據後端返回的訊息做出相應處理
+                            if (response.data === "帳號與密碼不匹配") {
+
+                                alert("帳號與密碼不匹配");
+                            }  else {
+                                localStorage.setItem('memberId', response.data.memberId);
+                                localStorage.setItem('memberName', response.data.memberName);
+                                console.log("OK");
+                                this.loginSuccess();
+                            }
+                        })
+                        .catch((error) => {
+                            console.error(error);
+                        });
+                },
+                bbb: function () {
+                    var userJson = localStorage.getItem('memberId');
+                    if (userJson) {
+                        var restaurantId = JSON.parse(userJson);
+                        console.log('本地存儲值:', memberId);
+                    } else {
+                        console.log('本機儲存中沒有名爲 "memberId" 的值。');
+                    }
+
+                },
+                handleUser1: function () {
+                    this.email = "ispantest02@gmail.com";
+                    this.password = "password1";
+                },
+                handleUser2: function () {
+                    this.email = "user2@gmail.com";
+                    this.password = "password2";
+                },
+                loginSuccess: function () {
+                    window.location.href = "../index.html";
+                },
+
+            }
+        });
+
+        const vm = app.mount("#bbb");
+
+
+    </script>
+
+
+
+
+</body>
+
+</html>

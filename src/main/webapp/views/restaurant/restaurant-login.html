@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>餐廳登入</title>
+    <script src="https://www.unpkg.com/axios@1.6.7/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.5"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: url('/images/05.jpg') no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body id="aaa">
+    <div
+        style="background-color: rgba(169, 165, 165, 0.8); border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.8); padding: 20px; width: 400px; max-width: 100%; height: 350px; font-size: 16px;">
+        <div style="font-size: 1.5em; font-weight: bold; margin-bottom: 20px;text-align: center; ">餐廳後臺登入</div>
+        <div style="border-radius: 5px; padding: 10px; text-align: center; border: none;">
+            <label class="tx" for="username" style="display: block; margin-bottom: 5px; font-weight: bold;">統一編號</label>
+            <input type="text" id="username" name="username" required v-model="uniformNumbers"
+                autocomplete="uniformNumbers"
+                style="width: 80%; padding: 10px; box-sizing: border-box; margin-bottom: 20px; font-size: 1.2em;">
+
+            <label for="password" style="display: block; margin-bottom: 5px; font-weight: bold;">登入密碼</label>
+            <input class="tx" type="password" id="password" name="password" required v-model="password"
+                autocomplete="current-password"
+                style="width: 80%; padding: 10px; box-sizing: border-box; margin-bottom: 20px; font-size: 1.2em;">
+
+            <div>
+                <a href="./restaurant-register.html" class="sa">餐廳註冊</a>
+                <!-- <a href="#" class="sa" style="margin-left: 20px;">忘記密碼</a> -->
+            </div>
+
+            <hr style="margin-bottom: 20px; margin-top: 10px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                    <input class="sa" type="button" value="使用者1"
+                        style="background-color: #263a52; color: #fff; padding: 6px 12px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; transition: background-color 0.3s ease; font-size: 0.8em; margin-right: 10px; width: auto;"
+                        @click="handleUser1">
+                    <input class="sa" type="button" value="使用者2"
+                        style="background-color: #263a52; color: #fff; padding: 6px 12px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; transition: background-color 0.3s ease; font-size: 0.8em; margin-right: 10px; width: auto;"
+                        @click="handleUser2">
+                </div>
+                <input class="sa" type="button" id="loginButton" value="登入" @click="login"
+                    style="background-color: #263a52; color: #fff; padding: 10px 40px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; transition: background-color 0.3s ease; font-size: 1.1em; width: auto;">
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { createApp } from "https://www.unpkg.com/vue@3.3.5/dist/vue.esm-browser.prod.js"
+
+        const app = createApp({
+            data() {
+                return {
+                    uniformNumbers: null,
+                    password: null,
+                }
+            },
+            methods: {
+                login: function () {
+                    let data = {
+                        uniformNumbers: this.uniformNumbers,
+                        password: this.password,
+                    };
+                    axios.post("http://localhost:8080/login", data)
+                        .then((response) => {
+                            // 根據後端返回的訊息做出相應處理
+                            if (response.data === "統編與密碼不匹配") {
+
+                                alert("統編與密碼不匹配");
+                            }  else {
+                                // 登入成功的處理邏輯
+                                localStorage.setItem('restaurantId', response.data.restaurantId);
+                                localStorage.setItem('restaurantName', response.data.restaurantName);
+                                console.log("OK");
+                                this.loginSuccess();
+                            }
+                        })
+                        .catch((error) => {
+                            console.error(error);
+                        });
+                },
+                aaa: function () {
+                    var userJson = localStorage.getItem('restaurantId');
+                    if (userJson) {
+                        // 將 JSON 字串轉換爲 JavaScript 對象
+                        var restaurantId = JSON.parse(userJson);
+                        console.log('本地存儲值:', restaurantId);
+                    } else {
+                        console.log('本機儲存中沒有名爲 "restaurantId" 的值。');
+                    }
+
+                },
+                handleUser1: function () {
+                    this.uniformNumbers = "89640001";
+                    this.password = "aaaa1234";
+                },
+                handleUser2: function () {
+                    this.uniformNumbers = "89641111";
+                    this.password = "aaaa1234";
+                },
+                loginSuccess: function () {
+                    window.location.href = "./restaurant-data.html";
+                },
+
+            }
+        });
+
+        const vm = app.mount("#aaa");
+
+
+    </script>
+
+
+
+
+</body>
+
+</html>

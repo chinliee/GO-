@@ -1,0 +1,45 @@
+@import url("https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700");
+bodynotification {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: #000;
+  flex-direction: column;
+  margin: 0;
+}
+* {
+  transition: background 0.5s ease !important;
+}
+
+.notification-count {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: #d80537;
+  color: #fff;
+  display: grid;
+  width: 1.5rem;
+  height: 1.5rem;
+  place-items: center;
+  border-radius: 50%;
+  font-family: "Open Sans", sans-serif;
+  font-weight: bold;
+  transition: transform 0.5s ease !important;
+}
+
+
+@keyframes ding {
+  0% {
+    transform: rotate(0);
+  }
+  25% {
+    transform: rotate(10deg);
+  }
+  75% {
+    transform: rotate(-10deg);
+  }
+  100% {
+    transform: rotate(0);
+  }
+}

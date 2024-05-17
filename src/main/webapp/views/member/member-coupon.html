@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>前台樣版</title>
+
+  <!-- bootstrap 5.3.2 CSS -->
+  <link rel="stylesheet" href="/css/bootstrap-5.3.2.css" />
+  <!-- Bootstrap 5.3.2 JS -->
+  <script src="/js/bootstrap-5.3.2.bundle.min.js"></script>
+
+  <!-- vue 3.4.21 -->
+  <script src="https://unpkg.com/vue@3.4.21/dist/vue.global.prod.js"></script>
+  <script src="https://unpkg.com/axios@1.6.7/dist/axios.min.js"></script>
+
+  <!-- 前台CSS樣版 -->
+  <link href="/css/frontstage-template.css" rel="stylesheet" />
+
+</head>
+<style>
+  html,
+  body {
+    height: 100%;
+    margin: 0;
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .container {
+    flex: 1;
+  }
+</style>
+
+<body id="app" class="d-flex flex-column">
+
+  <!-- header -->
+  <header class="frontstage-template-header" data-bs-theme="dark">
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+      <div class="container-fluid nav-outer-flex-container">
+        <div class="nav-container">
+          <a class="navbar-brand" href="/views/index.html"><img src="/favicon.ico" alt="覓食Go圖標預定地" width="50px"
+              height="50px"></a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+            aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+          </button>
+        </div>
+        <div class="collapse navbar-collapse nav-inner-flex-container" id="navbarNavDropdown">
+          <div class="nav-container">
+            <ul class="navbar-nav nav-function-setting">
+              <li class="nav-item">
+                <a class="nav-link" href="/views/index.html"><b>尋找餐廳</b></a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/views/mall/mall-index.html"><b>購物商城</b></a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/views/member/member-contact.html"><b>聯絡我們</b></a>
+              </li>
+            </ul>
+          </div>
+          <div class="nav-container">
+            <ul class="navbar-nav">
+              <li class="nav-item not-login">
+                <a class="nav-link" href="/views/member/member-login.html">
+                  <b>登入 / 註冊</b>
+                </a>
+              </li>
+              <li class="nav-item dropdown is-login">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                  aria-expanded="false">
+                  <b class="login-regist-text">會員您好</b>
+                </a>
+                <ul class="dropdown-menu">
+                  <li>
+                    <a class="dropdown-item login-dropdown-item" href="/views/member/member-menu-order.html">歷史訂單</a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item login-dropdown-item" href="/views/member/member-reserve.html">預約訂單</a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item login-dropdown-item" href="/views/member/member-coupon.html">折扣券</a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item login-dropdown-item" href="#" @click="logout">登出</a>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- 中間區域，放頁面內容 -->
+  <div class="container flex-grow-1">
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-3" v-for="(coupon, index) in coupons" :key="coupon.couponId">
+          <div class="card" style="background-color:aliceblue">
+            <div class="card-body">
+              <h4 class="card-title"><span class="badge bg-primary">{{100 - coupon.discount * 100}}%OFF</span></h4>
+              <p class="card-text small-text" v-if="coupon.type === 'birthday'">生日優惠卷</p>
+              <p class="card-text small-text" v-if="coupon.type === 'newmember'">新會員優惠卷</p>
+              <p class="card-text small-text" v-if="coupon.type === 'newyear'">新年優惠卷</p>
+              <p class="card-text small-text">使用條件:<span>購入金額滿{{coupon.usagePrice}}以上</span></p>
+              <p class="card-text small-text">使用期限:<span>{{coupon.endTime}}</span></p>
+            </div>
+            <div class="card-footer text-end">
+              <button class="btn btn-warning btn-sm" @click="selectCoupon(coupon)">使用此優惠卷</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- footer -->
+  <footer class="frontstage-template-footer">
+    Copyright © 覓食Go All rights reserved
+  </footer>
+
+  <script>
+    const { createApp, onMounted } = Vue
+
+    const app = createApp({
+      setup() {
+        const { createApp, ref, onMounted } = Vue
+        //獲取篩選優惠卷日期後的coupons變數
+        const coupons = ref([]);
+        //接收LocalStorage member資料
+        // const member = ref({});
+        const memberName = ref(localStorage.getItem('memberName'));
+        const memberId = ref(localStorage.getItem('memberId'));
+
+        const selectedCoupon = ref(null); // 儲存優惠卷資訊
+        const total = ref(0); // 消費金額
+        const discountedPrice = ref(0); //使用優惠卷後的金額
+
+        // 使用優惠卷
+        function selectCoupon(coupon) {
+          if (total.value < coupon.usagePrice) {
+            Swal.fire({
+              title: `購買金額滿${coupon.usagePrice}以上才能使用`,
+              icon: "warning"
+            })
+            return;
+          }
+          selectedCoupon.value = coupon;
+          discountedPrice.value = total.value * coupon.discount;
+
+        }
+        //${member.value.memberId}
+        //去結帳測試用
+        function payMoney() {
+
+          console.log(selectedCoupon.value);
+          const success = true;
+          if (success) {
+            axios.delete(`http://localhost:8080/coupons/${selectedCoupon.value.couponId}/members/1`)
+              .then(response => {
+                Swal.fire({
+                  title: "優惠卷使用成功",
+                  icon: "success",
+                });
+                selectAll(); // 假設 selectAll 是您用來刷新列表的函數
+              })
+              .catch(error => {
+                Swal.fire({
+                  title: "優惠卷使用失敗",
+                  icon: "error",
+                });
+              });
+          }
+        }
+        function selectAll() {
+          axios.get(`http://localhost:8080/members/${memberId.value}/coupons`)
+            .then(function (response) {
+              // 過濾掉未開始和已經結束的優惠券
+              const validCoupons = response.data.filter(coupon => {
+                const today = new Date();
+                const startTime = new Date(coupon.startTime);
+                const endTime = new Date(coupon.endTime);
+                return startTime <= today && today <= endTime;
+              });
+              coupons.value = validCoupons;
+            })
+            .catch(function (error) {
+              console.log(error);
+            })
+        };
+
+        onMounted(() => {
+          checkMemberLoginStatus();
+          selectAll();//頁面加載時顯示所有優惠卷
+        });
+
+        function checkMemberLoginStatus() {
+          if (localStorage.getItem('memberName')) {
+            document.querySelector('li.is-login').setAttribute("style", "display: block;");
+            document.querySelector('li.not-login').setAttribute("style", "display: none;");
+            document.querySelector('.login-regist-text').textContent = "歡迎 " + localStorage.getItem('memberName');
+          } else {
+            document.querySelector('li.is-login').setAttribute("style", "display: none;");
+            document.querySelector('li.not-login').setAttribute("style", "display: block;");
+          }
+        }
+
+        function logout() {
+          localStorage.removeItem("memberId");
+          localStorage.removeItem("memberName");
+          window.location.href = "/views/index.html";
+        }
+
+        return {
+          checkMemberLoginStatus,
+          logout,
+          selectAll,
+          coupons,
+          memberName,
+          memberId,
+
+          //測試優惠卷結帳用
+          total,
+          discountedPrice,
+          selectCoupon,
+          selectedCoupon,
+          payMoney
+        }
+
+      }
+    })
+
+    app.mount("#app")
+
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>會員-餐點訂單明細</title>
+
+  <!-- Bootstrap 5 -->
+  <link rel="stylesheet" href="/css/bootstrap-5.3.2.css" />
+
+  <!-- 前台模板 -->
+  <link href="/css/frontstage-template.css" rel="stylesheet"/>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    .main-content {
+      width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    /* 訂單區域 */
+    .order-data-container {
+      display: flex;
+      gap: 30px;
+    }
+    /* 共用的卡片 css */
+    .card {
+      border: 0;
+      border-radius: 12px;
+      box-shadow: 0 0 10px 2px #ccc;
+    }
+    .card-body {
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+    /* 左側訂單、訂單明細區域 */
+    .order-info-container {
+      flex-basis: 50%;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+    /* 右側 QR Code、地圖區域 */
+    .order-extra-info-container {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+    /* 標題區塊 */
+    .title {
+      background-color: linen;
+      text-align: center;
+      font-size: 24px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      padding: 10px;
+      border-radius: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 30px;
+
+      img {
+        width: 40px;
+        height: 40px;
+      }
+    }
+    .order-info-content {
+      display: flex;
+      gap: 20px;
+    }
+    /* 餐廳照片 */
+    .restaurant-photo img {
+      width: 120px;
+      height: 100px;
+      /* 讓上傳的圖片預覽，等比例縮放符合設定的寬高 */
+      object-fit: cover;
+      border-radius: 12px;
+    }
+    .basic-content {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    /* 餐廳名稱、訂單價錢 */
+    .order-price-wrapper {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 20px;
+      font-weight: 900;
+    }
+    .order-price-wrapper .restaurant-name {
+      color: navy;  
+    }
+    /* 訂單類型、預定時間 */
+    .order-type-wrapper {
+      display: flex;
+      justify-content: space-between;
+      align-items:flex-end;
+      font-weight: 900;
+    }
+    /* 訂單狀態、訂單類型標籤 */
+    .order-type {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+    .order-type span.badge {
+      font-size: 14px;
+    }
+    /* 狀態進行中的標籤 */
+    .order-type-wrapper span.badge.bg-ing {
+      background-color: #DEB887;
+    }
+    /* 取消訂單按鈕 */
+    .btn-cancel-order {
+      width: 100px;
+      height: 30px;
+      font-weight: 900;
+      color: white;
+      background-color: #E21B70;
+      border-radius: 5px;
+      border: 0;
+      transition: scale 0.3s ease;
+    }
+    .btn-cancel-order:hover {
+      scale: 1.1;
+    }
+    /* 地址區域 */
+    .order-address-info {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      font-weight: 900;
+    }
+    .restaurant-address, .delivery-address {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      img {
+        width: 25px;
+        height: 25px;
+      }
+    }
+    /* 左邊下方，餐點明細區域 */
+    .detail-info {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      padding: 0 15px;
+    }
+    .menu-item-wrapper, .detail-price-wrapper {
+      color: #666666;
+      font-weight: 900;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #ccc;
+    }
+    .menu-item, .price-item  {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .detail-price-wrapper {
+      color: navy;
+    }
+    .price-item.price-total {
+      font-size: 20px;
+    }
+    .order-payment-wrapper {
+      color: #E21B70;
+      font-size: 20px;
+      font-weight: 900;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .payment-type {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 15px;
+      img {
+        width: 45px;
+        height: 45px;
+      }
+    }
+    .payment-type img.icon-linepay {
+      width: 100px;
+      height: auto;
+    }
+    /* 右側上方，QR Code 區域 */
+    .qrcode-card-body {
+      padding-bottom: 8px;
+      gap: 6px;
+    }
+    .qrcode-info {
+      margin: 0 auto;
+      img {
+        width: 250px;
+        height: 250px;
+      }
+    }
+    /* 右側下方，Goolge Map */
+    /* Google Map 的 css，一定要添加明確高度 height:XXXpx (用 % 會顯示不出來)，且一定要加在 map 元素身上，不可以加在父層，否則地圖會顯示不出來 */
+    #map {
+      height: 370px;
+      width: 100%;
+    }
+    /* 取消訂單的 Sweet Alert2 視窗
+      先在取消訂單 Sweet Alert2 的 JavaScript 加上一個自訂 class
+      再用 class 去找內部的組件修改 css 樣式，這樣就不會影響到頁面其他的 Sweet Alert2 的視窗樣式  */
+    .custom-cancel-order-popup {
+      width: 500px;
+      background-color: rgb(255, 251, 247);
+      border-radius: 10px;
+      box-shadow: 0 0 10px 2px #ccc;
+    }
+    /* 自訂 icon */
+    .custom-cancel-order-popup .custom-icon-wrapper {
+      border: 0;
+      img {
+        width: 80px;
+        height: 80px;
+      }
+    }
+    /* 標題 */
+    .custom-cancel-order-popup .swal2-title {
+      font-size: 28px;
+      color: navy;
+      padding-top: 10px;
+    }
+    /* 按鈕區域 */
+    .custom-cancel-order-popup .swal2-actions button {
+      font-weight: 900;
+      margin: 0 10px;
+    }
+    .custom-cancel-order-popup .swal2-actions button.swal2-confirm {
+      background-color: #3498db;
+    }
+    /* 訂單完成的 Sweet Alert2 視窗 */
+    .custom-order-finished-swal-popup {
+      width: 500px;
+      background-color: rgb(255, 251, 247);
+      border-radius: 10px;
+      box-shadow: 0 0 10px 2px #ccc;
+    }
+    /* 自訂 icon */
+    .custom-order-finished-swal-popup .custom-icon-wrapper {
+      border: 0;
+      img {
+        width: 80px;
+        height: 80px;
+      }
+    }
+    /* 標題 */
+    .custom-order-finished-swal-popup .swal2-title{
+      color: navy;
+      padding-top: 10px;
+    }
+    /* 確認按鈕 */
+    .custom-order-finished-swal-popup .swal2-actions button.swal2-confirm {
+      font-weight: 900;
+      color: white;
+      background-color: #E21B70;
+    }
+    [v-cloak] {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app" v-cloak>
+    <!-- header -->
+    <header class="frontstage-template-header"  data-bs-theme="dark">
+      <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid nav-outer-flex-container">
+          <div class="nav-container">
+            <a class="navbar-brand" href="/views/index.html"><img src="/favicon.ico" alt="覓食Go圖標預定地" width="50px" height="50px"></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+              aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            </button>
+          </div>
+          <div class="collapse navbar-collapse nav-inner-flex-container" id="navbarNavDropdown">
+            <div class="nav-container">
+              <ul class="navbar-nav nav-function-setting">
+                <li class="nav-item">
+                  <a class="nav-link" href="/views/index.html"><b>尋找餐廳</b></a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/views/mall/mall-index.html"><b>購物商城</b></a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/views/member/member-contact.html"><b>聯絡我們</b></a>
+                </li>
+              </ul>
+            </div>
+            <div class="nav-container">
+              <ul class="navbar-nav">
+                <li class="nav-item not-login">
+                  <a class="nav-link" href="/views/member/member-login.html">
+                    <b>登入 / 註冊</b>
+                  </a>
+                </li>
+                <li class="nav-item dropdown is-login">
+                  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                    <b class="login-regist-text">會員您好</b>
+                  </a>
+                  <ul class="dropdown-menu">
+                    <li>
+                      <a class="dropdown-item login-dropdown-item" href="/views/member/member-menu-order.html">歷史訂單</a>
+                    </li>
+                    <li>
+                      <a class="dropdown-item login-dropdown-item" href="/views/member/member-reserve.html">預約訂單</a>
+                    </li>
+                    <li>
+                      <a class="dropdown-item login-dropdown-item" href="/views/member/member-coupon.html">折扣券</a>
+                    </li>
+                    <li>
+                      <a class="dropdown-item login-dropdown-item" href="#" @click="logout">登出</a>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <!-- 主內容 -->
+    <main class="main-content">
+      <div class="order-data-container">
+        <div class="order-info-container">
+          <!-- 訂單、餐廳資料區域 -->
+          <div class="order-wrapper">
+            <div class="card h-100">
+              <div class="card-body">
+                <div class="title">
+                  <span>訂單資訊</span>
+                  <div>
+                    <img src="/images/data-1.png">
+                  </div>
+                </div>
+                <div class="order-info-content">
+                  <div class="restaurant-photo">
+                    <img :src="restaurant.photoSrc ? restaurant.photoSrc : noRestaurantPhoto">
+                  </div>
+                  <div class="basic-content">
+                    <div class="order-price-wrapper">
+                      <div class="restaurant-name">
+                        <span>{{restaurant.name}}</span>
+                      </div>
+                      <div class="order-price">
+                        <span>$ {{formatNumber(order.total)}}</span>
+                      </div>
+                    </div>
+                    <div class="order-type-wrapper">
+                      <div class="data-wrapper">
+                        <div class="order-type">
+                          <div v-if="order.orderStatus === 'CREATED' || order.orderStatus === 'PROCESSING'">
+                            <span class="badge bg-ing">
+                              進行中
+                            </span>
+                          </div>
+                          <div v-if="order.orderStatus === 'FINISHED'">
+                            <span class="badge bg-success">已完成</span>
+                          </div>
+                          <div v-if="order.orderStatus === 'CANCELED'">
+                            <span class="badge bg-danger">已取消</span>
+                          </div>
+                          <div v-if="order.orderType === 'DELIVERY'">
+                            <span class="badge bg-primary">外送</span>
+                          </div>
+                          <div v-if="order.orderType === 'TAKEOUT'">
+                            <span class="badge bg-warning">外帶自取</span>
+                          </div>
+                        </div>
+                        <div class="reservation-time">
+                          <span>
+                            {{moment(order.reservationTime).format('M月D日 dddd HH:mm')}}
+                          </span>
+                        </div>
+                      </div>
+                      <div class="btn-cancel-wrapper" v-if="order.orderStatus !== 'FINISHED' && order.orderStatus !== 'CANCELED'">
+                        <button class="btn-cancel-order"
+                          @click="cancelOrder">
+                          取消訂單
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="order-address-info">                  
+                  <div class="restaurant-address">
+                    <div class="address-icon">
+                      <img src="/images/location-1.png">
+                    </div>
+                    <span>餐廳位置：{{restaurant.address}}</span>
+                  </div>
+                  <div class="delivery-address" v-if="order.orderType === 'DELIVERY'">
+                    <div class="address-icon">
+                      <img src="/images/location-2.png">
+                    </div>
+                    <span>外送地點：{{order.deliveryAddress}}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- 訂單明細區域 -->
+          <div class="order-detail-wrapper">
+            <div class="card h-100">
+              <div class="card-body">
+                <div class="title">
+                  <span>餐點資訊</span>
+                  <div>
+                    <img src="/images/fast-food.png">
+                  </div>
+                </div>
+                <div class="detail-info">
+                  <div class="menu-item-wrapper">
+                    <div v-for="(item, index) in orderDetailArr" :key="index"
+                      class="menu-item">
+                      <span>{{item.menuName}} x {{formatNumber(item.quantity)}}</span>
+                      <span>$ {{formatNumber(item.price * item.quantity)}}</span>
+                    </div>
+                  </div>
+                  <div class="detail-price-wrapper">
+                    <div class="price-item" v-if="order.orderType ==='DELIVERY'">
+                      <span class="field-name">小計</span>
+                      <span class="field-value">$ {{formatNumber(order.subTotal)}}</span>
+                    </div>
+                    <div class="price-item" v-if="order.orderType ==='DELIVERY'">
+                      <span class="field-name">外送服務費</span>
+                      <span class="field-value">$ {{formatNumber(order.deliveryFee)}}</span>
+                    </div>
+                    <div class="price-item" v-if="order.orderType ==='DELIVERY'">
+                      <span class="field-name">平台費</span>
+                      <span class="field-value">$ {{formatNumber(order.platformFee)}}</span>
+                    </div>
+                    <div class="price-item price-total">
+                      <span class="field-name">總計</span>
+                      <span class="field-value">$ {{formatNumber(order.total)}}</span>
+                    </div>
+                  </div>
+                  <div class="order-payment-wrapper">
+                    <span>付款方式</span>
+                    <div class="payment-type cash" v-if="order.paymentType === 'CASH'">
+                      <span>現金</span>
+                      <div>
+                        <img src="/images/cash-2.png">
+                      </div>
+                    </div>
+                    <div class="payment-type cash" v-if="order.paymentType === 'LINE_PAY'">
+                      <div>
+                        <img src="/images/LINE-Pay-1.png" class="icon-linepay">
+                      </div>
+                    </div>
+                    <div class="payment-type credit-card" v-if="order.paymentType === 'CREDIT_CARD'">
+                      <span>信用卡</span>
+                      <div>
+                        <img src="/images/credit-card-1.png">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="order-extra-info-container">
+          <div class="qrcode-wrapper">
+            <div class="card h-100">
+              <div class="card-body qrcode-card-body">
+                <div class="title">
+                  <span>取餐條碼</span>
+                  <div>
+                    <img src="/images/qrcode.png">
+                  </div>
+                </div>
+                <div class="qrcode-info">
+                  <img :src="order.qrcodeSrc">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="map-wrapper"
+            v-if="(order.orderStatus === 'CREATED' || order.orderStatus === 'PROCESSING') && order.orderType === 'DELIVERY'">
+            <div class="card h-100">
+              <div class="card-body map-card-body">
+                <div class="title">
+                  <span>即時外送資訊</span>
+                  <div>
+                    <img src="/images/map.png">
+                  </div>
+                </div>
+                <div class="map-box">
+                  <div id="map"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- footer -->
+    <footer class="frontstage-template-footer">
+      Copyright © 覓食Go All rights reserved
+    </footer>
+  </div>
+
+  <script src="/js/bootstrap-5.3.2.bundle.min.js"></script>
+  <script src="/js/vue-2.7.15.min.js"></script>
+  <script src="/js/axios-1.6.2.min.js"></script>
+  <script src="/js/numeral-2.0.6.min.js"></script>
+  <script src="/js/moment-with-locales-2.30.1.min.js"></script>
+  <!-- Google Map API -->
+  <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDudgOhv52MRazyYEI1REC6hVladKg62gI&libraries=places"></script>
+  <!-- Sweet Alert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.all.min.js"></script>
+  <!-- Sock.js -->
+  <script src="/js/sockjs-client-1.6.1.min.js"></script>
+  <!-- Stomp.js -->
+  <script src="/js/stomp-2.3.3.min.js"></script>
+
+  <script>
+    // 設定 moment.js 的語系為中文
+    moment.locale('zh-tw');
+    const vm = new Vue({
+      el: '#app',
+      data() {
+        return {
+          orderId: null,
+          // 餐廳資料
+          restaurant: {
+            restaurantId: null,
+            name: null,
+            address: null,
+            longitude: null,
+            latitude: null,
+            photoSrc: null,
+          },
+          // 外送員資料
+          courier: {
+            courierId: null,
+            name: null,
+            longitude: null,
+            latitude: null,
+          },
+          // 訂單資料
+          order: {
+            orderId: null,
+            orderType: null,
+            orderStatus: null,
+            paymentType: null,
+            reservationTime: null,
+            deliveryAddress: null,
+            deliveryFee: 0,
+            platformFee: 0,
+            subTotal: 0,
+            total: 0,
+            qrcodeSrc: null,
+          },
+          // 訂單明細資料
+          orderDetailArr: [],
+          noRestaurantPhoto: '/images/no-restaurant-photo.png',
+          // Google Map 實例物件
+          map: null,
+          // 目的地標記 marker
+          destinationMarker: null,
+          // 餐廳標記 marker
+          restaurantMarker: null,
+          // 外送員標記 marker
+          courierMarker: null,
+          // 繪製路線的 DirectionsRenderer 物件
+          directionsRenderer: null,
+          // 路線上的小藍點陣列，每一個元素都是小藍點座標
+          blueDotArr: [],
+          // 外送員是否到達餐廳位置
+          isArrivedRestaurant: false,
+          // WebSocket
+          socketUrl: 'http://localhost:8080/ws',
+          socket: null,
+          stompClient: null,
+        }
+      },
+      created() {
+        // 取得 URLSearchParams 物件，透過該物件，存取頁面跳轉時傳遞的所有參數
+        let urlParams = new URLSearchParams(window.location.search);
+        // 取得 orderId 參數值
+        this.orderId = urlParams.get('orderId');
+      },
+      mounted() {
+        // 檢查會員登入狀態，用於 header 樣式切換
+        this.checkMemberLoginStatus();
+
+        // 載入訂單相關資料
+        this.loadMenuOrderData();
+
+        // 初始化 WebSocket 連線
+        this.initWebsocket();
+      },
+      methods: {
+        // 檢查會員登入狀態
+        checkMemberLoginStatus() {
+          if (localStorage.getItem('memberName')) {
+            document.querySelector('li.is-login').setAttribute("style", "display: block;");
+            document.querySelector('li.not-login').setAttribute("style", "display: none;");
+            document.querySelector('.login-regist-text').textContent = "歡迎 " + localStorage.getItem('memberName');
+          } else {
+            document.querySelector('li.is-login').setAttribute("style", "display: none;");
+            document.querySelector('li.not-login').setAttribute("style", "display: block;");
+          }
+        },
+        // 會員登出
+        logout() {
+          localStorage.removeItem("memberId");
+          localStorage.removeItem("memberName");
+          window.location.href = "/views/index.html";
+        },
+        // 載入訂單資料
+        loadMenuOrderData() {
+          let paramObj = {
+            orderId: this.orderId,
+          }
+          axios({
+            method: 'GET',
+            url: 'http://localhost:8080/menu-order/data',
+            params: paramObj,
+          })
+          .then((response) => {
+            this.restaurant = response.data.data.restaurant;
+            this.courier = response.data.data.courier;
+            this.order = response.data.data.order;
+            this.orderDetailArr = response.data.data.orderDetailList;
+          })
+          .then(() => {
+            // 如果是進行中的外送訂單，才初始化 Google Map
+            if ((this.order.orderStatus === 'CREATED' 
+              || this.order.orderStatus === 'PROCESSING') 
+              && this.order.orderType === 'DELIVERY') {
+              this.initMap();
+            }
+          })
+          .catch((error) => {
+            console.log('error:', error);
+          })
+        },
+        initMap() {
+          // 餐廳經緯度物件
+          let restaurantPosition = {
+            lat: this.restaurant.latitude,
+            lng: this.restaurant.longitude,
+          }
+          // 外送員起始經緯度物件
+          let courierPosition = {
+            lat: this.courier.latitude,
+            lng: this.courier.longitude,
+          }
+
+          // #region
+          /* 建立地圖實例物件，並指定給 map 變數儲存
+            google.maps.Map 建構函式，此傳入兩個參數
+            第一個參數，指定地圖要放置的 DOM 元素，document.getElementById('map')
+            第二個參數，值為一個物件，用於地圖參數設定
+              center：地圖中心點座標
+              zoom：地圖縮放等級
+                -> 1-20，數字愈大，地圖愈細：1是世界地圖，20就會到街道
+              mapTypeId：地圖種類
+                -> roadmap 一般道路地圖、satellite 衛星空照圖、hybrid 混合地圖、terrain 地形圖
+          */
+          // #endregion
+          this.map = new google.maps.Map(document.getElementById('map'), {
+            center: courierPosition,
+            zoom: 15,
+            mapTypeId: 'roadmap',
+            // 自訂樣式，隱藏地圖上的 POI 點，例如地標、景點...，避免太多地圖上太多資訊干擾
+            styles: [
+              {
+                featureType: "poi",
+                elementType: "labels",
+                stylers: [
+                  {
+                    visibility: "off"
+                  }
+                ]
+              }
+            ]
+          });
+
+          // 放置餐廳 marker
+          this.restaurantMarker = new google.maps.Marker({
+            map: this.map,
+            position: restaurantPosition,
+            icon: {
+              url: '/images/cooker.png',
+              scaledSize: new google.maps.Size(50, 50),
+            }
+          });
+
+          // 放置外送員起始位置 marker
+          this.courierMarker = new google.maps.Marker({
+            map: this.map,
+            position: courierPosition,
+            icon: {
+              url: '/images/delivery-man-2.png',
+              scaledSize: new google.maps.Size(50, 50),
+            }
+          });
+
+          //#region
+          /*
+            如果外送地址存在，要放置外送目的地圖標 marker
+            geocodeAddress() 方法，為自定義的方法，參數傳入中文地址
+            -> 把中文地址轉換成經緯度，因為放置圖標 marker 需要根據經緯度
+          */
+          //#endregion
+          if (this.order.deliveryAddress) {
+            this.geocodeAddress(this.order.deliveryAddress);
+          }
+        },
+        // 把外送目的地的中文地址 -> 經緯度資訊，參數是中文地址
+        geocodeAddress(address) {
+          let geocoder = new google.maps.Geocoder();
+
+          geocoder.geocode({ address: address }, (results, status) => {
+            if (status === 'OK' && results[0]) {
+              /*
+                result[0]，是回傳的地址物件
+                results[0].formatted_address，中文地址
+                results[0].geometry.location，經緯度物件，屬性有 lng 經度、lat 緯度
+              */
+              let location = results[0].geometry.location;
+
+              // 放置外送目的地的圖標
+              let icon = {
+                url: '/images/destination.png',
+                scaledSize: new google.maps.Size(50, 50),
+              }
+              this.destinationMarker = new google.maps.Marker({
+                map: this.map,
+                position: location,
+                icon: icon,
+              });
+
+              // 繪製路線
+              this.drawRoute();
+            } 
+            else {
+              console.error('中文地址 -> 經緯度資訊，地址轉換失敗：', status);
+            }
+          });
+        },
+        // 在地圖上繪製路線
+        drawRoute() {
+          // 創建 DirectionsService、DirectionsRenderer 物件，用於繪製路線
+          let directionsService = new google.maps.DirectionsService();
+          // 設定路線樣式
+          this.directionsRenderer = new google.maps.DirectionsRenderer({
+            map: this.map,
+            suppressMarkers: true, // Google 地圖上，不要顯示預設的圖標 (避免太多資訊干擾)
+            polylineOptions: {
+              strokeColor: '#E21B70', // 路線顏色
+              strokeWeight: 6, // 路線寬度
+            },
+          });
+
+          /*
+            要發送路線的 request 參數，成功收到 response 後，才可以在地圖上繪製路線
+            請求參數如下：
+            origin：起點(必填)，外送員起始位置
+            destination：終點(必填)，外送目的地
+            waypoints：中間點，設定為餐廳位置
+            travelMode：交通方式，有 DRIVING(開車，預設)、BICYCLING(腳踏車)、WALKING(走路)、TRANSIT(轉運)
+            avoidHighways：是否避開高速公路，因為交通方式 DRIVING 和外送機車最接近，所以設定避開高速公路
+          */
+          let request = {
+            origin: this.courierMarker.getPosition(),
+            destination: this.destinationMarker.getPosition(),
+            // 中間點，餐廳位置
+            waypoints: [{
+              location: this.restaurantMarker.getPosition(),
+              // stopover，是否要停靠中間點，預設 true；如果設定 false，則不會停靠中間點，直接從起點到終點
+              // -> 停靠中間點，模擬外送員抵達餐廳停留取餐的情況
+              stopover: true,
+            }],
+            travelMode: 'DRIVING',
+            avoidHighways: true,
+          };
+
+          // 繪製路線
+          directionsService.route(request, (result, status) => {
+            if (status === 'OK') {
+              // 收到成功的 response
+              // setDirections() 方法，在地圖上繪製路線，參數是 response 物件
+              this.directionsRenderer.setDirections(result);
+
+              // 模擬外送員移動
+              this.simulateCourierMoving(result);
+            }
+          });
+        },
+        // 模擬外送員的移動
+        simulateCourierMoving(result) {
+          /*
+            result: DirectionsResult 物件，代表整個路線的結果
+            routes: 陣列，代表所有可能的路線，通常只有一條路線
+            legs: 陣列，代表路線中的每一段。每一段都是從起點到終點的一個部分，通常包含一個或多個 step
+            steps: 陣列，代表一個 leg 中的所有步驟。每個步驟是路線中的一個小段，例如轉彎或前進一小段距離
+            
+            所以 result.routes[0].legs[0].steps，這行程式碼的意思
+            -> 取得第一條路線的第一段的所有步驟 steps
+
+            stepSize：是自定義的距離長度，代表每隔多少公尺取得一個小藍點
+            distanceAccumulator：計算累計的距離，判斷如果累計的距離 > stepSize，就把當前的小藍點座標儲存到陣列中
+          */
+          let steps = result.routes[0].legs[0].steps;
+          let distanceAccumulator = 0;
+          let stepSize = 30; // 每30公尺取得沿路的小藍點
+
+          // 先清空儲存小藍點座標的陣列
+          this.blueDotArr = [];
+
+          // 計算每段的距離，並取得小藍點的座標
+          steps.forEach((step) => {
+            let stepPath = step.path;
+            for (let i = 0; i < stepPath.length - 1; i++) {
+              // computeDistanceBetween()，計算兩個經緯度座標點間的距離
+              let segmentDistance = google.maps.geometry.spherical.computeDistanceBetween(stepPath[i], stepPath[i + 1]);
+
+              // 累計距離
+              distanceAccumulator += segmentDistance;
+
+              // 如果累計的距離超過指定的步長，則計算小藍點的座標
+              while (distanceAccumulator >= stepSize) {
+
+                // 計算小藍點在這個路段的相對位置（fraction）
+                let fraction = (stepSize - (distanceAccumulator - segmentDistance)) / segmentDistance;
+
+                // interpolate()，根據已知兩地點的位置，計算介於這兩地之間某點的經緯度座標
+                // -> 傳入參數 fraction，計算小藍點的經緯度座標
+                let blueDotPosition = google.maps.geometry.spherical.interpolate(stepPath[i], stepPath[i + 1], fraction);
+
+                // 儲存小藍點的座標
+                this.blueDotArr.push(blueDotPosition);
+
+                // 儲存完座標後，重置累計距離
+                distanceAccumulator -= stepSize;
+              }
+            }
+          });
+
+          // 設定每 0.5 秒執行一次
+          let timer = setInterval(() => {
+            if (this.blueDotArr.length > 0) {
+              // 依序將小藍點座標陣列，第一個元素移除，並在下面指定給外送員的位置
+              let nextLocation = this.blueDotArr.shift();
+              this.courierMarker.setPosition(nextLocation);
+            }
+            else {
+              // 取得最後一個小藍點座標後，清除定期執行的函數
+              clearInterval(timer);
+
+              //#region
+              /**
+                當取得最後一個小藍點座標，分為兩種情況
+                  1. 從外送員起始位置，抵達餐廳中途點，因為有設定中途點要停留
+                    -> 最後一個小藍點是接近餐廳的位置
+                    -> 要繪製新的路線圖，外送員位置才會繼續移動
+                      新的路線起點：餐廳位置
+                      終點：外送目的地
+                  
+                  2. 新路線圖中，從餐廳出發，抵達外送目的地時，取得最後一個小藍點座標
+                    這時候不用再重新繪製路線圖，因為外送員已經到達外送目的地，不用再移動了
+                
+                所以下面的邏輯是，當取得最後一個小藍點座標 (小藍點座標陣列長度=0)
+                -> 判斷外送員是否已經「到達過」達餐廳位置
+                -> 如果為 false，代表外送員還沒有「到達過」餐廳位置
+                -> 就繪製新路線，從餐廳出發、往外送目的地前進
+              */
+              //#endregion
+              if (!this.isArrivedRestaurant) {
+                this.isArrivedRestaurant = true;
+                // 外送員抵達餐廳位置，停留5秒，再繪製新路線，讓外送員從餐廳出發、往外送目的地前進
+                // -> 模擬外送員停留餐廳、取餐的情況
+                setTimeout(() => {
+                  this.resumeCourierMoving();
+                }, 5000)
+              }
+            }
+          }, 500);
+        },
+        /* 繪製新路線圖，起點為餐廳位置，終點為外送目的地
+          -> 讓外送員從餐廳出發、往外送目的地移動
+        */
+        resumeCourierMoving() {
+          // 將路線的小藍點陣列清空
+          this.blueDotArr = [];
+
+          // 新路線圖的請求參數，成功收到 response 後，才可以在地圖上繪製路線
+          let newRequest = {
+            origin: this.restaurantMarker.getPosition(),
+            destination: this.destinationMarker.getPosition(),
+            travelMode: 'DRIVING',
+            avoidHighways: true,
+          };
+
+          let directionsService = new google.maps.DirectionsService();
+          directionsService.route(newRequest, (result, status) => {
+            if (status === 'OK') {
+              // 收到成功的 response
+              // setDirections() 方法，在地圖上繪製路線，參數是 response 物件
+              this.directionsRenderer.setDirections(result);
+
+              // 重新模擬外送員的移動
+              this.simulateCourierMoving(result);
+            }
+          });
+        },
+        // 取消訂單
+        cancelOrder() {
+          Swal.fire({
+            // iconHtml，自訂圖示
+            iconHtml: '<img src="/images/cancel-2.png">',
+            title: "確定要取消訂單嗎？",
+            // position，視窗的位置
+            position: 'center', 
+            confirmButtonText: "確認",
+            showDenyButton: true,
+            denyButtonText: "取消",
+            showCloseButton: true,
+            /* 加上自訂 class，再透過 class 去找內部的組件修改 css 樣式
+              這樣就不會影響頁面上其他的 SweetAlert2 視窗樣式 */
+            customClass: {
+              popup: 'custom-cancel-order-popup',
+              // 自訂 icon 父層加上 class，方便修改 css
+              icon: 'custom-icon-wrapper'
+            },
+          }).then((result) => {
+            let paramObj = {
+              orderId: this.orderId,
+              status: 'CANCELED',
+            }
+            if (result.isConfirmed) {
+              // 更新訂單狀態為 CANCELED
+              axios({
+                method: 'POST',
+                url: 'http://localhost:8080/menu-order/update/status',
+                data: paramObj,
+              })
+              .then((response) => {
+                // 跳轉到會員餐點訂單頁面
+                window.location.href = './member-menu-order.html';
+              })
+              .catch((error) => {
+                console.log('error:', error);
+              })
+            }
+          });
+        },
+        // 訂單完成視窗
+        handleOrderFinished(message) {
+          if (message.content === 'FINISHED') {
+            Swal.fire({
+              iconHtml: '<img src="/images/order-finished-1.png">',
+              title: "取餐成功 - 訂單完成",
+              position: 'center',
+              confirmButtonText: "確認",
+              showCloseButton: true,
+              /* 加上自訂 class，再透過 class 去找內部的組件修改 css 樣式
+                這樣就不會影響頁面上其他的 SweetAlert2 視窗樣式 */
+              customClass: {
+                popup: 'custom-order-finished-swal-popup',
+                icon: 'custom-icon-wrapper'
+              },
+              didClose: () => { // SweetAlert2 視窗被關閉後的回調函式
+                // 跳轉到會員訂單頁面
+                window.location.href = "./member-menu-order.html";
+              },
+            })
+          }
+        },
+        // 初始化 WebSocket 連線
+        initWebsocket() {
+          this.socket = new SockJS(this.socketUrl)
+          this.stompClient = Stomp.over(this.socket)
+
+          // Stomp.js 建立 WebSocket 連線
+          this.stompClient.connect({}, (frame) => {
+            // 要訂閱的頻道(端點)路徑
+            let endPointUrl = '/member/menu-order/' + this.orderId + '/status/finished';
+
+            // subscribe() 方法，訂閱頻道，當收到頻道回覆時，執行回調函式
+            this.stompClient.subscribe(endPointUrl, (response) => {
+              // response.body，是後端 WebSocket 頻道回覆的 JSON 字串
+              // -> 使用 JSON.parse() 轉成物件
+              let message = JSON.parse(response.body);
+              this.handleOrderFinished(message);
+            })
+          });
+        },
+        closeWebSocket() {
+          if (this.stompClient) {
+            this.stompClient.disconnect()
+          }
+        },
+        // 格式化數字，加上千分位
+        formatNumber(number) {
+          return numeral(number).format('0,0');
+        },
+      },
+      // Vue 實例被銷毀之前，要先關閉 WebSocket 連線
+      beforeDestroy() {
+        this.closeWebSocket()
+      },
+    })
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>餐廳後台-餐點訂單銷售數據</title>
+
+  <!-- 樣板需要的 css 資源-->
+  <script src="https://kit.fontawesome.com/cda74843f9.js" crossorigin="anonymous"></script>
+  <link href="/css/sb-admin-2.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/sb-admin-2-custom-restaurant.css">
+
+  <!-- Bootstrap 5 -->
+  <link rel="stylesheet" href="/css/bootstrap-5.3.2.css" />
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    .main-content {
+      width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    /* 主內容 */
+    .stastic-container {
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+    }
+    /* 共用標題區塊 */
+    .title {
+      background-color: linen;
+      text-align: center;
+      font-size: 30px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      padding: 10px 5px;
+      border-radius: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+
+      img {
+        width: 45px;
+        height: 45px;
+      }
+    }
+    /* 統計數據、圖表區域，每個區域共用的排版 css */
+    .statistic-number-container,
+    .month-sales-container,
+    .top-menu-sales-container,
+    .top-menu-quantity-container  {
+      padding: 40px;
+      border: 0;
+      box-shadow: 0 0 10px 2px #ccc;
+      border-radius: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+      transition: scale 0.3s ease;
+    }
+    .statistic-box {
+      padding-left: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+    }
+    .today-statistic-box,
+    .month-statistic-box,
+    .range-statistic-box {
+      display: flex;
+      align-items: center;
+      img {
+        width: 40px;
+        height: 40px;
+      }
+    }
+    .today-wrapper,
+    .month-wrapper,
+    .range-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    .today-orderCount-wrapper,
+    .month-orderCount-wrapper,
+    .range-orderCount-wrapper {
+      flex-basis: 45%;
+    }
+    .today-sales-wrapper,
+    .month-sales-wrapper,
+    .range-sales-wrapper {
+      flex-basis: 55%;
+    }
+    .statistic-box span {
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: 1px;
+    }
+    /* 訂單數據，自訂區間查詢 */
+    .statistic-box .range-statistic-container {
+      padding-top: 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+      /* 讓偽元素定位 */
+      position: relative;
+    }
+    /* 建立一個偽元素，目的是要顯示分隔線 */
+    .range-statistic-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      /* 偽元素的寬度，目的是調整 border 顯示的寬度 */
+      width: 720px;
+      border-top: 1px dashed #ccc;
+      border-width: 2px;
+    }
+    /* 區間搜尋 input 與按鈕 */
+    .time-search-box {
+      display: flex;
+      align-items:flex-start;
+      gap: 35px;
+    }
+    .time-search-box span {
+      font-size: 18px;
+    }
+    .input-time-search-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .input-time-search-wrapper span {
+      flex-shrink: 0;
+    }
+    .input-time-search-wrapper input.form-control {
+      width: 200px;
+      font-size: 16px;
+      font-weight: 900;
+    }
+    .error-message {
+      color: red;
+      margin-top: 5px;
+      span {
+        font-size: 14px;
+      }
+      img {
+        width: 15px;
+        height: 15px;
+        margin-right: 5px;
+      }
+    }
+    button.btn-search {
+      width: 80px;
+      height: 35px;
+      font-size: 16px;
+      font-weight: 900;
+      color: black;
+      background-color: #ffc107;
+      border: 0;
+      border-radius: 5px;
+      transition: scale 0.3s ease;
+    }
+    button.btn-search:hover {
+      scale: 1.05;
+    }
+    button.btn-search[disabled] {
+      cursor: not-allowed;
+      color: white;
+      background-color: #ccc;
+    }
+    /* 修改 BootStrap badge 的背景顏色 */
+    .statistic-box .today-field-name{
+      background-color: #E21B70;
+    }
+    .statistic-box .month-field-name {
+      background-color: #c4e9ad;
+      color: black;
+    }
+    .statistic-box .range-field-name {
+      background-color: #DEB887;
+      color: black;
+    }
+    .statistic-box .field-value{
+      color: navy;
+      font-size: 26px;
+    }
+    /* 圖表區域中，時間區間搜尋input和按鈕 */
+    .time-search-box.chart-time-search-box {
+      padding-left: 30px;
+      font-weight: 900;
+    }
+    /* 逐月銷售圖表、Top5 餐點圓餅圖，父容器調整 */
+    .month-sales-container {
+      padding-bottom: 10px;
+    }
+    .top-menu-sales-container, .top-menu-quantity-container {
+      padding-bottom: 30px;
+    }
+    /* 全部的圖表 DOM 元素，一定都要設定高度，否則無法正常顯示 */
+    #oneMonthSalesChart {
+      height: 450px;
+    }
+    #topMenuSalesChart, #topMenuQuantityChart {
+      height: 400px;
+    }
+    /* 發送請求，畫面遮罩 */
+    .loading {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(128, 128, 128, 0.5);
+      z-index: 9999;
+    }
+    .loading img.img-loading {
+      width: 60px;
+      height: 60px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    [v-cloak] {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="app" v-cloak>
+    <div class='loading' v-show="htmlProp.isLoading">
+      <img class="img-loading" src="/images/loading-1.gif">
+    </div>
+
+    <!-- 模板外層容器 -->
+    <div id="wrapper">
+      <!-- 側邊 Sidebar -->
+      <ul class="navbar-nav sidebar sidebar-dark accordion bg-deep-blue" id="accordionSidebar">
+        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="#">
+          <div class="sidebar-brand-text mx-3">餐廳後台</div>
+        </a>
+        <!-- 分隔線 -->
+        <hr class="sidebar-divider my-0">
+        <!-- 無下拉式選項 -->
+        <li class="nav-item">
+          <a class="nav-link" href="./restaurant-menu.html">
+            <img src="/images/food-1.png">
+            <span>餐點資訊</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="./restaurant-menu-order.html">
+            <img src="/images/data-1.png">
+            <span>餐點訂單</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="./restaurant-statistic.html">
+            <img src="/images/money-report-1.png">
+            <span>銷售數據</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="./restaurant-ad-buy.html">
+            <img src="/images/buyad.png">
+            <span>購買廣告</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="./restaurant-ad-history.html">
+            <img src="/images/adhistory.png">
+            <span>廣告履歷</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="restaurant-ckediotr.html">
+            <img src="/images/food-2.png">
+            <span>前台預覽</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="restaurant-data.html">
+            <img src="/images/status-1.png">
+            <span>基本資訊</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="restaurant-reserve.html">
+            <img src="/images/money-report-2.png">
+            <span>訂單預約</span>
+          </a>
+        </li>
+        <!-- 下拉式選項-->
+        <li class="nav-item">
+          <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages" aria-expanded="true" aria-controls="collapsePages">
+            <i class="fas fa-fw fa-folder"></i>
+            <span>餐廳資訊</span>
+          </a>
+          <div id="collapsePages" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+              <h6 class="collapse-header">餐廳資訊</h6>
+              <a class="collapse-item" href="restaurant-record.html">營業資訊</a>
+              <div class="collapse-divider"></div>
+              <h6 class="collapse-header">預約情況</h6>
+              <a class="collapse-item" href="restaurant-seat.html">座位資訊</a>
+            </div>
+          </div>
+        </li>
+        <!-- Sidebar 展開收合按鈕 -->
+        <div class="text-center d-none d-md-inline">
+          <button class="rounded-circle border-0" id="sidebarToggle"></button>
+        </div>
+      </ul>
+
+      <!-- 主內容區域，包含上方導覽列與各網頁內容 -->
+      <div id="content-wrapper" class="d-flex flex-column">
+        <div id="content">
+          <!-- 上方導覽列 -->
+          <nav class="navbar navbar-expand topbar mb-4 static-top" style="display: flex; justify-content: space-between;">
+            <div class="temp"></div>
+            <div class="nav-item dropdown no-arrow">
+              <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span class="mr-2 d-none d-lg-inline text-gray-600 small topbar-name">{{one.restaurantName || '餐廳名稱'}}</span>
+              </a>
+              <!-- 功能列表 -->
+              <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                aria-labelledby="userDropdown">
+                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal" @click="handleLogout">
+                  <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                  登出
+                </a>
+              </div>
+            </div>
+          </nav>
+          <!-- 各網頁內容 -->
+          <div class="container-fluid">
+            <main class="main-content">
+              <div class="stastic-container">
+                <!-- 單一餐廳，訂單統計數據 -->
+                <div class="statistic-number-container">
+                  <div class="title">
+                    <div class="title-icon-wrapper">
+                      <img src="/images/money-report-1.png">
+                    </div>
+                    <span>餐點訂單統計</span>
+                  </div>
+                  <div class="statistic-box">
+                    <div class="today-statistic-box">
+                      <div class="today-wrapper today-orderCount-wrapper">
+                        <img src="/images/money-report-2.png">
+                        <span class="badge today-field-name">本日訂單數：</span>
+                        <span id="one-todayOrderCount" class="field-value"></span>
+                      </div>
+                      <div class="today-wrapper today-sales-wrapper">
+                        <img src="/images/cash-2.png">
+                        <span class="badge today-field-name">本日銷售額：</span>
+                        <span id="one-todaySales" class="field-value"></span>
+                      </div>
+                    </div>
+                    <div class="month-statistic-box">
+                      <div class="month-wrapper month-orderCount-wrapper">
+                        <img src="/images/money-report-2.png">
+                        <span class="badge month-field-name">本月訂單數：</span>
+                        <span id="one-monthOrderCount" class="field-value"></span>
+                      </div>
+                      <div class="month-wrapper month-sales-wrapper">
+                        <img src="/images/cash-2.png">
+                        <span class="badge month-field-name">本月銷售額：</span>
+                        <span id="one-monthSales" class="field-value"></span>
+                      </div>
+                    </div>
+                    <div class="range-statistic-container">
+                      <div class="time-search-box">
+                        <div class="input-time-seach-box">
+                          <div class="input-time-search-wrapper">
+                            <span>起始時間</span>
+                            <input type="date" class="form-control"
+                              v-model="one.rangeSalesStartTime">
+                          </div>
+                          <div class="error-message"
+                            v-if="isOneRangeSalesStartTimeError">
+                            <img src="/images/cancel-1.png">
+                            <span>起始時間不可為空、或大於結束時間</span>
+                          </div>
+                        </div>
+                        <div class="input-time-seach-box">
+                          <div class="input-time-search-wrapper">
+                            <span>結束時間</span>
+                            <input type="date" class="form-control"
+                            v-model="one.rangeSalesEndTime">
+                          </div>
+                          <div class="error-message"
+                            v-if="isOneRangeSalesEndTimeError">
+                            <img src="/images/cancel-1.png">
+                            <span>結束時間不可為空、或小於起始時間</span>
+                          </div>
+                        </div>
+                        <button class="btn-search"
+                          :disabled="disabledOneRangeSalesSearchSubmit"
+                          @click="searchOneRestaurantRangeSales">
+                          查詢
+                        </button> 
+                      </div>
+                      <div class="range-statistic-box">
+                        <div class="range-wrapper range-orderCount-wrapper">
+                          <img src="/images/money-report-2.png">
+                          <span class="badge range-field-name">區間訂單數：</span>
+                          <span id="one-rangeOrderCount" class="field-value"></span>
+                        </div>
+                        <div class="range-wrapper range-sales-wrapper">
+                          <img src="/images/cash-2.png">
+                          <span class="badge range-field-name">區間銷售額：</span>
+                          <span id="one-rangeSales" class="field-value"></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- 單一餐廳，逐月銷售圖表 -->
+                <div class="month-sales-container">
+                  <div class="title">
+                    <div class="title-icon-wrapper">
+                      <img src="/images/statistic-1.png">
+                    </div>
+                    <span>逐月銷售統計</span>
+                  </div>
+                  <div class="time-search-box chart-time-search-box">
+                    <div class="input-time-seach-box">
+                      <div class="input-time-search-wrapper">
+                        <span>起始時間</span>
+                        <input type="month" class="form-control"
+                          v-model="one.monthSalesStartTime">
+                      </div>
+                      <div class="error-message"
+                        v-if="isOneMonthSalesStartTimeError">
+                        <img src="/images/cancel-1.png">
+                        <span>起始時間不可為空、或大於結束時間</span>
+                      </div>
+                    </div>
+                    <div class="input-time-seach-box">
+                      <div class="input-time-search-wrapper">
+                        <span>結束時間</span>
+                        <input type="month" class="form-control"
+                        v-model="one.monthSalesEndTime">
+                      </div>
+                      <div class="error-message"
+                        v-if="isOneMonthSalesEndTimeError">
+                        <img src="/images/cancel-1.png">
+                        <span>結束時間不可為空、或小於起始時間</span>
+                      </div>
+                    </div>
+                    <button class="btn-search"
+                      :disabled="disabledOneMonthSalesSearchSubmit"
+                      @click="searchOneRestaurantMonthSales">
+                      查詢
+                    </button> 
+                  </div>
+                  <div id="oneMonthSalesChart" ref="oneMonthSalesChart">
+                  </div>
+                </div>
+                <!-- Top5 銷售量餐點圓餅圖 -->
+                <div class="top-menu-quantity-container">
+                  <div class="title">
+                    <div class="title-icon-wrapper">
+                      <img src="/images/food-1.png">
+                    </div>
+                    <span>本月 Top5 銷售量餐點</span>
+                  </div>
+                  <div id="topMenuQuantityChart" ref="topMenuQuantityChart">
+                  </div>
+                </div>
+                <!-- Top5 銷售額餐點圓餅圖 -->
+                <div class="top-menu-sales-container">
+                  <div class="title">
+                    <div class="title-icon-wrapper">
+                      <img src="/images/food-2.png">
+                    </div>
+                    <span>本月 Top5 銷售額餐點</span>
+                  </div>
+                  <div id="topMenuSalesChart" ref="topMenuSalesChart">
+                  </div>
+                </div>
+              </div>
+            </main>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="sticky-footer bg-white">
+          <div class="container my-auto">
+            <div class="copyright text-center my-auto">
+              <span>Copyright &copy; 覓食 GO</span>
+            </div>
+          </div>
+        </footer>
+      </div>
+    </div>
+  </div>  
+
+  <!-- 模板需要的 js 資源 -->
+  <script src="/js/jquery-3.7.1.js"></script>
+  <script src="/js/bootstrap-4.6.2.bundle.min.js"></script>
+  <script src="/js/sb-admin-2.min.js"></script>
+
+  <!-- Bootstrap 5 -->
+  <script src="/js/bootstrap-5.3.2.bundle.min.js"></script>
+  <!-- Vue -->
+  <script src="/js/vue-2.7.15.min.js"></script>
+  <!-- ECharts.js -->
+  <script src="/js/echarts-5.4.3.min.js"></script>
+  <!-- axios -->
+  <script src="/js/axios-1.6.2.min.js"></script>
+  <!-- CountUp.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/countup.js/1.9.3/countUp.min.js" integrity="sha512-fojFLrCKRmoGiEXroMMaF88NlzkQLbBGIQ0LwgmxDM6vGSh6fnm04ClpwheRDrLnY+gi/1CfOWV5+YqcPSSh7A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <!-- Moment.js，引入有 locales 設定的檔案，才能使用國際語系的功能  -->
+  <script src="/js/moment-with-locales-2.30.1.min.js"></script>
+
+  <script>
+    // 設定 moment.js 的語系為中文
+    moment.locale('zh-tw');
+    const vm = new Vue({
+      el: '#app',
+      data() {
+        return {
+          one: {
+            restaurantId: null,
+            restaurantName: null,
+            todaySalesNumber: {
+              orderCount: 0,
+              sales: 0,
+            },
+            monthSalesNumber: {
+              orderCount: 0,
+              sales: 0,
+            },
+            rangeSalesNumber: {
+              orderCount: 0,
+              sales: 0,
+            },
+            monthSalesArr: [],
+            topMenuByQuantityArr: [],
+            topMenuBySalesArr: [],
+            /* 區間訂單數據，查詢起始時間、結束時間，value 格式：YYYY-MM-DD
+              預設起始時間為今年的第一天，預設結束時間為今天
+            */
+            rangeSalesStartTime: moment().startOf('year').format('YYYY-MM-DD'),
+            rangeSalesEndTime: moment().format('YYYY-MM-DD'),
+            /* 月銷售統計圖表，查詢起始時間、結束時間，value 格式：YYYY-MM
+              預設起始月份，為一年前的月份(包含本月總共12個月)，預設結束月份為本月
+              例如：今天是 2024/1/17，預設會查詢 2023/2/1 00:00:00 - 2024/1/31 23:59:59 的訂單
+            */
+            monthSalesStartTime: moment().subtract(11, 'month').format('YYYY-MM'),
+            monthSalesEndTime: moment().format('YYYY-MM'),
+            // 圖表實例，逐月銷售圖表
+            monthSalesChart: null,
+            // Top5 銷售量餐點圓餅圖
+            topMenuQuantityChart: null,
+            // Top5 銷售額餐點圓餅圖
+            topMenuSalesChart: null,
+          },
+          // 控制 html DOM 元素變化的屬性
+          htmlProp: {
+            // 遮罩顯示
+            isLoading: false,
+          },
+        }
+      },
+      computed: {
+        /* 單一餐廳，訂單數據統計，自訂區間查詢 */
+        // 區間起始時間的錯誤訊息顯示
+        isOneRangeSalesStartTimeError() {
+          // 結束時間沒有選擇，不顯示錯誤訊息
+          if (!this.one.rangeSalesEndTime) {
+            return false;
+          }
+          // 時間都有選擇，且起始時間 < 結束時間，不顯示錯誤訊息
+          if ((this.one.rangeSalesStartTime && this.one.rangeSalesEndTime) && 
+            this.one.rangeSalesStartTime <= this.one.rangeSalesEndTime) {
+            return false;
+          }
+          // 其他情況，回傳 true，顯示錯誤訊息
+          return true;
+        },
+        // 區間結束時間的錯誤訊息顯示
+        isOneRangeSalesEndTimeError() {
+          // 起始時間沒有選擇，不顯示錯誤訊息
+          if (!this.one.rangeSalesStartTime) {
+            return false;
+          }
+          // 時間都有選擇，且起始時間 < 結束時間
+          if ((this.one.rangeSalesStartTime && this.one.rangeSalesEndTime) && 
+            this.one.rangeSalesStartTime <= this.one.rangeSalesEndTime) {
+            return false;
+          }
+          // 其他情況，回傳 true，顯示錯誤訊息
+          return true;
+        },
+        // 自訂區間查詢按鈕，禁用 disabled 狀態
+        disabledOneRangeSalesSearchSubmit() {
+          // 時間都有選擇，且起始時間 < 結束時間，代表合法的時間範圍，按鈕不禁用
+          if ((this.one.rangeSalesStartTime && this.one.rangeSalesEndTime) && 
+            this.one.rangeSalesStartTime <= this.one.rangeSalesEndTime) {
+            return false;
+          }
+          // 其他情況都禁用按鈕
+          return true;
+        },
+        /* 單一餐廳，逐月銷售圖表，自訂區間查詢 */
+        isOneMonthSalesStartTimeError() {
+          if (!this.one.monthSalesEndTime) {
+            return false;
+          }
+          if ((this.one.monthSalesStartTime && this.one.monthSalesEndTime) && 
+            this.one.monthSalesStartTime <= this.one.monthSalesEndTime) {
+            return false;
+          }
+          return true;
+        },
+        isOneMonthSalesEndTimeError() {
+          if (!this.one.monthSalesStartTime) {
+            return false;
+          }
+          if ((this.one.monthSalesStartTime && this.one.monthSalesEndTime) && 
+            this.one.monthSalesStartTime <= this.one.monthSalesEndTime) {
+            return false;
+          }
+          return true;
+        },
+        disabledOneMonthSalesSearchSubmit() {
+          if ((this.one.monthSalesStartTime && this.one.monthSalesEndTime) && 
+            this.one.monthSalesStartTime <= this.one.monthSalesEndTime) {
+            return false;
+          }
+          return true;
+        },
+      },
+      created() {
+        // 從 localStorage 取得，登入的餐廳資料
+        this.one.restaurantId = localStorage.getItem('restaurantId');
+      },
+      mounted() {
+        // 載入統計資料
+        this.loadOneRestaurantStatisticData();
+      },
+      methods: {
+        // 載入單一餐廳統計資料
+        loadOneRestaurantStatisticData() {
+          // 發送請求前，顯示畫面遮罩
+          this.htmlProp.isLoading = true;
+          let paramObj = {
+            restaurantId: this.one.restaurantId,
+          }
+          axios({
+            method: 'GET',
+            url: 'http://localhost:8080/statistic/menu-order/one-restaurant',
+            params: paramObj
+          })
+          .then((response) => {
+            let result = response.data.data;
+            this.one.restaurantName = result.restaurantName;
+            this.one.todaySalesNumber = result.todaySalesNumber;
+            this.one.monthSalesNumber = result.monthSalesNumber;
+            this.one.rangeSalesNumber = result.rangeSalesNumber;
+            this.one.monthSalesArr = result.monthSalesList;
+            this.one.topMenuBySalesArr = result.topMenuBySalesList;
+            this.one.topMenuByQuantityArr = result.topMenuByQuantityList;
+          })
+          .then(() => {
+            /* 初始化統計數字，使用 CountUp.js，達成數字增加的效果
+              第一個參數：要顯示數字的 DOM 元素 id
+              第二個參數：計數器的起始值，設定為從 0 開始
+              第三個參數：計數器的結束值，也就是計數器會數到的數字
+              第四個參數：小數位數，0代表沒有小數位數
+              第五個參數：動畫時間，單位是秒
+            */
+            let countUpOneTodayOrderCount = new CountUp('one-todayOrderCount', 0, this.one.todaySalesNumber.orderCount, 0, 2, {
+              useEasing: true, // 預設為true，是否套用緩動效果，讓數字變化更為平滑
+              useGrouping: true, // 預設為true，是否使用千分位分隔符號
+              separator: ',',
+              prefix: '',
+            });
+            let countUpOneTodaySales = new CountUp('one-todaySales', 0, this.one.todaySalesNumber.sales, 0, 3, {
+              prefix: '$ ',
+            });
+            let countUpOneMonthOrderCount = new CountUp('one-monthOrderCount', 0, this.one.monthSalesNumber.orderCount, 0, 2);
+            let countUpOneMonthSales = new CountUp('one-monthSales', 0, this.one.monthSalesNumber.sales, 0, 3, {
+              prefix: '$ ',
+            });
+            let countUpOneRangeOrderCount = new CountUp('one-rangeOrderCount', 0, this.one.rangeSalesNumber.orderCount, 0, 2);
+            let countUpOneRangeSales = new CountUp('one-rangeSales', 0, this.one.rangeSalesNumber.sales, 0, 3, {
+              prefix: '$ ',
+            });
+
+            countUpOneTodayOrderCount.start();
+            countUpOneTodaySales.start();
+            countUpOneMonthOrderCount.start();
+            countUpOneMonthSales.start();
+            countUpOneRangeOrderCount.start();
+            countUpOneRangeSales.start();
+          })
+          .then(() => {
+            // 初始化圖表，單一餐廳，逐月銷售圖表
+            this.initOneRestaurantMonthSalesChart();
+            // Top5 銷售量餐點圓餅圖
+            this.initTopMenuQuantityChart();
+            // Top5 銷售額餐點圓餅圖
+            this.initTopMenuSalesChart();
+          })
+          .catch((error) => {
+            console.log('error:', error);
+          })
+          .finally(() => {
+            // 請求結束，不論 response 成功或失敗，都會隱藏畫面遮罩
+            this.hideLoading();
+          });
+        },
+        // 單一餐廳，訂單統計數據，查詢自訂區間
+        searchOneRestaurantRangeSales() {
+          this.htmlProp.isLoading = true;
+          let paramObj = {
+            restaurantId: this.one.restaurantId,
+            startTime: moment(this.one.rangeSalesStartTime).valueOf(),
+            endTime: moment(this.one.rangeSalesEndTime).endOf('day').valueOf(),
+          }
+          axios({
+            method: 'GET',
+            url: 'http://localhost:8080/statistic/menu-order/sales-number',
+            params: paramObj
+          })
+          .then((response) => {
+            this.one.rangeSalesNumber = response.data.data;
+          })
+          .then(() => {
+            // 查詢成功，更新自訂區間統計訂單數、銷售額的數字
+            let countUpOneRangeOrderCount = new CountUp('one-rangeOrderCount', 0, this.one.rangeSalesNumber.orderCount, 0, 2);
+            let countUpOneRangeSales = new CountUp('one-rangeSales', 0, this.one.rangeSalesNumber.sales, 0, 3, {
+              prefix: '$ ',
+            });
+            countUpOneRangeOrderCount.start();
+            countUpOneRangeSales.start();
+          })
+          .catch((error) => {
+            console.log('error:', error);
+          })
+          .finally(() => {
+            this.hideLoading();
+          });
+        },
+        // 單一餐廳，逐月銷售圖表，查詢自訂區間
+        searchOneRestaurantMonthSales() {
+          this.htmlProp.isLoading = true;
+          let paramObj = {
+            restaurantId: this.one.restaurantId,
+            startTime: moment(this.one.monthSalesStartTime).valueOf(),
+            endTime: moment(this.one.monthSalesEndTime).endOf('month').valueOf(),
+          }
+          axios({
+            method: 'GET',
+            url: 'http://localhost:8080/statistic/menu-order/month-sales',
+            params: paramObj
+          })
+          .then((response) => {
+            this.one.monthSalesArr = response.data.data;
+          })
+          .then(() => {
+            // 更新逐月銷售圖表參數，包含X軸月份名稱、月份銷售額、訂單數量資料
+            let options = {
+              xAxis: {
+                data: this.one.monthSalesArr.map(item => item.month),
+              },
+              series: [
+                {
+                  data: this.one.monthSalesArr.map(item => item.sales),
+                },
+                {
+                  data: this.one.monthSalesArr.map(item => item.orderCount),
+                }
+              ]
+            }
+            // setOption 方法更新圖表數據
+            this.one.monthSalesChart.setOption(options);
+          })
+          .catch((error) => {
+            console.log('error:', error);
+          })
+          .finally(() => {
+            this.hideLoading();
+          });
+        },
+        // 初始化逐月銷售圖表
+        initOneRestaurantMonthSalesChart() {
+          this.one.monthSalesChart = echarts.init(this.$refs.oneMonthSalesChart)
+
+          // 圖表參數
+          let options = {
+            // 圖表位置
+            grid: {
+              left: 40, // 距離父容器最左邊 40px
+              containLabel: true
+            },
+            // 圖例
+            legend: {
+              top: 'top', // 圖例位置，此設定在圖表上方
+              itemGap: 40, // 圖例之間的間距，代表40px
+              // 圖例陣列
+              data: [
+                { 
+                  name: '銷售額',
+                  textStyle: {
+                    fontSize: 16,
+                    fontWeight: "bolder",
+                    color: '#3498db' 
+                  } 
+                }, 
+                { 
+                  name: '訂單數量',
+                  textStyle: {
+                    fontSize: 16,
+                    fontWeight: "bolder",
+                    color: '#D4262F' 
+                  } 
+                }
+              ],
+            },
+            // tooltip 提示框、axisPointer 軸指針
+            tooltip: {
+              trigger: 'axis',
+              axisPointer: {
+                // 軸指針的類型，有 cross、line、shadow、none 四種類型
+                type: 'cross',
+                // 軸指針樣式
+                crossStyle: {
+                  color: '#999'
+                }
+              }
+            },
+            // 工具箱
+            toolbox: {
+              feature: {
+                dataZoom: {
+                  yAxisIndex: "none",
+                  title: {
+                    zoom: '區域縮放',
+                    back: '區域縮放還原'
+                  }
+                },
+                dataView: { 
+                  readOnly: false,
+                  title: '資料視圖',
+                },
+                saveAsImage: { 
+                  title: '保存為圖片',
+                }
+              }
+            },
+            // x 軸的屬性
+            xAxis: {
+              type: 'category',
+              // x 軸的月份文字
+              data: this.one.monthSalesArr.map(item => item.month),
+              axisPointer: {
+                type: 'shadow'
+              },
+              axisLabel: {
+                fontSize: 14,
+                fontWeight: "bolder",
+                color: '#001852',
+              },
+              // x 軸相對於預設位置的偏移量
+              offset: 10,
+            },
+            yAxis: [
+              { // 第1個 Y 軸，預設 index 為 0
+                type: 'value',
+                // Y 軸文字的樣式、加上$符號
+                axisLabel: {
+                  fontSize: 14,
+                  fontWeight: "bolder",
+                  color: '#3498db',
+                  formatter: '$ {value}'
+                },
+                // y 軸相對於預設位置的偏移量
+                offset: 10,
+              },
+              { // 第2個 Y 軸，index 為 1
+                type: 'value',
+                  axisLabel: {
+                    fontSize: 14,
+                    fontWeight: "bolder",
+                    color: '#D4262F',
+                  },
+                  // 第2個 Y 軸，不顯示單位格線，才不會太多線
+                  splitLine: {
+                    show: false
+                  },
+                offset: 10,
+              },
+            ],
+            // series 代表圖表中的數據系列，其中 data 是每一個 series 的數據來源
+            series: [
+              {
+                type: 'bar',
+                data: this.one.monthSalesArr.map(item => item.sales),
+                // 使用第1個 Y 軸，套用銷售額 Y 軸的設定
+                yAxisIndex: 0,
+                name: '銷售額',
+                barWidth: '70%', // 柱狀圖的寬度為類別寬度的 70%
+                itemStyle: {
+                  color: '#3498db', // 柱狀圖的顏色
+                },
+                // 原本就會有 tooltip 提示框，這邊自定義提示框的內容，加上 $ 符號
+                // 但要自己使用 toLocaleString() 方法，才會有千分位分隔 , 的符號
+                tooltip: {
+                  valueFormatter: function (value) {
+                    return '$ ' + value.toLocaleString();
+                  }
+                },
+              },
+              {
+                type: 'line',
+                data: this.one.monthSalesArr.map(item => item.orderCount),
+                // 使用第1個 Y 軸，套用訂單數量 Y 軸的設定
+                yAxisIndex: 1,
+                name: '訂單數量',
+                // 折線圖線條樣式
+                lineStyle: {
+                  color: '#D4262F',
+                  width: 5
+                },
+                // 折線圖標記點樣式
+                itemStyle: {
+                  color: '#D4262F'
+                },
+                // 折線圖的線，是否平滑
+                smooth: true,
+              },
+            ],
+            // 縮放控制功能
+            dataZoom: [ 
+              {
+                /* type 屬性，數據縮放、平移工具，可選值 inslide、slider
+                    inside：可以在圖表上使用滑鼠滾輪縮放，也可以在圖表上使用滑鼠拖動平移
+                    slider：在圖表下方使用滑鼠拖動縮放
+                */
+                type: 'inside',
+                // 作用於第一個 x 軸 
+                xAxisIndex: 0,
+                // 起始位置是從 x 軸數據，50% 到 100% 的位置
+                start: 50,
+                end: 100,
+              },
+            ],
+          };
+
+          // 套用上面設定的圖表參數
+          this.one.monthSalesChart.setOption(options);
+        },
+        // 初始化 Top5 銷售量餐點圓餅圖
+        initTopMenuQuantityChart() {
+          this.one.topMenuQuantityChart = echarts.init(this.$refs.topMenuQuantityChart);
+          
+          let options = {
+            // 當滑鼠移到圓餅圖項目上，會顯示提示框
+            tooltip: {
+              trigger: 'item', 
+              textStyle: {
+                fontSize: 16,
+                fontWeight: "bolder",
+              },
+            },
+            // 圖例
+            legend: {
+              top: 'top', // 圖例位置
+              itemGap: 40, // 圖例之間的間距，代表40px
+              textStyle: {
+                fontSize: 18,
+                fontWeight: "bolder",
+                color: '#001852' 
+              },
+            },
+            series: [
+              {
+                name: '熱銷餐點',
+                type: 'pie',
+                // radius 屬性為一個陣列，代表圓餅圖的半徑，第一個參數是內半徑，第二個參數是外半徑
+                // 半徑數值可以是數字、百分比，如果是百分比，是相對於圖表區域的寬度或高度
+                radius: ['50%', '82%'],
+                // center，調整圓餅圖的中心位置(不要離上面的圖例太近)
+                // 第一個參數是 x 軸的位置，第二個參數是 y 軸的位置
+                center: ['50%', '55%'],
+                avoidLabelOverlap: false, // 允許標籤重疊
+                label: {
+                  show: false, // 隱藏圓餅圖的數據標籤
+                  position: 'center'
+                },
+                // 當滑鼠移到圓餅圖特定項目時，會套用 emphasis 的設定
+                emphasis: {
+                  scale: true, // 放大強調的項目
+                  scaleSize: 10, // 放大的大小
+                  label: {
+                    show: true,
+                    fontSize: 28,
+                    fontWeight: 'bold',
+                    color: '#E21B70',
+                  },
+                  itemStyle: {
+                    shadowBlur: 10, // 陰影的模糊大小
+                    shadowOffsetX: 8, // 陰影的水平偏移
+                    shadowOffsetY: 8, // 陰影的垂直偏移
+                    shadowColor: 'rgba(0, 0, 0, 0.5)' // 陰影的顏色
+                  }
+                },
+                /* series 中的 data 屬性，值為陣列，是圖表的資料來源
+                  圓餅圖的 data 陣列中，每一個資料元素，都要有 name 和 value 兩個屬性，是固定的屬性！
+                  圓餅圖會依據 name 呈現資料的名稱，依據 value 呈現資料的數值
+                */
+                data: this.one.topMenuByQuantityArr.map(menu => {
+                  // 把陣列中的每一個元素，轉換成圓餅圖的資料格式
+                  // 封裝新物件回傳，裡面有 name 和 value 兩個屬性
+                  return {
+                    name: menu.menuName,
+                    value: menu.quantity,
+                  }
+                })
+              }
+            ]
+          };
+
+          this.one.topMenuQuantityChart.setOption(options);
+        },
+        // 初始化 Top5 銷售額餐點圓餅圖
+        initTopMenuSalesChart() {
+          this.one.topMenuSalesChart = echarts.init(this.$refs.topMenuSalesChart)
+
+          // 圖表參數
+          let options = {
+            tooltip: {
+              trigger: 'item',
+              textStyle: {
+                fontSize: 16,
+                fontWeight: "bolder",
+              },
+              valueFormatter: function (value) {
+                return '$ ' + value.toLocaleString();
+              },
+            },
+            legend: {
+              top: 'top',
+              itemGap: 40,
+              textStyle: {
+                fontSize: 18,
+                fontWeight: "bolder",
+                color: '#001852' 
+              },
+            },
+            series: [
+              {
+                name: '高銷售額餐點',
+                type: 'pie',
+                // 圓餅圖的半徑，可以是數字、百分比，如果是百分比，是相對於圖表區域的寬度或高度。調整半徑 -> 改變圓餅圖大小
+                radius: '75%',
+                // center，調整圓餅圖的中心位置(不要離上面的圖例太近)，第一個參數是 x 軸的位置，第二個參數是 y 軸的位置
+                center: ['50%', '57%'],
+                data: this.one.topMenuBySalesArr.map(menu => {
+                  return {
+                    name: menu.menuName,
+                    value: menu.sales,
+                  }
+                }),
+                // 標籤樣式
+                label: {
+                  show: true, // 是否顯示標籤
+                  position: 'outside', // 標籤的位置，可以是 outside、inside、center
+                  fontSize: 16,
+                  fontWeight: 'bold',
+                  color: '#000',
+                },
+                // 當滑鼠移到圓餅圖特定項目時，會套用 emphasis 的設定
+                emphasis: {
+                  scale: true, // 放大強調的項目
+                  scaleSize: 10, // 放大的大小
+                  label: {
+                    show: true,
+                    fontSize: 28,
+                    fontWeight: 'bold',
+                    color: '#E21B70',
+                  },
+                  itemStyle: {
+                    shadowBlur: 10, // 陰影的模糊大小
+                    shadowOffsetX: 8, // 陰影的水平偏移
+                    shadowOffsetY: 8, // 陰影的垂直偏移
+                    shadowColor: 'rgba(0, 0, 0, 0.5)' // 陰影的顏色
+                  }
+                },
+              }
+            ]
+          };
+
+          this.one.topMenuSalesChart.setOption(options);
+        },
+        // 隱藏畫面遮罩，一般請求完成速度很快，如果直接關閉遮罩，
+        // 會感覺到畫面閃爍問題，所以延遲 200 毫秒再關閉遮罩
+        hideLoading() {
+          setTimeout(() => {
+            this.htmlProp.isLoading = false;
+          }, 200);
+        },
+        // 餐廳登出
+        handleLogout() {
+          localStorage.removeItem('restaurantId');
+          localStorage.removeItem('restaurantName');
+          window.location.href = './restaurant-login.html';
+        },
+      },
+    });
+  </script>
+
+</body>
+</html>
